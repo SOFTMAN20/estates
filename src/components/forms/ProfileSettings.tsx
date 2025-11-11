@@ -24,21 +24,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { User, Save, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { Tables } from '@/lib/integrations/supabase/types';
-
-type Profile = Tables<'profiles'>;
-
-/**
- * PROFILE FORM DATA INTERFACE
- * ==========================
- * 
- * Defines the structure for profile form data.
- */
-interface ProfileFormData {
-  full_name: string;
-  phone: string;
-  user_type: string;
-}
+import type { ProfileFormData } from '@/hooks/dashboardHooks';
 
 interface ProfileSettingsProps {
   isOpen: boolean;
@@ -80,11 +66,11 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="full_name">{t('dashboard.fullName')}</Label>
+            <Label htmlFor="name">{t('dashboard.fullName')}</Label>
             <Input
-              id="full_name"
-              value={profileForm.full_name}
-              onChange={(e) => onInputChange('full_name', e.target.value)}
+              id="name"
+              value={profileForm.name}
+              onChange={(e) => onInputChange('name', e.target.value)}
               placeholder={t('dashboard.enterFullName')}
               required
             />

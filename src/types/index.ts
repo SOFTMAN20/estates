@@ -46,7 +46,7 @@ export interface PropertyFormData {
 }
 
 export interface ProfileFormData {
-  full_name: string;
+  name: string;
   phone: string;
-  user_type: string;
+  is_host: boolean;
 }

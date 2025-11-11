@@ -37,25 +37,33 @@ import type { Tables } from '@/lib/integrations/supabase/types';
  * =======================
  * 
  * Extended property type that includes related profile data.
- * Combines property information with landlord contact details.
+ * Combines property information with host contact details.
  * 
  * BASE TYPE / AINA YA MSINGI:
- * - Inherits from Supabase generated types
+ * - Inherits from Supabase generated types (Tables<'properties'>)
  * - Ensures type safety with database schema
  * - Automatic updates when schema changes
+ * - Includes all fields: id, title, description, price, location, etc.
  * 
  * EXTENDED FIELDS / UGA ULIOONGEZWA:
- * - profiles: Landlord contact information
+ * - profiles: Host/landlord contact information
  * - Optional to handle cases where profile might not exist
- * - Includes full_name and phone for contact purposes
+ * - Includes name and phone for contact purposes
+ * 
+ * KEY FIELDS / UGA MUHIMU:
+ * - amenities: string[] - Array of amenities (electricity, water, etc.)
+ * - nearby_services: string[] - Array of nearby services (school, hospital, market)
+ * - status: 'pending' | 'approved' | 'rejected'
+ * - host_id: UUID - References profiles.id
+ * - images: string[] - Array of image URLs
  * 
  * USAGE / MATUMIZI:
  * Used throughout the app for consistent property data structure.
- * Enables type-safe access to property and landlord information.
+ * Enables type-safe access to property and host information.
  */
 export type Property = Tables<'properties'> & {
   profiles?: {
-    full_name: string | null;
+    name: string | null;
     phone: string | null;
   };
 };
@@ -115,29 +123,36 @@ export const useProperties = () => {
        * 
        * Complex query that:
        * - Selects all property fields (*)
-       * - Joins with profiles table for landlord info
-       * - Filters only active properties
-       * - Orders by creation date descending
+       * - Joins with profiles table for host information
+       * - Filters only approved properties (status='approved')
+       * - Orders by creation date descending (newest first)
        * 
        * JOIN SYNTAX / MUUNDO WA KUUNGANISHA:
-       * profiles!fk_landlord_profile - Uses foreign key relationship
-       * (full_name, phone) - Selects specific profile fields
+       * profiles:host_id - Joins using host_id foreign key
+       * - host_id in properties table references id in profiles table
+       * - Returns host's name and phone number
+       * 
+       * FILTERING / KUCHUJA:
+       * - Only properties with status='approved' are returned
+       * - Pending and rejected properties are excluded
+       * - Ensures users only see verified listings
        * 
        * PERFORMANCE / UTENDAJI:
-       * - Single query reduces round trips
-       * - Indexed fields for fast filtering
-       * - Limited fields for reduced payload
+       * - Single query reduces round trips to database
+       * - Indexed fields (status, created_at) for fast filtering
+       * - Limited profile fields for reduced payload
+       * - React Query caches results for 2 minutes
        */
       const { data, error } = await supabase
         .from('properties')
         .select(`
           *,
-          profiles!fk_landlord_profile (
-            full_name,
+          profiles:host_id (
+            name,
             phone
           )
         `)
-        .eq('status', 'active')
+        .eq('status', 'approved')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -175,12 +190,12 @@ export const useProperties = () => {
        * - Handles edge cases where profile might not exist
        * - Maintains consistency with Property type definition
        */
-      const transformedData = data?.map(property => ({
+      const transformedData = (data?.map((property: Record<string, unknown>) => ({
         ...property,
         profiles: Array.isArray(property.profiles) && property.profiles.length > 0 
           ? property.profiles[0] 
           : undefined
-      })) || [];
+      })) || []) as Property[];
 
       /**
        * SUCCESS LOGGING AND RETURN
@@ -204,11 +219,11 @@ export const useProperties = () => {
         console.log(`🚀 Properties API: ${responseTime.toFixed(0)}ms ${responseTime < 500 ? '✅' : '❌'}`);
       }
       
-      return transformedData as Property[];
+      return transformedData;
     },
     // Optimize for performance
     staleTime: 2 * 60 * 1000, // 2 minutes - data stays fresh
-    cacheTime: 10 * 60 * 1000, // 10 minutes - cache retention
+    gcTime: 10 * 60 * 1000, // 10 minutes - cache retention (formerly cacheTime)
     refetchOnWindowFocus: false, // Prevent unnecessary refetches
     retry: 2, // Limit retries for faster failure handling
   });

@@ -1,4 +1,40 @@
 
+/**
+ * SIGNIN.TSX - USER AUTHENTICATION PAGE
+ * =====================================
+ * 
+ * Ukurasa wa kuingia - User sign in page
+ * 
+ * ARCHITECTURE / MUUNDO:
+ * This page handles user authentication with email and password.
+ * After successful login, users are redirected based on their role:
+ * - Admins/Super Admins → /admin
+ * - Hosts (landlords) → /dashboard
+ * - Regular users → /
+ * 
+ * FEATURES / VIPENGELE:
+ * - Email and password authentication
+ * - Password visibility toggle
+ * - Remember me functionality
+ * - Forgot password link
+ * - Role-based redirect after login
+ * - Animated UI with Framer Motion
+ * - Internationalization support
+ * - Loading states and error handling
+ * 
+ * SECURITY / USALAMA:
+ * - Input validation through useAuth hook
+ * - Rate limiting on login attempts
+ * - Secure password handling (never stored locally)
+ * - CSRF protection
+ * 
+ * USER EXPERIENCE / TAJRIBA YA MTUMIAJI:
+ * - Responsive design for all devices
+ * - Clear error messages in Swahili
+ * - Smooth animations and transitions
+ * - Accessible form controls
+ */
+
 import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/layout/Navigation';
 import { Button } from '@/components/ui/button';
@@ -11,24 +47,55 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 
+/**
+ * SIGNIN COMPONENT
+ * ===============
+ * 
+ * Main authentication component that handles user login.
+ * Integrates with Supabase Auth for secure authentication.
+ */
 const SignIn = () => {
+  // Password visibility toggle state
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Form data state - stores email and password
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+  
+  // Loading state for submit button
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Navigation and authentication hooks
   const navigate = useNavigate();
   const { signIn, user, loading, checkUserTypeAndRedirect } = useAuth();
   const { t } = useTranslation();
 
-  // Redirect if already authenticated
+  /**
+   * AUTO-REDIRECT EFFECT
+   * ===================
+   * 
+   * Redirects already authenticated users to their appropriate page.
+   * Prevents logged-in users from seeing the login page.
+   */
   useEffect(() => {
     if (!loading && user) {
       checkUserTypeAndRedirect(navigate);
     }
   }, [user, loading, navigate, checkUserTypeAndRedirect]);
 
+  /**
+   * FORM SUBMIT HANDLER
+   * ==================
+   * 
+   * Handles the login form submission:
+   * 1. Prevents default form behavior
+   * 2. Sets loading state
+   * 3. Calls signIn from useAuth hook
+   * 4. On success, redirects based on user role
+   * 5. On error, displays error message via toast
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -36,7 +103,7 @@ const SignIn = () => {
     const { error } = await signIn(formData.email, formData.password);
     
     if (!error) {
-      // Wait a moment for the user state to update, then check user type and redirect
+      // Wait for user state to update, then redirect based on role
       setTimeout(() => {
         checkUserTypeAndRedirect(navigate);
       }, 500);
@@ -45,6 +112,13 @@ const SignIn = () => {
     setIsLoading(false);
   };
 
+  /**
+   * INPUT CHANGE HANDLER
+   * ===================
+   * 
+   * Updates form data state when user types in input fields.
+   * Uses functional update to ensure latest state.
+   */
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };

@@ -52,14 +52,10 @@ interface PropertyFormData {
   property_type: string;
   bedrooms: string;
   bathrooms: string;
-  area_sqm: string;
+  square_meters: string;
   contact_phone: string;
   contact_whatsapp_phone: string;
-  electricity: boolean;
-  water: boolean;
-  furnished: boolean;
-  parking: boolean;
-  security: boolean;
+  amenities: string[];
   nearby_services: string[];
   images: string[];
 }
@@ -74,6 +70,7 @@ interface PropertyFormProps {
   onSubmit: (e: React.FormEvent) => Promise<void>;
   onInputChange: (field: keyof PropertyFormData, value: any) => void;
   onServiceToggle: (service: string) => void;
+  onAmenityToggle: (amenity: string) => void;
 }
 
 /**
@@ -95,7 +92,8 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
   onClose,
   onSubmit,
   onInputChange,
-  onServiceToggle
+  onServiceToggle,
+  onAmenityToggle
 }) => {
   const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(1);
@@ -204,7 +202,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
       case 3:
         return !!formData.contact_phone?.trim();
       case 4:
-        return formData.images && formData.images.length > 0; // Images are now required
+        return formData.images && formData.images.length >= 3; // At least 3 images required
       default:
         return false;
     }
@@ -355,11 +353,11 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
         </Label>
         <div className="grid grid-cols-2 gap-3">
           {[
-            { value: 'apartment', label: t('dashboard.apartment'), icon: Building },
-            { value: 'house', label: t('dashboard.house'), icon: Home },
-            { value: 'room', label: t('dashboard.room'), icon: Bed },
-            { value: 'studio', label: t('dashboard.studio'), icon: Users },
-            { value: 'office', label: t('dashboard.office'), icon: Briefcase }
+            { value: 'Apartment', label: t('dashboard.apartment'), icon: Building },
+            { value: 'House', label: t('dashboard.house'), icon: Home },
+            { value: 'Shared Room', label: t('dashboard.room'), icon: Bed },
+            { value: 'Studio', label: t('dashboard.studio'), icon: Users },
+            { value: 'Bedsitter', label: 'Bedsitter', icon: Briefcase }
           ].map(({ value, label, icon: Icon }) => (
             <button
               key={value}
@@ -417,8 +415,8 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
           </Label>
         <Input
           type="number"
-          value={formData.area_sqm}
-          onChange={(e) => onInputChange('area_sqm', e.target.value)}
+          value={formData.square_meters}
+          onChange={(e) => onInputChange('square_meters', e.target.value)}
           placeholder="100"
             className="text-center"
         />
@@ -445,7 +443,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
         </div>
       </div>
 
-      {/* Basic Services - Interactive Toggle Cards */}
+      {/* Amenities - Interactive Toggle Cards */}
       <div className="space-y-3">
         <Label className="flex items-center gap-2 text-sm font-medium">
           <Award className="h-4 w-4 text-primary" />
@@ -459,12 +457,12 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
             { key: 'parking', label: t('dashboard.parking'), icon: Car, colorClass: 'border-green-300 bg-green-50 text-green-600' },
             { key: 'security', label: t('dashboard.security'), icon: Shield, colorClass: 'border-red-300 bg-red-50 text-red-600' }
           ].map(({ key, label, icon: Icon, colorClass }) => {
-            const isSelected = formData[key as keyof PropertyFormData];
+            const isSelected = formData.amenities.includes(key);
             return (
               <button
                 key={key}
                 type="button"
-                onClick={() => onInputChange(key as keyof PropertyFormData, !formData[key as keyof PropertyFormData])}
+                onClick={() => onAmenityToggle(key)}
                 className={`p-4 border-2 rounded-lg transition-all duration-200 text-left hover:shadow-md ${
                   isSelected ? colorClass + ' shadow-md' : 'border-gray-200 hover:border-gray-300'
                 }`}
@@ -636,7 +634,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
         </div>
         <h3 className="text-xl font-semibold text-gray-900 mb-2">Picha za Nyumba *</h3>
         <p className="text-gray-600">Ongeza picha nzuri za nyumba yako ili kuvutia wapangaji</p>
-        <p className="text-sm text-red-600 font-medium">⚠️ Picha ni za lazima - ongeza angalau picha moja</p>
+        <p className="text-sm text-red-600 font-medium">⚠️ Picha ni za lazima - ongeza angalau picha 3</p>
       </div>
 
       {/* Photo Upload Component */}
@@ -666,10 +664,10 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
         <div className="flex items-center justify-between text-sm text-gray-600">
           <span>Hatua ya 4: Picha za Nyumba</span>
           <div className="flex items-center gap-2">
-            <Badge variant={formData.images.length > 0 ? "default" : "destructive"}>
+            <Badge variant={formData.images.length >= 3 ? "default" : "destructive"}>
               {formData.images.length} picha
             </Badge>
-            {formData.images.length > 0 ? (
+            {formData.images.length >= 3 ? (
               <div className="flex items-center gap-1 text-green-600 text-xs">
                 <CheckCircle className="h-3 w-3" />
                 Picha zimeongezwa
@@ -677,7 +675,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
             ) : (
               <div className="flex items-center gap-1 text-red-600 text-xs">
                 <X className="h-3 w-3" />
-                Ongeza picha za lazima
+                Ongeza picha 3 za lazima
               </div>
             )}
           </div>
@@ -787,7 +785,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
           formData.description?.trim() && 
           formData.contact_phone?.trim() &&
           formData.property_type?.trim() &&
-          formData.images && formData.images.length > 0
+          formData.images && formData.images.length >= 3
         );
         
         console.log('Validation check:', {
@@ -797,7 +795,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
           description: !!formData.description?.trim(),
           contact_phone: !!formData.contact_phone?.trim(),
           property_type: !!formData.property_type?.trim(),
-          images: formData.images && formData.images.length > 0,
+          images: formData.images && formData.images.length >= 3,
           imagesLength: formData.images?.length || 0
         });
         
@@ -809,7 +807,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
             description: !!formData.description?.trim(),
             contact_phone: !!formData.contact_phone?.trim(),
             property_type: !!formData.property_type?.trim(),
-            images: formData.images && formData.images.length > 0
+            images: formData.images && formData.images.length >= 3
           });
           
           // Show alert to user about missing fields
@@ -820,7 +818,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
             `• Maelezo ya nyumba: ${formData.description?.trim() ? '✓' : '✗'}\n` +
             `• Aina ya nyumba: ${formData.property_type?.trim() ? '✓' : '✗'}\n` +
             `• Nambari ya simu: ${formData.contact_phone?.trim() ? '✓' : '✗'}\n` +
-            `• Picha za nyumba: ${formData.images && formData.images.length > 0 ? '✓' : '✗'} (${formData.images?.length || 0} picha)`
+            `• Picha za nyumba: ${formData.images && formData.images.length >= 3 ? '✓' : '✗'} (${formData.images?.length || 0} picha, lazima 3)`
           );
           return;
         }

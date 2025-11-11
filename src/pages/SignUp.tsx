@@ -1,3 +1,44 @@
+/**
+ * SIGNUP.TSX - USER REGISTRATION PAGE
+ * ===================================
+ * 
+ * Ukurasa wa kujisajili - User registration page
+ * 
+ * ARCHITECTURE / MUUNDO:
+ * This page handles new user registration with email and password.
+ * All users are registered as regular users (role='user', is_host=false).
+ * A database trigger automatically creates a profile entry when a user signs up.
+ * 
+ * FEATURES / VIPENGELE:
+ * - Email and password registration
+ * - Full name collection
+ * - Password confirmation validation
+ * - Password visibility toggles
+ * - Automatic profile creation via database trigger
+ * - Role-based redirect after signup
+ * - Animated UI with Framer Motion
+ * - Internationalization support
+ * 
+ * DATABASE INTEGRATION / MUUNGANISHO WA DATABASE:
+ * - User created in auth.users table
+ * - Profile automatically created in public.profiles table via trigger
+ * - Default role: 'user'
+ * - Default is_host: false
+ * 
+ * SECURITY / USALAMA:
+ * - Password strength validation
+ * - Email format validation
+ * - Rate limiting on signup attempts
+ * - Input sanitization
+ * - CSRF protection
+ * 
+ * USER FLOW / MTIRIRIKO WA MTUMIAJI:
+ * 1. User fills in registration form
+ * 2. Password confirmation is validated
+ * 3. Account is created in Supabase Auth
+ * 4. Database trigger creates profile entry
+ * 5. User is redirected to home page
+ */
 
 import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/layout/Navigation';
@@ -6,40 +47,68 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Eye, EyeOff, Home, Check } from 'lucide-react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 
+/**
+ * SIGNUP COMPONENT
+ * ===============
+ * 
+ * Main registration component that handles new user signup.
+ * Integrates with Supabase Auth and database triggers.
+ */
 const SignUp = () => {
-  const [searchParams] = useSearchParams();
+  // Password visibility toggle states
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  // Loading state for submit button
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Form data state - stores all registration fields
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
-    phone: '',
     password: '',
-    confirmPassword: '',
-    userType: 'landlord' // Always landlord since only landlords register
+    confirmPassword: ''
   });
+  
+  // Navigation and authentication hooks
   const navigate = useNavigate();
   const { signUp, user, loading, checkUserTypeAndRedirect } = useAuth();
   const { t } = useTranslation();
 
-  // Redirect if already authenticated
+  /**
+   * AUTO-REDIRECT EFFECT
+   * ===================
+   * 
+   * Redirects already authenticated users to their appropriate page.
+   * Prevents logged-in users from seeing the signup page.
+   */
   useEffect(() => {
     if (!loading && user) {
       checkUserTypeAndRedirect(navigate);
     }
   }, [user, loading, navigate, checkUserTypeAndRedirect]);
 
+  /**
+   * FORM SUBMIT HANDLER
+   * ==================
+   * 
+   * Handles the registration form submission:
+   * 1. Validates password confirmation
+   * 2. Calls signUp from useAuth hook
+   * 3. Database trigger creates profile automatically
+   * 4. On success, redirects to home page
+   * 5. On error, displays error message via toast
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate password confirmation
     if (formData.password !== formData.confirmPassword) {
       alert('Nywila hazifanani');
       return;
@@ -47,37 +116,38 @@ const SignUp = () => {
 
     setIsLoading(true);
 
+    // Sign up with default user role
     const { error } = await signUp(formData.email, formData.password, {
       full_name: formData.fullName,
-      phone: formData.phone,
-      user_type: formData.userType
+      user_type: 'user' // All new users are regular users by default
     });
 
     if (!error) {
-      // Navigate landlords to dashboard using the new redirect function
-      if (formData.userType === 'landlord') {
-        // Small delay to ensure profile is created
-        setTimeout(() => {
-          checkUserTypeAndRedirect(navigate);
-        }, 1000);
-      } else {
-        navigate('/', { replace: true });
-      }
+      // Wait for profile creation, then redirect
+      setTimeout(() => {
+        checkUserTypeAndRedirect(navigate);
+      }, 1000);
       
+      // Clear form data
       setFormData({
         fullName: '',
         email: '',
-        phone: '',
         password: '',
-        confirmPassword: '',
-        userType: ''
+        confirmPassword: ''
       });
     }
 
     setIsLoading(false);
   };
 
-  const handleInputChange = (field: string, value: any) => {
+  /**
+   * INPUT CHANGE HANDLER
+   * ===================
+   * 
+   * Updates form data state when user types in input fields.
+   * Uses functional update to ensure latest state.
+   */
+  const handleInputChange = (field: string, value: unknown) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -104,10 +174,10 @@ const SignUp = () => {
               <span className="text-2xl font-bold text-primary">Nyumba Link</span>
             </Link>
             <h2 className="text-3xl font-bold text-gray-900">
-              {t('auth.becomeLandlord')}
+              Jisajili / Sign Up
             </h2>
             <p className="mt-2 text-gray-600">
-              {t('auth.signUpSubtitle')}
+              Unda akaunti yako ili kuanza kutumia huduma zetu
             </p>
           </motion.div>
 
@@ -153,19 +223,6 @@ const SignUp = () => {
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     placeholder={t('auth.emailPlaceholder')}
-                    required
-                    className="mt-1"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="phone">{t('auth.phone')}</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    placeholder={t('auth.phonePlaceholder')}
                     required
                     className="mt-1"
                   />
@@ -231,7 +288,7 @@ const SignUp = () => {
                   className="w-full bg-gradient-to-r from-primary via-serengeti-500 to-kilimanjaro-600 hover:from-primary/90 hover:via-serengeti-400 hover:to-kilimanjaro-500 text-white font-bold py-3 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
                   disabled={isLoading}
                 >
-                  {isLoading ? t('auth.registering') : t('auth.registerAsLandlord')}
+                  {isLoading ? t('auth.registering') : t('auth.signUp')}
                 </Button>
               </form>
 

@@ -7,22 +7,37 @@
  * ARCHITECTURE OVERVIEW / MUHTASARI WA MUUNDO:
  * This is the main property discovery page that handles complex filtering,
  * search functionality, and property display. It serves as the primary
- * interface for users to find properties that match their criteria.
+ * interface for users to find approved properties that match their criteria.
  * 
  * DESIGN PATTERNS / MIFUMO YA MUUNDO:
  * - URL-driven state management for shareable searches
- * - Compound filtering with multiple criteria
+ * - Compound filtering with multiple criteria (location, price, amenities, nearby services)
  * - Responsive grid/list view switching
- * - Real-time search with debouncing (can be added)
- * - Infinite scroll ready architecture
+ * - Client-side filtering for instant results
+ * - React Query for efficient data fetching and caching
+ * 
+ * DATA FETCHING / KUPATA DATA:
+ * - Fetches properties with status='approved' from Supabase
+ * - Joins with profiles table to get host information
+ * - Uses React Query for caching and background updates
+ * - Filters properties by amenities array (electricity, water)
+ * - Filters by nearby_services array (school, hospital, market)
  * 
  * MAIN FUNCTIONALITY / KAZI KEKUU:
- * - Display all available properties (Kuonyesha nyumba zote zinazopatikana)
- * - Advanced filtering by location, price, utilities (Vichujio vya kirefu vya eneo, bei, huduma)
- * - Property search functionality (Utendakazi wa kutafuta nyumba)
- * - Sorting options (price, date, etc.) (Chaguo za kupanga)
- * - Grid and list view modes (Hali za kuona kama gridi na orodha)
+ * - Display all approved properties (Kuonyesha nyumba zote zilizoidhinishwa)
+ * - Advanced filtering by location, price, amenities, nearby services
+ * - Property search by location name
+ * - Sorting options (newest, price low-to-high, price high-to-low)
+ * - Grid view mode for property display
  * - Favorites management (Usimamizi wa vipendwa)
+ * - Active filter badges with remove functionality
+ * 
+ * FILTERING SYSTEM / MFUMO WA KUCHUJA:
+ * - Location search: Case-insensitive partial match
+ * - Price range: Predefined ranges or custom min/max
+ * - Amenities: Checks amenities array for electricity, water
+ * - Nearby services: Checks nearby_services array
+ * - All filters work together (AND logic)
  */
 
 import React, { useState } from 'react';
@@ -108,15 +123,24 @@ const getInitialUIState = (): UIState => ({
  * ========================
  * 
  * Pure function that filters properties based on current filter state.
- * Separated for testability and reusability.
+ * Implements client-side filtering for instant results without API calls.
+ * All filters use AND logic - property must match ALL active filters.
  * 
- * @param properties - Array of properties to filter
- * @param filters - Current filter state
- * @returns Filtered array of properties
+ * FILTER TYPES / AINA ZA VICHUJIO:
+ * 1. Location Search: Case-insensitive partial match on location field
+ * 2. Custom Price Range: User-defined min and max price
+ * 3. Predefined Price Range: Quick select price brackets
+ * 4. Amenities: Checks amenities array (electricity, water)
+ * 5. Nearby Services: Checks nearby_services array (school, hospital, market)
+ * 
+ * @param properties - Array of properties to filter (from Supabase)
+ * @param filters - Current filter state from component
+ * @returns Filtered array of properties matching all criteria
  */
 const filterProperties = (properties: Property[], filters: FilterState): Property[] => {
   return properties.filter(property => {
     // Location filtering - case insensitive partial match
+    // Searches within the location string for the query
     if (filters.searchQuery) {
       const query = filters.searchQuery.toLowerCase().trim();
       const location = property.location.toLowerCase();
@@ -126,7 +150,8 @@ const filterProperties = (properties: Property[], filters: FilterState): Propert
       }
     }
 
-    // Custom price range filtering
+    // Custom price range filtering - user-defined min/max
+    // Checks if property price falls within specified range
     if (filters.minPrice && parseInt(filters.minPrice) > Number(property.price)) {
       return false;
     }
@@ -134,7 +159,8 @@ const filterProperties = (properties: Property[], filters: FilterState): Propert
       return false;
     }
 
-    // Predefined price range filtering
+    // Predefined price range filtering - quick select brackets
+    // Parses range string (e.g., "100000-500000") and checks bounds
     if (filters.priceRange && filters.priceRange !== 'all') {
       const [min, max] = filters.priceRange.split('-').map(p => p.replace('+', ''));
       const minPriceRange = parseInt(min);
@@ -145,13 +171,19 @@ const filterProperties = (properties: Property[], filters: FilterState): Propert
       }
     }
 
-    // Utilities filtering
+    // Amenities filtering - checks amenities array
+    // Property must have ALL selected amenities (electricity, water)
+    // Uses Array.every() to ensure all utilities are present
     if (filters.utilities.length > 0) {
-      if (filters.utilities.includes('electricity') && !property.electricity) return false;
-      if (filters.utilities.includes('water') && !property.water) return false;
+      const hasAllUtilities = filters.utilities.every(utility =>
+        property.amenities?.includes(utility)
+      );
+      if (!hasAllUtilities) return false;
     }
 
-    // Nearby services filtering
+    // Nearby services filtering - checks nearby_services array
+    // Property must have ALL selected services (school, hospital, market)
+    // Uses Array.every() to ensure all services are present
     if (filters.nearbyServices.length > 0) {
       const hasAllServices = filters.nearbyServices.every(service =>
         property.nearby_services?.includes(service)
@@ -159,6 +191,7 @@ const filterProperties = (properties: Property[], filters: FilterState): Propert
       if (!hasAllServices) return false;
     }
 
+    // Property passed all filters
     return true;
   });
 };
@@ -246,7 +279,25 @@ const FilterUtils = {
  * ===============
  * 
  * Main component for property browsing and search functionality.
- * Handles all filtering, sorting, and display logic.
+ * Handles all filtering, sorting, and display logic for approved properties.
+ * 
+ * DATA FLOW / MTIRIRIKO WA DATA:
+ * 1. useProperties hook fetches approved properties from Supabase
+ * 2. Properties are joined with profiles table for host info
+ * 3. Client-side filtering applies all active filters
+ * 4. Client-side sorting arranges filtered results
+ * 5. PropertyCard components display final results
+ * 
+ * STATE MANAGEMENT / USIMAMIZI WA HALI:
+ * - filters: All filter criteria (location, price, amenities, services)
+ * - uiState: UI-related state (showFilters, favoriteIds, viewMode)
+ * - URL params: Initial filter state from URL for shareable searches
+ * 
+ * PERFORMANCE / UTENDAJI:
+ * - React Query caches property data
+ * - Client-side filtering for instant results
+ * - Memoized filter and sort functions
+ * - Efficient re-renders with proper state structure
  */
 const Browse = () => {
   // URL parameter handling for search state persistence
@@ -257,13 +308,14 @@ const Browse = () => {
   const [filters, setFilters] = useState<FilterState>(() => getInitialFilterState(searchParams));
   const [uiState, setUIState] = useState<UIState>(() => getInitialUIState());
 
-  // Data fetching from Supabase
+  // Data fetching from Supabase via React Query
+  // Fetches properties with status='approved' and joins with profiles
   const { data: properties = [], isLoading, error } = useProperties();
 
-  // Favorites functionality
+  // Favorites functionality - manages user's favorite properties
   const { isFavorited, toggleFavorite } = useFavorites();
 
-  // Scroll to top when component mounts
+  // Scroll to top when component mounts for better UX
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -272,7 +324,8 @@ const Browse = () => {
    * FILTER UPDATE HANDLERS
    * =====================
    * 
-   * Centralized handlers for updating different types of filters.
+   * Generic handlers for updating filter and UI state.
+   * Uses TypeScript generics for type-safe state updates.
    */
   const updateFilter = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -286,7 +339,9 @@ const Browse = () => {
    * UTILITY TOGGLE HANDLER
    * =====================
    * 
-   * Handles toggling of utility filters (electricity, water).
+   * Handles toggling of amenity filters (electricity, water).
+   * Checks/unchecks amenities in the amenities array filter.
+   * Uses FilterUtils helper for array manipulation.
    */
   const handleUtilityToggle = (utility: string) => {
     const newUtilities = FilterUtils.toggleUtility(filters.utilities, utility);
@@ -298,6 +353,8 @@ const Browse = () => {
    * ============================
    * 
    * Handles toggling of nearby service filters (school, hospital, market).
+   * Checks/unchecks services in the nearby_services array filter.
+   * Uses FilterUtils helper for array manipulation.
    */
   const handleNearbyServiceToggle = (service: string) => {
     const newServices = FilterUtils.toggleNearbyService(filters.nearbyServices, service);
@@ -309,6 +366,8 @@ const Browse = () => {
    * ======================
    * 
    * Manages adding/removing properties from favorites list.
+   * Note: This is local state only. For persistent favorites,
+   * integrate with useFavorites hook and Supabase.
    */
   const handleToggleFavorite = (propertyId: string) => {
     const newFavorites = uiState.favoriteIds.includes(propertyId)
@@ -323,12 +382,22 @@ const Browse = () => {
    * ========================
    * 
    * Resets all filters to their default state.
+   * Useful when user wants to start fresh search.
    */
   const handleClearAllFilters = () => {
     setFilters(FilterUtils.clearAll());
   };
 
-  // Apply filtering and sorting to properties
+  /**
+   * APPLY FILTERING AND SORTING
+   * ==========================
+   * 
+   * Two-step process:
+   * 1. Filter properties based on all active filters
+   * 2. Sort filtered results based on sort criteria
+   * 
+   * Both operations are client-side for instant results.
+   */
   const filteredProperties = filterProperties(properties as Property[], filters);
   const sortedProperties = sortProperties(filteredProperties, filters.sortBy);
 
@@ -671,8 +740,8 @@ const Browse = () => {
                   phone={property.profiles?.phone || undefined}
                   contactPhone={property.contact_phone || undefined}
                   contactWhatsappPhone={property.contact_whatsapp_phone || undefined}
-                  electricity={property.electricity || false}
-                  water={property.water || false}
+                  electricity={property.amenities?.includes('electricity') || false}
+                  water={property.amenities?.includes('water') || false}
                   bedrooms={property.bedrooms || undefined}
                   isFavorited={isFavorited(property.id)}
                   onToggleFavorite={toggleFavorite}

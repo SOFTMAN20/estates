@@ -228,7 +228,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Sanitize metadata
     const sanitizedMetadata = {
       full_name: validateInput.text(metadata.full_name || '', 100).sanitized,
-      user_type: ['landlord', 'tenant'].includes(metadata.user_type) ? metadata.user_type : 'tenant'
+      user_type: ['landlord', 'tenant', 'user', 'admin', 'super_admin'].includes(metadata.user_type) ? metadata.user_type : 'user'
     };
 
     const redirectUrl = `${window.location.origin}/`;
@@ -243,17 +243,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     if (error) {
+      console.error('Signup error:', error);
+      const errorMessage = error.message?.includes('Email signups are disabled') 
+        ? 'Usajili kwa barua pepe haujawezeshwa. Wasiliana na msimamizi.'
+        : error.message || 'Imeshindikana kujisajili. Jaribu tena.';
+      
       toast({
         variant: "destructive",
         title: "Hitilafu ya kujisajili",
-        description: "Imeshindikana kujisajili. Jaribu tena."
+        description: errorMessage
       });
     } else {
       toast({
         title: "Umefanikiwa kujisajili!",
-        description: sanitizedMetadata.user_type === 'landlord' 
-          ? "Karibu kwenye Nyumba Link! Unaweza kuanza kuongeza nyumba zako sasa."
-          : "Tafadhali kagua barua pepe yako ili kuthibitisha akaunti yako."
+        description: "Karibu kwenye Nyumba Link!"
       });
     }
 
@@ -349,17 +352,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
    * - Prevents unauthorized access
    */
   const signOut = async (navigate?: (path: string, options?: any) => void) => {
-    // Check if user is a landlord before signing out
-    let isLandlord = false;
+    // Check if user is a host or admin before signing out
+    let isHostOrAdmin = false;
     if (user && navigate) {
       try {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('user_type')
-          .eq('user_id', user.id)
+          .select('is_host, role')
+          .eq('id', user.id)
           .single();
         
-        isLandlord = profile?.user_type === 'landlord';
+        isHostOrAdmin = profile?.is_host || profile?.role === 'admin' || profile?.role === 'super_admin';
       } catch (error) {
         console.error('Error checking user type before signout:', error);
       }
@@ -372,8 +375,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         description: "Tutakuona tena!"
       });
 
-      // Redirect landlords to browse page after sign out
-      if (isLandlord && navigate) {
+      // Redirect hosts/admins to browse page after sign out
+      if (isHostOrAdmin && navigate) {
         navigate('/browse', { replace: true });
       }
     }
@@ -383,8 +386,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
    * CHECK USER TYPE AND REDIRECT
    * ===========================
    * 
-   * Checks the user's profile to determine if they are a landlord
-   * and redirects them to the dashboard if so.
+   * Checks the user's profile to determine their role and is_host status
+   * and redirects them to the appropriate page.
    */
   const checkUserTypeAndRedirect = async (navigate: (path: string, options?: any) => void) => {
     if (!user) return;
@@ -392,16 +395,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const { data: profile, error } = await supabase
         .from('profiles')
-        .select('user_type')
-        .eq('user_id', user.id)
+        .select('role, is_host')
+        .eq('id', user.id)
         .single();
 
       if (error) {
         console.error('Error fetching user profile:', error);
+        navigate('/', { replace: true });
         return;
       }
 
-      if (profile?.user_type === 'landlord') {
+      // Redirect based on role or host status
+      if (profile?.role === 'admin' || profile?.role === 'super_admin') {
+        navigate('/admin', { replace: true });
+      } else if (profile?.is_host) {
         navigate('/dashboard', { replace: true });
       } else {
         navigate('/', { replace: true });

@@ -59,14 +59,23 @@ import { csrfProtection } from '@/utils/csrf';
  * - Strict typing prevents runtime errors
  * - Metadata parameter allows flexible user data
  */
+interface SignUpMetadata {
+  full_name: string;
+  user_type: 'landlord' | 'tenant' | 'user' | 'admin' | 'super_admin';
+}
+
+interface AuthError {
+  message?: string;
+}
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, metadata: any) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signOut: (navigate?: (path: string, options?: any) => void) => Promise<void>;
-  checkUserTypeAndRedirect: (navigate: (path: string, options?: any) => void) => Promise<void>;
+  signUp: (email: string, password: string, metadata: SignUpMetadata) => Promise<{ error: AuthError | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signOut: (navigate?: (path: string, options?: Record<string, unknown>) => void) => Promise<void>;
+  checkUserTypeAndRedirect: (navigate: (path: string, options?: Record<string, unknown>) => void) => Promise<void>;
 }
 
 /**
@@ -188,11 +197,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
    * - Detailed error logging for debugging
    * - Graceful fallback for network issues
    */
-  const signUp = async (email: string, password: string, metadata: any) => {
+  const signUp = async (email: string, password: string, metadata: SignUpMetadata) => {
     // Rate limiting check
     const clientId = `signup_${email}`;
     if (!rateLimiters.signup.isAllowed(clientId)) {
-      const error = { message: 'Too many signup attempts. Please try again later.' };
+      const error: AuthError = { message: 'Too many signup attempts. Please try again later.' };
       toast({
         variant: "destructive",
         title: "Hitilafu ya kujisajili",
@@ -204,7 +213,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Validate email
     const emailValidation = validateInput.email(email);
     if (!emailValidation.isValid) {
-      const error = { message: emailValidation.error };
+      const error: AuthError = { message: emailValidation.error };
       toast({
         variant: "destructive",
         title: "Hitilafu ya kujisajili",
@@ -216,7 +225,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Validate password strength
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
-      const error = { message: passwordValidation.feedback.join(', ') };
+      const error: AuthError = { message: passwordValidation.feedback.join(', ') };
       toast({
         variant: "destructive",
         title: "Nywila si salama",
@@ -260,7 +269,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
     }
 
-    return { error };
+    return { error: error || null };
   };
 
   /**
@@ -287,7 +296,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Rate limiting check
     const clientId = `login_${email}`;
     if (!rateLimiters.login.isAllowed(clientId)) {
-      const error = { message: 'Too many login attempts. Please try again later.' };
+      const error: AuthError = { message: 'Too many login attempts. Please try again later.' };
       toast({
         variant: "destructive",
         title: "Hitilafu ya kuingia",
@@ -299,7 +308,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Validate email format
     const emailValidation = validateInput.email(email);
     if (!emailValidation.isValid) {
-      const error = { message: emailValidation.error };
+      const error: AuthError = { message: emailValidation.error };
       toast({
         variant: "destructive",
         title: "Hitilafu ya kuingia",
@@ -329,56 +338,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
     }
 
-    return { error };
+    return { error: error || null };
   };
 
   /**
    * SIGN OUT FUNCTION
    * ================
    * 
-   * Handles user logout and session cleanup with smart redirect.
+   * Handles user logout and session cleanup.
    * 
    * CLEANUP PROCESS / MCHAKATO WA USAFISHAJI:
-   * 1. Check user type before signing out
-   * 2. Clear Supabase session
-   * 3. Remove local storage tokens
-   * 4. Reset authentication state
-   * 5. Show confirmation message
-   * 6. Redirect landlords to browse page
+   * 1. Clear Supabase session
+   * 2. Remove local storage tokens
+   * 3. Reset authentication state
+   * 4. Show confirmation message
    * 
    * SECURITY / USALAMA:
    * - Complete session invalidation
    * - Secure token cleanup
    * - Prevents unauthorized access
    */
-  const signOut = async (navigate?: (path: string, options?: any) => void) => {
-    // Check if user is a host or admin before signing out
-    let isHostOrAdmin = false;
-    if (user && navigate) {
-      try {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('is_host, role')
-          .eq('id', user.id)
-          .single();
-        
-        isHostOrAdmin = profile?.is_host || profile?.role === 'admin' || profile?.role === 'super_admin';
-      } catch (error) {
-        console.error('Error checking user type before signout:', error);
-      }
-    }
-
+  const signOut = async (navigate?: (path: string, options?: Record<string, unknown>) => void) => {
     const { error } = await supabase.auth.signOut();
     if (!error) {
       toast({
         title: "Umetoka nje",
         description: "Tutakuona tena!"
       });
-
-      // Redirect hosts/admins to browse page after sign out
-      if (isHostOrAdmin && navigate) {
-        navigate('/browse', { replace: true });
-      }
     }
   };
 
@@ -386,31 +372,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
    * CHECK USER TYPE AND REDIRECT
    * ===========================
    * 
-   * Checks the user's profile to determine their role and is_host status
+   * Checks the user's profile to determine their role
    * and redirects them to the appropriate page.
+   * 
+   * REDIRECT LOGIC:
+   * - Admin/Super Admin → /admin
+   * - Regular Users → / (homepage)
    */
-  const checkUserTypeAndRedirect = async (navigate: (path: string, options?: any) => void) => {
+  const checkUserTypeAndRedirect = async (navigate: (path: string, options?: Record<string, unknown>) => void) => {
     if (!user) return;
 
     try {
-      const { data: profile, error } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
-        .select('role, is_host')
+        .select('role')
         .eq('id', user.id)
         .single();
 
-      if (error) {
+      if (error || !data) {
         console.error('Error fetching user profile:', error);
         navigate('/', { replace: true });
         return;
       }
 
-      // Redirect based on role or host status
-      if (profile?.role === 'admin' || profile?.role === 'super_admin') {
+      // Redirect based on role only
+      const userRole = (data as { role: string | null }).role;
+      if (userRole === 'admin' || userRole === 'super_admin') {
         navigate('/admin', { replace: true });
-      } else if (profile?.is_host) {
-        navigate('/dashboard', { replace: true });
       } else {
+        // All regular users go to homepage
         navigate('/', { replace: true });
       }
     } catch (error) {

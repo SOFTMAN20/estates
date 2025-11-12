@@ -8,14 +8,17 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/integrations/supabase/client';
-import type { Tables } from '@/lib/integrations/supabase/types';
+import type { Tables, TablesUpdate } from '@/lib/integrations/supabase/types';
 import type { User } from '@supabase/supabase-js';
 
 type Profile = Tables<'profiles'>;
+type ProfileUpdate = TablesUpdate<'profiles'>;
 
 export interface ProfileFormData {
   name: string;
   phone: string;
+  location: string;
+  bio: string;
   is_host: boolean;
 }
 
@@ -38,6 +41,8 @@ export const useDashboardProfile = (): UseDashboardProfileReturn => {
   const [profileForm, setProfileForm] = useState<ProfileFormData>({
     name: '',
     phone: '',
+    location: '',
+    bio: '',
     is_host: true
   });
 
@@ -69,6 +74,8 @@ export const useDashboardProfile = (): UseDashboardProfileReturn => {
         setProfileForm({
           name: (data as Profile).name || '',
           phone: (data as Profile).phone || '',
+          location: (data as Profile).location || '',
+          bio: (data as Profile).bio || '',
           is_host: (data as Profile).is_host || true
         });
       } else {
@@ -109,6 +116,8 @@ export const useDashboardProfile = (): UseDashboardProfileReturn => {
         setProfileForm({
           name: basicProfileData.name,
           phone: '',
+          location: '',
+          bio: '',
           is_host: true
         });
       } else {
@@ -117,6 +126,8 @@ export const useDashboardProfile = (): UseDashboardProfileReturn => {
         setProfileForm({
           name: (data as Profile).name || '',
           phone: (data as Profile).phone || '',
+          location: (data as Profile).location || '',
+          bio: (data as Profile).bio || '',
           is_host: (data as Profile).is_host || true
         });
       }
@@ -125,6 +136,8 @@ export const useDashboardProfile = (): UseDashboardProfileReturn => {
       setProfileForm({
         name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Mtumiaji',
         phone: '',
+        location: '',
+        bio: '',
         is_host: true
       });
     }
@@ -141,21 +154,18 @@ export const useDashboardProfile = (): UseDashboardProfileReturn => {
     try {
       setProfileLoading(true);
       
-      const profileData: {
-        user_id: string;
-        name: string;
-        phone: string;
-        is_host: boolean;
-      } = {
-        user_id: user.id,
+      // Update existing profile using user_id
+      const updateData: ProfileUpdate = {
         name: profileForm.name,
         phone: profileForm.phone,
-        is_host: profileForm.is_host
+        location: profileForm.location,
+        bio: profileForm.bio
       };
 
       const { error } = await supabase
         .from('profiles')
-        .upsert(profileData as never, { onConflict: 'user_id' });
+        .update(updateData)
+        .eq('user_id', user.id);
 
       if (error) throw error;
 

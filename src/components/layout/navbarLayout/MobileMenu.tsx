@@ -183,20 +183,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 </Link>
               )}
 
-              {/* Become Host Link - Only for non-hosts */}
-              {!user || (user && !profile?.is_host) ? (
-                <Link
-                  to="/signup?type=landlord"
-                  className="block px-4 py-3 text-gray-700 hover:bg-primary/10 hover:text-primary 
-                             rounded-lg text-sm transition-all duration-300"
-                  onClick={handleLinkClick}
-                >
-                  <div className="flex items-center">
-                    <Building2 className="h-5 w-5 mr-3 text-gray-400" />
-                    {t('navigation.becomeHost')}
-                  </div>
-                </Link>
-              ) : null}
+              {/* Removed "Become Host" link - All users can access dashboard */}
 
               {/* User Actions Section */}
               <div className="border-t border-gray-200 pt-4 mt-4">

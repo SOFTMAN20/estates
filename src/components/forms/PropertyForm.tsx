@@ -15,6 +15,7 @@
 
 import React, { useState, useEffect } from 'react';
 import ImageUpload from '@/components/forms/ImageUpload';
+import PriceInput, { type PricePeriod } from '@/components/forms/property_formDataForms/PriceInput';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -47,6 +48,7 @@ interface PropertyFormData {
   title: string;
   description: string;
   price: string;
+  price_period: string;
   location: string;
   full_address: string;
   property_type: string;
@@ -68,7 +70,7 @@ interface PropertyFormProps {
   submitting: boolean;
   onClose: () => void;
   onSubmit: (e: React.FormEvent) => Promise<void>;
-  onInputChange: (field: keyof PropertyFormData, value: any) => void;
+  onInputChange: (field: keyof PropertyFormData, value: unknown) => void;
   onServiceToggle: (service: string) => void;
   onAmenityToggle: (amenity: string) => void;
 }
@@ -266,33 +268,16 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
         )}
       </div>
 
-      {/* Price */}
-      <div className="space-y-2">
-        <Label htmlFor="price" className="flex items-center gap-2 text-sm font-medium">
-          <Star className="h-4 w-4 text-primary" />
-          {t('dashboard.rentPrice')} *
-        </Label>
-        <div className="relative">
-        <Input
-          id="price"
-          type="number"
-          value={formData.price}
-          onChange={(e) => onInputChange('price', e.target.value)}
-          placeholder="800000"
-            className={`pl-12 transition-all duration-200 ${formData.price ? 'border-green-300 bg-green-50' : ''}`}
-          required
-        />
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">
-            TZS
-          </div>
-        </div>
-        {formData.price && (
-          <div className="flex items-center gap-1 text-green-600 text-xs">
-            <CheckCircle className="h-3 w-3" />
-            Bei: TZS {parseInt(formData.price || '0').toLocaleString()}
-          </div>
-        )}
-      </div>
+      {/* Price Input - Using Modular Component */}
+      <PriceInput
+        value={formData.price}
+        period={(formData.price_period || 'per_month') as PricePeriod}
+        onPriceChange={(value) => onInputChange('price', value)}
+        onPeriodChange={(period) => onInputChange('price_period', period)}
+        label={t('dashboard.rentPrice')}
+        required
+        showFeedback
+      />
 
       {/* Location */}
       <div className="space-y-2">

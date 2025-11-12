@@ -21,8 +21,9 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { User, Save, RefreshCw } from 'lucide-react';
+import { User, Save, RefreshCw, MapPin, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ProfileFormData } from '@/hooks/dashboardHooks';
 
@@ -89,15 +90,30 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
           </div>
 
           <div>
-            <Label htmlFor="user_type">{t('dashboard.userType')}</Label>
+            <Label htmlFor="location" className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-primary" />
+              Mahali / Location
+            </Label>
             <Input
-              value={t('dashboard.landlordAgent')}
-              disabled
-              className="bg-gray-50 text-gray-600"
+              id="location"
+              value={profileForm.location}
+              onChange={(e) => onInputChange('location', e.target.value)}
+              placeholder="Mfano: Kinondoni, Dar es Salaam"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              {t('dashboard.accountTypeCannotChange')}
-            </p>
+          </div>
+
+          <div>
+            <Label htmlFor="bio" className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-primary" />
+              Bio / Maelezo
+            </Label>
+            <Textarea
+              id="bio"
+              value={profileForm.bio}
+              onChange={(e) => onInputChange('bio', e.target.value)}
+              placeholder="Maelezo mafupi kukuhusu wewe au biashara yako"
+              rows={3}
+            />
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">

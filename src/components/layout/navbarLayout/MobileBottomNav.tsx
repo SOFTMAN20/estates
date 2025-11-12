@@ -98,10 +98,10 @@ const MobileBottomNav = () => {
       path: '/favorites'
     },
     {
-      id: 'host',
+      id: 'dashboard',
       icon: <Building2 className="h-5 w-5" />,
-      label: user ? 'Host' : 'Host',
-      path: user ? '/dashboard' : '/signup?type=landlord'
+      label: user ? 'Dashboard' : 'Dashboard',
+      path: user ? '/dashboard' : '/signin'
     },
     {
       id: 'profile',

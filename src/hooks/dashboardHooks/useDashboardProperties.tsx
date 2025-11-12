@@ -18,6 +18,7 @@ export interface PropertyFormData {
   title: string;
   description: string;
   price: string;
+  price_period: string;
   location: string;
   full_address: string;
   property_type: string;
@@ -65,6 +66,7 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     title: '',
     description: '',
     price: '',
+    price_period: 'per_month',
     location: '',
     full_address: '',
     property_type: '',
@@ -151,6 +153,7 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       title: formData.title?.trim(),
       description: formData.description?.trim(),
       price: parseFloat(formData.price) || 0,
+      price_period: formData.price_period || 'per_month',
       location: formData.location?.trim(),
       full_address: formData.full_address?.trim() || null,
       property_type: formData.property_type?.trim() || null,
@@ -263,6 +266,7 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       title: property.title || '',
       description: property.description || '',
       price: property.price?.toString() || '',
+      price_period: property.price_period || 'per_month',
       location: property.location || '',
       full_address: property.full_address || '',
       property_type: property.property_type || '',
@@ -325,6 +329,7 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       title: '',
       description: '',
       price: '',
+      price_period: 'per_month',
       location: '',
       full_address: '',
       property_type: '',

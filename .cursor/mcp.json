@@ -1,4 +1,6 @@
 
+
+
 {
 
     "mcpServers": {
@@ -10,10 +12,10 @@
           "-y",
           "@supabase/mcp-server-supabase@latest",
           
-          "--project-ref=jayreyhmnjaymutadues"
+          "--project-ref=cahwyvtnveuiukgbnanb"
         ],
         "env": {
-          "SUPABASE_ACCESS_TOKEN": "sbp_4abca01c2ad207bf50946a2cf5a1e383388162ea"
+          "SUPABASE_ACCESS_TOKEN": "sbp_9e1c16f4dbe55b0b24840ccc2eb603bbd1a0232b"
         }
       }
     }

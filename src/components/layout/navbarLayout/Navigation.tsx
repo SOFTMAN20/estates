@@ -137,18 +137,7 @@ const Navigation = () => {
               </div>
             </Link>
             
-            {/* Host Dashboard Link - Kiungo cha dashibodi ya mwenye nyumba (LEFT SIDE) - Only show for non-hosts */}
-            {!user || (user && !profile?.is_host) ? (
-              <Link to="/signup?type=landlord" className="block">
-                <Button
-                  variant="ghost"
-                  className="px-2 sm:px-4 py-1 sm:py-2 rounded-full transition-all duration-300 text-xs sm:text-sm lg:text-base
-                             hover:bg-primary/10 hover:text-primary hover:scale-105"
-                >
-                  {t('navigation.becomeHost')}
-                </Button>
-              </Link>
-            ) : null}
+            {/* Removed "Become a Host" button - All users can access dashboard */}
           </div>
 
           {/* Enhanced Desktop Navigation Menu - Menyu ya uongozaji wa kompyuta */}

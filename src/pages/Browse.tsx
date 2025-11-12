@@ -42,8 +42,8 @@
 
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import Navigation from '@/components/layout/Navigation';
-import PropertyCard from '@/components/common/PropertyCard';
+import Navigation from '@/components/layout/navbarLayout/Navigation';
+import PropertyCard from '@/components/common/propertyCommon/PropertyCard';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,7 +51,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import { PropertyGridSkeleton } from '@/components/common/PropertyCardSkeleton';
+import { PropertyGridSkeleton } from '@/components/common/propertyCommon/PropertyCardSkeleton';
 import { Search, MapPin, SlidersHorizontal, X } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useProperties } from '@/hooks/useProperties';

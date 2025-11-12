@@ -12,8 +12,8 @@
  */
 
 import React, { useEffect } from 'react';
-import Navigation from '@/components/layout/Navigation';
-import PropertyCard from '@/components/common/PropertyCard';
+import Navigation from '@/components/layout/navbarLayout/Navigation';
+import PropertyCard from '@/components/common/propertyCommon/PropertyCard';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Heart, Search } from 'lucide-react';

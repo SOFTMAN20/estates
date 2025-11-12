@@ -25,13 +25,13 @@
  */
 
 import { lazy, Suspense } from 'react';
-import Navigation from "@/components/layout/Navigation";
+import Navigation from "@/components/layout/navbarLayout/Navigation";
 import HeroSection from "@/components/layout/HeroSection";
 import { Link } from 'react-router-dom';
 
 // Lazy load below-the-fold components
-const PopularDestinations = lazy(() => import("@/components/common/PopularDestinations"));
-const FeaturedProperties = lazy(() => import("@/components/common/FeaturedProperties"));
+const PopularDestinations = lazy(() => import("@/components/common/propertyCommon/PopularDestinations"));
+const FeaturedProperties = lazy(() => import("@/components/common/propertyCommon/FeaturedProperties"));
 const Footer = lazy(() => import("@/components/layout/Footer"));
 
 /**

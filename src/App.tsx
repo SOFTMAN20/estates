@@ -59,7 +59,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import ErrorBoundary from "@/components/ui/error-boundary";
 import { lazy, Suspense } from "react";
-import MobileBottomNav from "./components/layout/MobileBottomNav";
+import MobileBottomNav from "./components/layout/navbarLayout/MobileBottomNav";
 import PerformanceDashboard from "./components/common/PerformanceDashboard";
 
 // Lazy load pages for code splitting
@@ -67,6 +67,7 @@ const Index = lazy(() => import("./pages/Index"));
 const Browse = lazy(() => import("./pages/Browse"));
 const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Profile = lazy(() => import("./pages/Profile"));
 const Favorites = lazy(() => import("./pages/Favorites"));
 const SignIn = lazy(() => import("./pages/SignIn"));
 const SignUp = lazy(() => import("./pages/SignUp"));
@@ -147,6 +148,7 @@ const App = () => (
 
                 {/* User-specific routes - Njia za mtumiaji */}
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/property-example" element={<PropertyExample />} />
 

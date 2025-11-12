@@ -6,7 +6,7 @@ import { Star, MapPin, Wifi, Car, Utensils, Zap, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProperties, type Property } from '@/hooks/useProperties';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import { PropertyGridSkeleton } from '@/components/common/PropertyCardSkeleton';
+import { PropertyGridSkeleton } from '@/components/common/propertyCommon/PropertyCardSkeleton';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -16,7 +16,13 @@ import { useTranslation } from 'react-i18next';
  * Wrapper component that handles mobile touch functionality
  * for each individual property card in the featured section.
  */
-const FeaturedPropertyCard = ({ property, index, t }: { property: any, index: number, t: any }) => {
+interface FeaturedPropertyCardProps {
+  property: Property;
+  index: number;
+  t: (key: string) => string;
+}
+
+const FeaturedPropertyCard = ({ property, index, t }: FeaturedPropertyCardProps) => {
   const [showMobileActions, setShowMobileActions] = useState(false);
 
   /**
@@ -91,7 +97,7 @@ const FeaturedPropertyCard = ({ property, index, t }: { property: any, index: nu
           </div>
 
           <div className="flex items-center gap-1 mb-2 sm:mb-3">
-            {property.electricity && (
+            {property.amenities?.includes('electricity') && (
               <Badge variant="secondary" className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-green-100 text-green-800 
                                                    border border-green-200 hover:bg-green-200 transition-colors duration-300">
                 <Zap className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
@@ -99,14 +105,14 @@ const FeaturedPropertyCard = ({ property, index, t }: { property: any, index: nu
                 <span className="sm:hidden">⚡</span>
               </Badge>
             )}
-            {property.water && (
+            {property.amenities?.includes('water') && (
               <Badge variant="secondary" className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-blue-100 text-blue-800 
                                                    border border-blue-200 hover:bg-blue-200 transition-colors duration-300">
                 <span className="mr-0.5 sm:mr-1">💧</span>
                 <span className="hidden sm:inline">Maji</span>
               </Badge>
             )}
-            {property.parking && (
+            {property.amenities?.includes('parking') && (
               <Badge variant="secondary" className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-100 text-gray-800 
                                                    border border-gray-200 hover:bg-gray-200 transition-colors duration-300">
                 <Car className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />

@@ -86,7 +86,12 @@ export const useDashboardProfile = (): UseDashboardProfileReturn => {
     
     try {
       console.log('Creating basic profile for user:', user.id);
-      const basicProfileData = {
+      const basicProfileData: {
+        user_id: string;
+        name: string;
+        phone: string;
+        is_host: boolean;
+      } = {
         user_id: user.id,
         name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Mtumiaji',
         phone: '',
@@ -95,7 +100,7 @@ export const useDashboardProfile = (): UseDashboardProfileReturn => {
 
       const { data, error } = await supabase
         .from('profiles')
-        .insert(basicProfileData as any)
+        .insert([basicProfileData as never])
         .select()
         .single();
 
@@ -136,7 +141,12 @@ export const useDashboardProfile = (): UseDashboardProfileReturn => {
     try {
       setProfileLoading(true);
       
-      const profileData = {
+      const profileData: {
+        user_id: string;
+        name: string;
+        phone: string;
+        is_host: boolean;
+      } = {
         user_id: user.id,
         name: profileForm.name,
         phone: profileForm.phone,
@@ -145,7 +155,7 @@ export const useDashboardProfile = (): UseDashboardProfileReturn => {
 
       const { error } = await supabase
         .from('profiles')
-        .upsert(profileData as any, { onConflict: 'user_id' });
+        .upsert(profileData as never, { onConflict: 'user_id' });
 
       if (error) throw error;
 

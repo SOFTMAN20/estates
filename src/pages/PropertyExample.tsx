@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import Navigation from '@/components/layout/Navigation';
+import Navigation from '@/components/layout/navbarLayout/Navigation';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

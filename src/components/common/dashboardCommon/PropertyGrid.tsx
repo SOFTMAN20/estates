@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { PropertyGridSkeleton } from '@/components/common/PropertyCardSkeleton';
+import { PropertyGridSkeleton } from '@/components/common/propertyCommon/PropertyCardSkeleton';
 import { Home, Plus, Eye, Edit, Trash2, MapPin, DollarSign } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Property } from '@/hooks/useProperties';

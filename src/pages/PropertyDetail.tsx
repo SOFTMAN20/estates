@@ -23,11 +23,11 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Navigation from '@/components/layout/Navigation';
+import Navigation from '@/components/layout/navbarLayout/Navigation';
 import Footer from '@/components/layout/Footer';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import Map from '@/components/ui/map';
-import ShareDropdown from '@/components/common/ShareDropdown';
+import ShareDropdown from '@/components/common/PropertyDetails/ShareDropdown';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -54,7 +54,7 @@ import {
 import { useProperties, type Property } from '@/hooks/useProperties';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useTranslation } from 'react-i18next';
-import ServiceFeeCalculator from '@/components/common/ServiceFeeCalculator';
+import ServiceFeeCalculator from '@/components/common/PropertyDetails/ServiceFeeCalculator';
 
 /**
  * PROPERTY DETAIL COMPONENT

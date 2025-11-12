@@ -20,7 +20,7 @@
  */
 
 import React from 'react';
-import WelcomeBanner from '@/components/common/WelcomeBanner';
+import WelcomeBanner from '@/components/common/dashboardCommon/WelcomeBanner';
 import type { Tables } from '@/lib/integrations/supabase/types';
 
 type Profile = Tables<'profiles'>;

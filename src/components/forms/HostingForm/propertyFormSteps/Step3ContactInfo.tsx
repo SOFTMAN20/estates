@@ -10,7 +10,9 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Phone, Heart, MapPin, CheckCircle } from 'lucide-react';
+import { Phone, CheckCircle } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import { useTranslation } from 'react-i18next';
 
 interface Step3ContactInfoProps {
@@ -55,13 +57,15 @@ export const Step3ContactInfo: React.FC<Step3ContactInfoProps> = ({
           className={`transition-all duration-200 ${formData.contact_phone ? 'border-green-300 bg-green-50' : ''}`}
           required
         />
-        <p className="text-xs text-gray-500">
-          {t('dashboard.contactPhoneDescription')}
-        </p>
-        {formData.contact_phone && (
+        {formData.contact_phone && formData.contact_phone.startsWith('+') && (
           <div className="flex items-center gap-1 text-green-600 text-xs">
             <CheckCircle className="h-3 w-3" />
             Nambari ya simu imejazwa
+          </div>
+        )}
+        {formData.contact_phone && !formData.contact_phone.startsWith('+') && (
+          <div className="flex items-center gap-1 text-red-600 text-xs">
+            <span>⚠️ Nambari lazima ianze na + na country code</span>
           </div>
         )}
       </div>
@@ -69,7 +73,7 @@ export const Step3ContactInfo: React.FC<Step3ContactInfoProps> = ({
       {/* WhatsApp Phone */}
       <div className="space-y-2">
         <Label htmlFor="contact_whatsapp_phone" className="flex items-center gap-2 text-sm font-medium">
-          <Heart className="h-4 w-4 text-green-500" />
+          <FontAwesomeIcon icon={faWhatsapp} className="h-4 w-4 text-green-500" />
           {t('dashboard.whatsappNumber')}
           <Badge variant="secondary" className="ml-2 text-xs">Si lazima</Badge>
         </Label>
@@ -81,9 +85,11 @@ export const Step3ContactInfo: React.FC<Step3ContactInfoProps> = ({
           placeholder="+255712345678"
           className={`transition-all duration-200 ${formData.contact_whatsapp_phone ? 'border-green-300 bg-green-50' : ''}`}
         />
-        <p className="text-xs text-gray-500">
-          {t('dashboard.whatsappOptional')}
-        </p>
+        {formData.contact_whatsapp_phone && !formData.contact_whatsapp_phone.startsWith('+') && (
+          <div className="flex items-center gap-1 text-red-600 text-xs">
+            <span>⚠️ Nambari lazima ianze na + na country code</span>
+          </div>
+        )}
       </div>
 
     </div>

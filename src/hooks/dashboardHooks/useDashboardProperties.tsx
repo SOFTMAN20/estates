@@ -114,8 +114,30 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     if (!formData.location?.trim() || formData.location.trim().length < 2) {
       errors.push('Eneo la nyumba lazima liwe na angalau herufi 2');
     }
-    if (!formData.contact_phone?.trim() || formData.contact_phone.trim().length < 10) {
-      errors.push('Nambari ya simu lazima iwe na angalau nambari 10');
+    // Phone number validation - must start with country code
+    if (!formData.contact_phone?.trim()) {
+      errors.push('Nambari ya simu ni lazima');
+    } else {
+      const phone = formData.contact_phone.trim();
+      // Check if starts with + (country code)
+      if (!phone.startsWith('+')) {
+        errors.push('Nambari ya simu lazima ianze na country code (mfano: +255)');
+      } else if (phone.startsWith('+255') && phone.length < 13) {
+        // Tanzania number should be +255 followed by 9 digits (total 13 characters)
+        errors.push('Nambari ya simu ya Tanzania lazima iwe +255 na nambari 9 (mfano: +255712345678)');
+      } else if (phone.length < 10) {
+        errors.push('Nambari ya simu si sahihi');
+      }
+    }
+    
+    // WhatsApp phone validation (optional but must be valid if provided)
+    if (formData.contact_whatsapp_phone?.trim()) {
+      const whatsapp = formData.contact_whatsapp_phone.trim();
+      if (!whatsapp.startsWith('+')) {
+        errors.push('Nambari ya WhatsApp lazima ianze na country code (mfano: +255)');
+      } else if (whatsapp.startsWith('+255') && whatsapp.length < 13) {
+        errors.push('Nambari ya WhatsApp ya Tanzania lazima iwe +255 na nambari 9');
+      }
     }
     
     // Property type validation
@@ -215,6 +237,8 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
         }
       );
       
+      let propertyId: string;
+      
       if (editingProperty) {
         // Update existing property
         const { error } = await authenticatedClient
@@ -229,9 +253,10 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
           }
           throw new Error(`Hitilafu ya database: ${error.message}`);
         }
+        propertyId = editingProperty.id;
       } else {
         // Create new property
-        const { error } = await authenticatedClient
+        const { data, error } = await authenticatedClient
           .from('properties')
           .insert([propertyData])
           .select();
@@ -243,6 +268,49 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
             throw new Error('Taarifa ulizojaza hazikidhi mahitaji ya database.');
           }
           throw new Error(`Hitilafu ya database: ${error.message}`);
+        }
+        propertyId = data[0].id;
+      }
+      
+      // Parse and save address details to property_addresses table
+      if (formData.full_address) {
+        const addressLines = formData.full_address.split('\n');
+        const addressData = {
+          property_id: propertyId,
+          full_address: formData.full_address,
+          street: addressLines[0]?.trim() || null,
+          city: addressLines[2]?.trim() || null,
+          region: addressLines[3]?.trim() || null,
+          postal_code: addressLines[4]?.trim() || null,
+          country: 'Tanzania'
+        };
+        
+        // Check if address already exists
+        const { data: existingAddress } = await authenticatedClient
+          .from('property_addresses')
+          .select('id')
+          .eq('property_id', propertyId)
+          .single();
+        
+        if (existingAddress) {
+          // Update existing address
+          const { error: addressError } = await authenticatedClient
+            .from('property_addresses')
+            .update(addressData)
+            .eq('property_id', propertyId);
+          
+          if (addressError) {
+            console.error('Error updating property address:', addressError);
+          }
+        } else {
+          // Insert new address
+          const { error: addressError } = await authenticatedClient
+            .from('property_addresses')
+            .insert([addressData]);
+          
+          if (addressError) {
+            console.error('Error inserting property address:', addressError);
+          }
         }
       }
       

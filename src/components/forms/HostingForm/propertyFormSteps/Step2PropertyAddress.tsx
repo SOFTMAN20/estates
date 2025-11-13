@@ -9,7 +9,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { MapPin, Home, Building2, CheckCircle } from 'lucide-react';
+import { MapPin, Home, Building2, CheckCircle, Hash } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface Step2PropertyAddressProps {
@@ -66,7 +66,7 @@ export const Step2PropertyAddress: React.FC<Step2PropertyAddressProps> = ({
             lines[0] = e.target.value;
             onInputChange('full_address', lines.join('\n'));
           }}
-          placeholder="Mfano: Bint Matola Road"
+          placeholder="Mfano: Mikocheni B, Off Sam Nujoma Road"
           className={`transition-all duration-200 ${formData.full_address.split('\n')[0] ? 'border-green-300 bg-green-50' : ''}`}
           required
         />
@@ -92,7 +92,7 @@ export const Step2PropertyAddress: React.FC<Step2PropertyAddressProps> = ({
             lines[1] = e.target.value;
             onInputChange('full_address', lines.join('\n'));
           }}
-          placeholder="Mfano: Ghorofa ya 3, Flat 5B"
+          placeholder="Mfano: House No. 45, Ghorofa ya 3, Flat 5B"
         />
       </div>
 
@@ -146,6 +146,26 @@ export const Step2PropertyAddress: React.FC<Step2PropertyAddressProps> = ({
             Mkoa umejazwa
           </div>
         )}
+      </div>
+
+      {/* Postal Code */}
+      <div className="space-y-2">
+        <Label htmlFor="postal_code" className="flex items-center gap-2 text-sm font-medium">
+          <Hash className="h-4 w-4 text-primary" />
+          Postal Code / Nambari ya Posta
+          <span className="text-xs text-gray-500 font-normal">(Si lazima)</span>
+        </Label>
+        <Input
+          id="postal_code"
+          value={formData.full_address.split('\n')[4] || ''}
+          onChange={(e) => {
+            const lines = formData.full_address.split('\n');
+            lines[4] = e.target.value;
+            onInputChange('full_address', lines.join('\n'));
+          }}
+          placeholder="Mfano: 14111"
+          className="transition-all duration-200"
+        />
       </div>
 
       {/* Info box */}

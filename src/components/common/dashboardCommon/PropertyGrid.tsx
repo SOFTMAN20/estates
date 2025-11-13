@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PropertyGridSkeleton } from '@/components/common/propertyCommon/PropertyCardSkeleton';
+import { DeletePropertyDialog } from './DeletePropertyDialog';
 import { Home, Plus, Eye, Edit, Trash2, MapPin, DollarSign } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Property } from '@/hooks/useProperties';
@@ -35,6 +36,25 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
   onAddProperty
 }) => {
   const { t } = useTranslation();
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; property: Property | null }>({
+    isOpen: false,
+    property: null
+  });
+
+  const handleDeleteClick = (property: Property) => {
+    setDeleteDialog({ isOpen: true, property });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteDialog.property) {
+      await onDelete(deleteDialog.property.id);
+      setDeleteDialog({ isOpen: false, property: null });
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialog({ isOpen: false, property: null });
+  };
 
   /**
    * Handles navigation to property example page
@@ -118,10 +138,17 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
           {/* Status Badge */}
           <div className="absolute top-3 right-3">
             <Badge 
-              variant={property.status === 'rented' ? "secondary" : "default"}
-              className={property.status === 'rented' ? "bg-gray-500" : "bg-green-500"}
+              className={
+                property.status === 'approved' ? "bg-green-500 text-white" :
+                property.status === 'pending' ? "bg-yellow-500 text-white" :
+                property.status === 'rejected' ? "bg-red-500 text-white" :
+                "bg-gray-500 text-white"
+              }
             >
-              {property.status === 'rented' ? t('dashboard.rented') : t('dashboard.available')}
+              {property.status === 'approved' ? 'Approved' :
+               property.status === 'pending' ? 'Pending' :
+               property.status === 'rejected' ? 'Rejected' :
+               property.status}
             </Badge>
           </div>
         </div>
@@ -164,7 +191,7 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => onDelete(property.id)}
+              onClick={() => handleDeleteClick(property)}
               className="flex-1 flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
             >
               <Trash2 className="w-4 h-4" />
@@ -209,9 +236,19 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
 
   // Main render logic
   return (
-    <div className="space-y-6">
-      {properties.length === 0 ? renderEmptyState() : renderPropertiesGrid()}
-    </div>
+    <>
+      <div className="space-y-6">
+        {properties.length === 0 ? renderEmptyState() : renderPropertiesGrid()}
+      </div>
+
+      {/* Delete Confirmation Dialog */}
+      <DeletePropertyDialog
+        isOpen={deleteDialog.isOpen}
+        propertyTitle={deleteDialog.property?.title || ''}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
+    </>
   );
 };
 

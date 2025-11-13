@@ -49,7 +49,7 @@ interface UseDashboardPropertiesReturn {
     onSuccess: () => void,
     onError: (message: string) => void
   ) => Promise<void>;
-  handleEditProperty: (property: Property, profile: Profile | null) => void;
+  handleEditProperty: (property: Property, profile: Profile | null) => Promise<void>;
   handleDeleteProperty: (id: string, onSuccess: () => void, onError: () => void) => Promise<void>;
   handleInputChange: (field: keyof PropertyFormData, value: unknown) => void;
   handleServiceToggle: (service: string) => void;
@@ -177,7 +177,6 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       price: parseFloat(formData.price) || 0,
       price_period: formData.price_period || 'per_month',
       location: formData.location?.trim(),
-      full_address: formData.full_address?.trim() || null,
       property_type: formData.property_type?.trim() || null,
       bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : 0,
       bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : 1,
@@ -328,15 +327,32 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     }
   };
 
-  const handleEditProperty = (property: Property, profile: Profile | null): void => {
+  const handleEditProperty = async (property: Property, profile: Profile | null): Promise<void> => {
     setEditingProperty(property);
+    
+    // Fetch address from property_addresses table
+    let fullAddress = '';
+    try {
+      const { data: addressData } = await supabase
+        .from('property_addresses')
+        .select('full_address')
+        .eq('property_id', property.id)
+        .single();
+      
+      if (addressData) {
+        fullAddress = addressData.full_address || '';
+      }
+    } catch (error) {
+      console.error('Error fetching property address:', error);
+    }
+    
     setFormData({
       title: property.title || '',
       description: property.description || '',
       price: property.price?.toString() || '',
       price_period: property.price_period || 'per_month',
       location: property.location || '',
-      full_address: property.full_address || '',
+      full_address: fullAddress,
       property_type: property.property_type || '',
       bedrooms: property.bedrooms?.toString() || '',
       bathrooms: property.bathrooms?.toString() || '',
@@ -354,8 +370,6 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     onSuccess: () => void,
     onError: () => void
   ): Promise<void> => {
-    if (!confirm('Una uhakika unataka kufuta tangazo hili?')) return;
-
     try {
       const { error } = await supabase
         .from('properties')

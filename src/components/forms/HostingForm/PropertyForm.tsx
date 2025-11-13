@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { X, Home, Building, Phone, Camera, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '@/hooks/use-toast';
 import type { Tables } from '@/lib/integrations/supabase/types';
 
 // Import modular step components
@@ -72,6 +73,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
   onAmenityToggle
 }) => {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
 
   const FORM_STORAGE_KEY = 'nyumba_link_property_form_data';
@@ -199,7 +201,11 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
       );
       
       if (!requiredFieldsValid) {
-        alert('Tafadhali jaza sehemu zote za lazima kabla ya kuongeza nyumba');
+        toast({
+          variant: "destructive",
+          title: "Taarifa hazikamiliki",
+          description: "Tafadhali jaza sehemu zote za lazima kabla ya kuongeza nyumba"
+        });
         return;
       }
       
@@ -213,7 +219,11 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
         clearSavedData();
       } catch (error) {
         console.error('Form submission error:', error);
-        alert('Kuna tatizo la kuongeza nyumba. Tafadhali jaribu tena.');
+        toast({
+          variant: "destructive",
+          title: "Hitilafu",
+          description: "Kuna tatizo la kuongeza nyumba. Tafadhali jaribu tena."
+        });
       }
     }
   };

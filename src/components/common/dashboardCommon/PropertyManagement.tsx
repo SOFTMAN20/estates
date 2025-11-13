@@ -67,16 +67,48 @@ const PropertyManagement: React.FC<PropertyManagementProps> = ({
   const { t } = useTranslation();
 
   /**
+   * STATUS COUNTS
+   * =============
+   * 
+   * Calculate counts for each status
+   */
+  const statusCounts = {
+    all: properties.length,
+    approved: properties.filter(p => p.status === 'approved').length,
+    pending: properties.filter(p => p.status === 'pending').length,
+    rejected: properties.filter(p => p.status === 'rejected').length,
+    active: properties.filter(p => p.status === 'approved').length,
+    inactive: properties.filter(p => p.status === 'pending' || p.status === 'rejected').length
+  };
+
+  /**
    * PROPERTY FILTERING LOGIC
    * =======================
    * 
    * Filters properties based on search query and status filter.
+   * Status mapping:
+   * - approved = active
+   * - pending = inactive
+   * - rejected = inactive
    */
   const filteredProperties = properties.filter(property => {
     const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          property.location.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesStatus = filterStatus === 'all' || property.status === filterStatus;
+    let matchesStatus = true;
+    if (filterStatus === 'all') {
+      matchesStatus = true;
+    } else if (filterStatus === 'active') {
+      matchesStatus = property.status === 'approved';
+    } else if (filterStatus === 'inactive') {
+      matchesStatus = property.status === 'pending' || property.status === 'rejected';
+    } else if (filterStatus === 'pending') {
+      matchesStatus = property.status === 'pending';
+    } else if (filterStatus === 'rejected') {
+      matchesStatus = property.status === 'rejected';
+    } else if (filterStatus === 'approved') {
+      matchesStatus = property.status === 'approved';
+    }
     
     return matchesSearch && matchesStatus;
   });
@@ -99,13 +131,16 @@ const PropertyManagement: React.FC<PropertyManagementProps> = ({
       </div>
       
       <Select value={filterStatus} onValueChange={onFilterChange}>
-        <SelectTrigger className="w-full sm:w-40">
+        <SelectTrigger className="w-full sm:w-48">
           <SelectValue placeholder={t('dashboard.status')} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">{t('dashboard.all')}</SelectItem>
-          <SelectItem value="active">{t('dashboard.active')}</SelectItem>
-          <SelectItem value="inactive">{t('dashboard.inactive')}</SelectItem>
+          <SelectItem value="all">Zote ({statusCounts.all})</SelectItem>
+          <SelectItem value="active">Active ({statusCounts.active})</SelectItem>
+          <SelectItem value="inactive">Inactive ({statusCounts.inactive})</SelectItem>
+          <SelectItem value="pending">Pending ({statusCounts.pending})</SelectItem>
+          <SelectItem value="approved">Approved ({statusCounts.approved})</SelectItem>
+          <SelectItem value="rejected">Rejected ({statusCounts.rejected})</SelectItem>
         </SelectContent>
       </Select>
 

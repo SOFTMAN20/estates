@@ -311,8 +311,8 @@ const Dashboard = () => {
           onSearchChange={(query) => updateUIState({ searchQuery: query })}
           onFilterChange={(status) => updateUIState({ filterStatus: status })}
           onViewModeChange={(mode) => updateUIState({ viewMode: mode })}
-          onEditProperty={(property) => {
-            handleEditProperty(property, profile);
+          onEditProperty={async (property) => {
+            await handleEditProperty(property, profile);
             openAddForm();
           }}
           onDeleteProperty={(id) => handleDeleteProperty(id, onPropertyDeleteSuccess, onPropertyDeleteError)}

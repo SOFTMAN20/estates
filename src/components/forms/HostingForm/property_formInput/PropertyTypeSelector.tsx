@@ -15,10 +15,10 @@
 
 import React from 'react';
 import { Label } from '@/components/ui/label';
-import { Home, Building, Bed, Users, Briefcase, LucideIcon } from 'lucide-react';
+import { Home, Building, Bed, Users, Briefcase, Hotel, Building2, Landmark, LucideIcon } from 'lucide-react';
 import { cn } from '@/utils/utils';
 
-export type PropertyType = 'Apartment' | 'House' | 'Shared Room' | 'Studio' | 'Bedsitter';
+export type PropertyType = 'Apartment' | 'House' | 'Shared Room' | 'Studio' | 'Bedsitter' | 'Lodge' | 'Hotel' | 'Office';
 
 interface PropertyTypeOption {
   value: PropertyType;
@@ -77,6 +77,24 @@ const DEFAULT_OPTIONS: PropertyTypeOption[] = [
     label: 'Bedsitter', 
     icon: Briefcase,
     description: 'Chumba na jiko ndani'
+  },
+  { 
+    value: 'Lodge', 
+    label: 'Lodge', 
+    icon: Landmark,
+    description: 'Lodge au gesti'
+  },
+  { 
+    value: 'Hotel', 
+    label: 'Hotel', 
+    icon: Hotel,
+    description: 'Hoteli'
+  },
+  { 
+    value: 'Office', 
+    label: 'Ofisi', 
+    icon: Building2,
+    description: 'Ofisi ya biashara'
   },
 ];
 

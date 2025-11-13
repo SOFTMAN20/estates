@@ -12,12 +12,12 @@
  */
 
 // Input Components
-export { PriceInput, type PricePeriod } from './property_formDataForms/PriceInput';
-export { RoomCounter } from './property_formDataForms/RoomCounter';
+export { PriceInput, type PricePeriod } from './HostingForm/property_formInput/PriceInput';
+export { RoomCounter } from './HostingForm/property_formInput/RoomCounter';
 
 // Selector Components
-export { PropertyTypeSelector, type PropertyType } from './property_formDataForms/PropertyTypeSelector';
-export { AmenitiesSelector, type AmenityKey } from './property_formDataForms/AmenitiesSelector';
+export { PropertyTypeSelector, type PropertyType } from './HostingForm/property_formInput/PropertyTypeSelector';
+export { AmenitiesSelector, type AmenityKey } from './HostingForm/property_formInput/AmenitiesSelector';
 
 // Upload Components
 export { default as ImageUpload } from './ImageUpload';
@@ -25,4 +25,4 @@ export { default as AvatarUpload } from './AvatarUpload';
 
 // Form Components
 export { default as ProfileSettings } from './ProfileSettings';
-export { default as PropertyForm } from './PropertyForm';
+export { default as PropertyForm } from './HostingForm/PropertyForm';

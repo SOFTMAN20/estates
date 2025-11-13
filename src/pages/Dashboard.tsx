@@ -34,7 +34,7 @@ import Navigation from '@/components/layout/navbarLayout/Navigation';
 import QuickActions from '@/components/common/dashboardCommon/QuickActions';
 import StatsSection from '@/components/common/dashboardCommon/StatsSection';
 import PropertyManagement from '@/components/common/dashboardCommon/PropertyManagement';
-import PropertyForm from '@/components/forms/PropertyForm';
+import PropertyForm from '@/components/forms/HostingForm/PropertyForm';
 import ProfileSettings from '@/components/forms/ProfileSettings';
 import GetHelpSection from '@/components/common/dashboardCommon/GetHelpSection';
 import { PropertyGridSkeleton } from '@/components/common/propertyCommon/PropertyCardSkeleton';

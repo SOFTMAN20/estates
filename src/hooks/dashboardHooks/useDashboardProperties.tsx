@@ -91,7 +91,7 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setProperties(data || []);
+      setProperties((data as Property[]) || []);
     } catch (error) {
       console.error('Error fetching properties:', error);
       throw error;
@@ -119,7 +119,7 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     }
     
     // Property type validation
-    const allowedTypes = ['Apartment', 'House', 'Studio', 'Shared Room', 'Bedsitter'];
+    const allowedTypes = ['Apartment', 'House', 'Studio', 'Shared Room', 'Bedsitter', 'Lodge', 'Hotel', 'Office'];
     if (!formData.property_type?.trim()) {
       errors.push('Chagua aina ya nyumba');
     } else if (!allowedTypes.includes(formData.property_type)) {

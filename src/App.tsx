@@ -126,7 +126,12 @@ const App = () => (
           <Sonner />
 
           {/* Main routing configuration - Mipangilio ya uongozaji */}
-          <BrowserRouter>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true,
+            }}
+          >
             <Suspense fallback={
               <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-serengeti-50 to-kilimanjaro-50">
                 <div className="text-center">

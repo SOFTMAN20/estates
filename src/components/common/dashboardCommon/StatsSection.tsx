@@ -12,21 +12,22 @@
  * 
  * FEATURES / VIPENGELE:
  * - Total properties count (Jumla ya nyumba)
- * - Total views across all properties (Jumla ya miwani kwa nyumba zote)
  * - Active properties count (Idadi ya nyumba zinazoonekana)
+ * - Pending approval count (Idadi ya nyumba zinazosubiri idhini)
+ * - Total bookings count (Jumla ya mahifadhi)
  * - Average property price (Bei ya wastani ya nyumba)
  */
 
 import React from 'react';
 import StatsCard from './StatsCard';
-import { Home, Eye, TrendingUp, DollarSign } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { Home, TrendingUp, DollarSign, Clock, Calendar } from 'lucide-react';
 import type { Tables } from '@/lib/integrations/supabase/types';
 
 type Property = Tables<'properties'>;
 
 interface StatsSectionProps {
   properties: Property[];
+  totalBookings?: number;
 }
 
 /**
@@ -39,20 +40,14 @@ interface StatsSectionProps {
  * Inaonyesha gridi ya kadi za takwimu zinazoonyesha vipimo vikuu
  * kuhusu nyumba za mtumiaji na utendaji wao.
  */
-const StatsSection: React.FC<StatsSectionProps> = ({ properties }) => {
-  const { t } = useTranslation();
+const StatsSection: React.FC<StatsSectionProps> = ({ properties, totalBookings = 0 }) => {
 
   /**
    * STATISTICS CALCULATION FUNCTIONS
    * ================================
    */
 
-  /**
-   * Calculates total views across all properties
-   */
-  const getTotalViews = (): number => {
-    return properties.reduce((sum, property) => sum + (property.views_count || 0), 0);
-  };
+
 
   /**
    * Calculates average price of all properties
@@ -64,38 +59,52 @@ const StatsSection: React.FC<StatsSectionProps> = ({ properties }) => {
   };
 
   /**
-   * Counts active properties
+   * Counts active properties (approved)
    */
   const getActivePropertiesCount = (): number => {
-    return properties.filter(p => p.status === 'active').length;
+    return properties.filter(p => p.status === 'approved').length;
   };
 
+  /**
+   * Counts pending approval properties
+   */
+  const getPendingApprovalCount = (): number => {
+    return properties.filter(p => p.status === 'pending').length;
+  };
+
+
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 mb-8">
       <StatsCard
-        title={t('dashboard.totalProperties')}
+        title="Total Properties"
         value={properties.length}
         icon={Home}
         trend={{ value: 12, isPositive: true }}
         gradient="bg-gradient-to-br from-blue-500 to-blue-600"
       />
       <StatsCard
-        title={t('dashboard.totalViews')}
-        value={getTotalViews()}
-        icon={Eye}
-        trend={{ value: 8, isPositive: true }}
-        gradient="bg-gradient-to-br from-green-500 to-green-600"
-      />
-      <StatsCard
-        title={t('dashboard.activeProperties')}
+        title="Active"
         value={getActivePropertiesCount()}
         icon={TrendingUp}
         trend={{ value: 5, isPositive: true }}
-        gradient="bg-gradient-to-br from-purple-500 to-purple-600"
+        gradient="bg-gradient-to-br from-green-500 to-green-600"
       />
       <StatsCard
-        title={t('dashboard.averagePrice')}
-        value={getAveragePrice() ? `TZS ${Math.round(getAveragePrice()).toLocaleString()}` : 'TZS 0'}
+        title="Pending Approval"
+        value={getPendingApprovalCount()}
+        icon={Clock}
+        gradient="bg-gradient-to-br from-amber-500 to-amber-600"
+      />
+      <StatsCard
+        title="Total Bookings"
+        value={totalBookings}
+        icon={Calendar}
+        gradient="bg-gradient-to-br from-pink-500 to-pink-600"
+      />
+      <StatsCard
+        title="Avg Price"
+        value={getAveragePrice() ? `${Math.round(getAveragePrice() / 1000)}k` : '0'}
         icon={DollarSign}
         gradient="bg-gradient-to-br from-orange-500 to-orange-600"
       />

@@ -41,6 +41,8 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { useTranslation } from 'react-i18next';
 import UserMenu from '@/components/layout/navbarLayout/UserMenu';
 import MobileMenu from '@/components/layout/navbarLayout/MobileMenu';
+import ModeToggle from '@/components/layout/navbarLayout/ModeToggle';
+import LanguageToggle from '@/components/layout/navbarLayout/LanguageToggle';
 
 import { supabase } from '@/lib/integrations/supabase/client';
 import type { Tables } from '@/lib/integrations/supabase/types';
@@ -203,6 +205,13 @@ const Navigation = () => {
               </Button>
             </Link>
 
+            {/* Mode Toggle - only show for authenticated users */}
+            {user && (
+              <div className="hidden lg:block">
+                <ModeToggle />
+              </div>
+            )}
+
             {/* Enhanced User Account Menu - Menyu ya akaunti ya mtumiaji */}
             {user ? (
               <>
@@ -232,27 +241,33 @@ const Navigation = () => {
                 </Link>
               </>
             ) : (
-              <Link to="/signin">
-                <Button size="sm" className="bg-gradient-to-r from-primary to-serengeti-500 
-                                            hover:from-primary/90 hover:to-serengeti-400 text-sm px-4 py-2
-                                            shadow-lg hover:shadow-xl transform hover:scale-105 
-                                            transition-all duration-300">
-                  {t('navigation.signIn')}
-                </Button>
-              </Link>
+              <>
+                {/* Become a Host Button */}
+                <Link to="/signup">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-sm px-4 py-2 border-gray-300 hover:bg-gray-50 
+                               transition-all duration-300 hover:scale-105"
+                  >
+                    Become a Host
+                  </Button>
+                </Link>
+                
+                {/* Sign In Button */}
+                <Link to="/signin">
+                  <Button size="sm" className="bg-gradient-to-r from-primary to-serengeti-500 
+                                              hover:from-primary/90 hover:to-serengeti-400 text-sm px-4 py-2
+                                              shadow-lg hover:shadow-xl transform hover:scale-105 
+                                              transition-all duration-300">
+                    {t('navigation.signIn')}
+                  </Button>
+                </Link>
+              </>
             )}
 
-            {/* Enhanced Language Toggle Button - Kitufe cha kubadilisha lugha (RIGHT SIDE) */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleLanguage}
-              className="flex items-center space-x-2 px-3 py-2 rounded-full hover:bg-gray-100 
-                         hover:scale-105 transition-all duration-300 border border-gray-200 hover:border-primary/30"
-            >
-              <Globe className="h-4 w-4 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">{i18n.language.toUpperCase()}</span>
-            </Button>
+            {/* Language Dropdown - Globe icon only */}
+            <LanguageToggle />
           </div>
 
           {/* Enhanced Mobile Menu Toggle Button - Kitufe cha menyu ya simu */}

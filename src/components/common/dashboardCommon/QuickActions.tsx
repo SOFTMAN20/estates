@@ -13,6 +13,7 @@ import {
   Headphones
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 interface QuickActionsProps {
   onAddProperty: () => void;
@@ -30,6 +31,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({
   propertiesCount
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const actions = [
     {
@@ -56,7 +58,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({
       title: t('dashboard.viewAnalytics'),
       description: t('dashboard.viewPerformance'),
       icon: BarChart3,
-      onClick: () => console.log('Analytics clicked'),
+      onClick: () => navigate('/analytics'),
       primary: false,
       disabled: propertiesCount === 0,
       color: 'bg-green-500 hover:bg-green-600'

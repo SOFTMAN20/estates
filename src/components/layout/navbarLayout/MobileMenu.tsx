@@ -29,6 +29,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Home, Search, User, X, Globe, Building2, LogOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import ModeToggle from '@/components/layout/navbarLayout/ModeToggle';
 import type { Tables } from '@/lib/integrations/supabase/types';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
@@ -183,7 +184,15 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 </Link>
               )}
 
-              {/* Removed "Become Host" link - All users can access dashboard */}
+              {/* Mode Toggle for mobile - only show for authenticated users */}
+              {user && (
+                <div className="border-t border-gray-200 pt-4 mt-4">
+                  <p className="text-sm font-medium text-gray-600 mb-2 px-4">Switch Mode</p>
+                  <div className="px-4">
+                    <ModeToggle />
+                  </div>
+                </div>
+              )}
 
               {/* User Actions Section */}
               <div className="border-t border-gray-200 pt-4 mt-4">

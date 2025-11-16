@@ -23,7 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Home, TrendingUp } from 'lucide-react';
+import { LayoutGrid, List } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { Tables } from '@/lib/integrations/supabase/types';
 
@@ -144,22 +144,26 @@ const PropertyManagement: React.FC<PropertyManagementProps> = ({
         </SelectContent>
       </Select>
 
-      <div className="flex border rounded-lg">
+      <div className="flex border rounded-lg overflow-hidden">
         <Button
           variant={viewMode === 'grid' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => onViewModeChange('grid')}
-          className="rounded-r-none"
+          className="rounded-r-none gap-1.5"
+          title="Grid View"
         >
-          <Home className="h-4 w-4" />
+          <LayoutGrid className="h-4 w-4" />
+          <span className="hidden sm:inline text-xs">Grid</span>
         </Button>
         <Button
           variant={viewMode === 'list' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => onViewModeChange('list')}
-          className="rounded-l-none"
+          className="rounded-l-none gap-1.5"
+          title="List View"
         >
-          <TrendingUp className="h-4 w-4" />
+          <List className="h-4 w-4" />
+          <span className="hidden sm:inline text-xs">List</span>
         </Button>
       </div>
     </div>

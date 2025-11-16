@@ -49,6 +49,7 @@ import {
   useDashboardProfile,
   useDashboardProperties
 } from '@/hooks/dashboardHooks';
+import { useBookingsStats } from '@/hooks/dashboardHooks/useBookingsStats';
 
 /**
  * DASHBOARD COMPONENT - REFACTORED WITH CUSTOM HOOKS
@@ -104,6 +105,9 @@ const Dashboard = () => {
     handleAmenityToggle,
     resetForm
   } = useDashboardProperties();
+
+  // Bookings Statistics Hook
+  const { totalBookings } = useBookingsStats(user?.id);
 
   /**
    * INITIALIZATION AND LIFECYCLE MANAGEMENT
@@ -300,7 +304,7 @@ const Dashboard = () => {
         />
 
         {/* Statistics Section */}
-        <StatsSection properties={properties} />
+        <StatsSection properties={properties} totalBookings={totalBookings} />
 
         {/* Property Management */}
         <PropertyManagement

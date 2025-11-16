@@ -69,6 +69,7 @@ const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Favorites = lazy(() => import("./pages/Favorites"));
+const Analytics = lazy(() => import("./pages/Analytics"));
 const SignIn = lazy(() => import("./pages/SignIn"));
 const SignUp = lazy(() => import("./pages/SignUp"));
 const PropertyExample = lazy(() => import("./pages/PropertyExample"));
@@ -155,6 +156,7 @@ const App = () => (
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/favorites" element={<Favorites />} />
+                <Route path="/analytics" element={<Analytics />} />
                 <Route path="/property-example" element={<PropertyExample />} />
 
                 {/* Authentication routes - Njia za uthibitisho */}

@@ -12,6 +12,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      bookings: {
+        Row: {
+          cancellation_date: string | null
+          created_at: string | null
+          end_date: string
+          id: string
+          payment_method: string | null
+          payment_status: string | null
+          property_id: string
+          start_date: string
+          status: string | null
+          total_price: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          cancellation_date?: string | null
+          created_at?: string | null
+          end_date: string
+          id?: string
+          payment_method?: string | null
+          payment_status?: string | null
+          property_id: string
+          start_date: string
+          status?: string | null
+          total_price: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          cancellation_date?: string | null
+          created_at?: string | null
+          end_date?: string
+          id?: string
+          payment_method?: string | null
+          payment_status?: string | null
+          property_id?: string
+          start_date?: string
+          status?: string | null
+          total_price?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       properties: {
         Row: {
           amenities: string[] | null
@@ -207,7 +252,20 @@ export type Database = {
         Relationships: []
       }
     }
-    Views: Record<string, never>
+    Views: {
+      booking_stats: {
+        Row: {
+          average_booking_value: number | null
+          cancelled_bookings: number | null
+          completed_bookings: number | null
+          confirmed_bookings: number | null
+          pending_bookings: number | null
+          total_bookings: number | null
+          total_revenue: number | null
+        }
+        Relationships: []
+      }
+    }
     Functions: Record<string, never>
     Enums: Record<string, never>
     CompositeTypes: Record<string, never>

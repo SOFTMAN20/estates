@@ -38,8 +38,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Menu, User, Building2, LogOut, Heart, Bell, Settings } from 'lucide-react';
+import { Menu, User, Building2, LogOut, Heart, Bell, Settings, Calendar, Home as HomeIcon, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useModeToggle } from '@/hooks/useModeToggle';
 import type { Tables } from '@/lib/integrations/supabase/types';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
@@ -76,6 +77,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { currentMode } = useModeToggle();
 
   /**
    * Get user initials from name or email
@@ -145,11 +147,31 @@ const UserMenu: React.FC<UserMenuProps> = ({
               <p className="text-xs leading-none text-muted-foreground">
                 {user.email}
               </p>
+              <p className="text-xs leading-none text-primary font-medium mt-1">
+                {currentMode === 'guest' ? '👤 Guest Mode' : '🏠 Host Mode'}
+              </p>
             </div>
           </div>
         </DropdownMenuLabel>
 
         <DropdownMenuSeparator />
+
+        {/* Mode-specific menu items */}
+        {currentMode === 'guest' ? (
+          <DropdownMenuItem asChild>
+            <Link to="/my-bookings" className="flex items-center cursor-pointer">
+              <Calendar className="mr-2 h-4 w-4" />
+              <span>My Bookings</span>
+            </Link>
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem asChild>
+            <Link to="/dashboard" className="flex items-center cursor-pointer">
+              <HomeIcon className="mr-2 h-4 w-4" />
+              <span>My Listings</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
 
         {/* Favorites Link */}
         <DropdownMenuItem asChild>
@@ -172,14 +194,6 @@ const UserMenu: React.FC<UserMenuProps> = ({
           </Link>
         </DropdownMenuItem>
 
-        {/* Dashboard Link */}
-        <DropdownMenuItem asChild>
-          <Link to="/dashboard" className="flex items-center cursor-pointer">
-            <Building2 className="mr-2 h-4 w-4" />
-            <span>{t('navigation.dashboard')}</span>
-          </Link>
-        </DropdownMenuItem>
-
         {/* Notifications (Disabled) */}
         <DropdownMenuItem disabled>
           <Bell className="mr-2 h-4 w-4" />
@@ -194,6 +208,19 @@ const UserMenu: React.FC<UserMenuProps> = ({
           <Settings className="mr-2 h-4 w-4" />
           <span>Mipangilio</span>
         </DropdownMenuItem>
+
+        {/* Admin link - only visible if role='admin' */}
+        {profile?.role === 'admin' && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link to="/admin" className="flex items-center cursor-pointer">
+                <Shield className="mr-2 h-4 w-4" />
+                <span>Admin Panel</span>
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
 
         <DropdownMenuSeparator />
 

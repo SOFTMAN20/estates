@@ -156,26 +156,21 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
         {/* Property Details */}
         <div className="p-4 space-y-3">
           {/* Title */}
-          <h3 className="font-semibold text-lg text-gray-900 line-clamp-1">
+          <h3 className="font-semibold text-lg text-gray-900 line-clamp-1 break-words">
             {property.title}
           </h3>
 
           {/* Location */}
-          <div className="flex items-center gap-2 text-gray-600">
-            <MapPin className="w-4 h-4" />
-            <span className="text-sm">{property.location}</span>
+          <div className="flex items-start gap-2 text-gray-600">
+            <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <span className="text-sm break-words">{property.location}</span>
           </div>
 
           {/* Price */}
-          <div className="flex items-center gap-2 text-green-600 font-semibold">
-            <DollarSign className="w-4 h-4" />
-            <span>TSh {property.price?.toLocaleString()}/mwezi</span>
+          <div className="flex items-start gap-2 text-green-600 font-semibold">
+            <DollarSign className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <span className="break-all">TSh {property.price?.toLocaleString()}/mwezi</span>
           </div>
-
-          {/* Description Preview */}
-          <p className="text-gray-600 text-sm line-clamp-2">
-            {property.description}
-          </p>
 
           {/* Action Buttons */}
           <div className="flex gap-2 pt-2">

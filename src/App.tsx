@@ -57,6 +57,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { createOptimizedQueryClient } from "@/utils/cache";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import { ModeProvider } from "@/contexts/ModeContext";
 import ErrorBoundary from "@/components/ui/error-boundary";
 import { lazy, Suspense } from "react";
 import MobileBottomNav from "./components/layout/navbarLayout/MobileBottomNav";
@@ -121,10 +122,11 @@ const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TooltipProvider>
-          {/* Notification systems - Mifumo ya arifa */}
-          <Toaster />
-          <Sonner />
+        <ModeProvider>
+          <TooltipProvider>
+            {/* Notification systems - Mifumo ya arifa */}
+            <Toaster />
+            <Sonner />
 
           {/* Main routing configuration - Mipangilio ya uongozaji */}
           <BrowserRouter
@@ -175,7 +177,8 @@ const App = () => (
 
           {/* Performance Dashboard - Development only */}
           <PerformanceDashboard />
-        </TooltipProvider>
+          </TooltipProvider>
+        </ModeProvider>
       </AuthProvider>
     </QueryClientProvider>
   </ErrorBoundary>

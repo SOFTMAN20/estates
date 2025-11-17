@@ -18,7 +18,7 @@
  * - Testability: Easy to unit test filter logic
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 export interface FilterState {
@@ -26,24 +26,46 @@ export interface FilterState {
   priceRange: string;
   minPrice: string;
   maxPrice: string;
+  propertyType: string;
+  bedrooms: string;
+  bathrooms: string;
   utilities: string[];
   nearbyServices: string[];
   sortBy: string;
 }
 
-const getInitialFilterState = (searchParams: URLSearchParams): FilterState => ({
-  searchQuery: searchParams.get('location') || '',
-  priceRange: searchParams.get('price') || 'all',
-  minPrice: searchParams.get('minPrice') || '',
-  maxPrice: searchParams.get('maxPrice') || '',
-  utilities: [],
-  nearbyServices: [],
-  sortBy: 'newest'
-});
+const getInitialFilterState = (searchParams: URLSearchParams): FilterState => {
+  // Parse utilities from URL (comma-separated)
+  const utilitiesParam = searchParams.get('utilities');
+  const utilities = utilitiesParam ? utilitiesParam.split(',') : [];
+  
+  // Parse nearby services from URL (comma-separated)
+  const servicesParam = searchParams.get('services');
+  const nearbyServices = servicesParam ? servicesParam.split(',') : [];
+  
+  return {
+    searchQuery: searchParams.get('location') || '',
+    priceRange: searchParams.get('price') || 'all',
+    minPrice: searchParams.get('minPrice') || '',
+    maxPrice: searchParams.get('maxPrice') || '',
+    propertyType: searchParams.get('propertyType') || 'all',
+    bedrooms: searchParams.get('bedrooms') || 'all',
+    bathrooms: searchParams.get('bathrooms') || 'all',
+    utilities,
+    nearbyServices,
+    sortBy: searchParams.get('sortBy') || 'newest'
+  };
+};
 
 export const usePropertyFilters = () => {
   const [searchParams] = useSearchParams();
   const [filters, setFilters] = useState<FilterState>(() => getInitialFilterState(searchParams));
+
+  // Sync filters with URL parameters when they change
+  useEffect(() => {
+    const newFilters = getInitialFilterState(searchParams);
+    setFilters(newFilters);
+  }, [searchParams]);
 
   /**
    * Update a single filter value
@@ -85,6 +107,9 @@ export const usePropertyFilters = () => {
       priceRange: 'all',
       minPrice: '',
       maxPrice: '',
+      propertyType: 'all',
+      bedrooms: 'all',
+      bathrooms: 'all',
       utilities: [],
       nearbyServices: [],
       sortBy: 'newest'
@@ -100,6 +125,9 @@ export const usePropertyFilters = () => {
       (filters.priceRange && filters.priceRange !== 'all') ||
       filters.minPrice ||
       filters.maxPrice ||
+      (filters.propertyType && filters.propertyType !== 'all') ||
+      (filters.bedrooms && filters.bedrooms !== 'all') ||
+      (filters.bathrooms && filters.bathrooms !== 'all') ||
       filters.utilities.length > 0 ||
       filters.nearbyServices.length > 0
     );

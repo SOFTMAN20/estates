@@ -35,7 +35,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, Search, User, Menu, X, Globe, Building2 } from 'lucide-react';
+import { Home, Menu, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useTranslation } from 'react-i18next';
@@ -43,6 +43,7 @@ import UserMenu from '@/components/layout/navbarLayout/UserMenu';
 import MobileMenu from '@/components/layout/navbarLayout/MobileMenu';
 import ModeToggle from '@/components/layout/navbarLayout/ModeToggle';
 import LanguageToggle from '@/components/layout/navbarLayout/LanguageToggle';
+import NavbarSearchBar from '@/components/layout/navbarLayout/NavbarSearchBar';
 
 import { supabase } from '@/lib/integrations/supabase/client';
 import type { Tables } from '@/lib/integrations/supabase/types';
@@ -101,6 +102,9 @@ const Navigation = () => {
     fetchProfile();
   }, [user]);
 
+  // Scroll tracking removed - second row now always visible
+  // The second row will remain visible at all times for better navigation access
+
   /**
    * Language Toggle Function
    * Utendakazi wa kubadilisha lugha
@@ -114,202 +118,181 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-        <div className="flex justify-between items-center h-14 sm:h-16 lg:h-20">
-          
-          {/* Enhanced Brand Logo Section - Sehemu ya nembo ya chapa */}
-          <div className="flex items-center space-x-2 sm:space-x-4">
-            <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group">
-              <div className="p-1 sm:p-1.5 lg:p-2 bg-gradient-to-br from-primary to-serengeti-500 
-                              rounded-md sm:rounded-lg lg:rounded-xl transform group-hover:scale-110 transition-all duration-300 
-                              shadow-lg group-hover:shadow-xl">
-                <Home className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-white" />
-              </div>
-              <div className="transform group-hover:scale-105 transition-transform duration-300">
-                {/* Mobile label: NyLink */}
-                <span className="md:hidden text-base sm:text-lg lg:text-2xl font-bold bg-gradient-to-r from-primary to-serengeti-600 
-                                bg-clip-text text-transparent">NyLink</span>
-                <span className="md:hidden text-base sm:text-lg lg:text-2xl font-bold text-serengeti-600"></span>
+    <>
+      {/* TOP ROW: YouTube-style Layout: Logo | Search | Actions - Scrolls away on mobile */}
+      <div className="bg-white border-b border-gray-200 md:sticky md:top-0 md:z-50">
+        <div className="flex items-center justify-between px-2 sm:px-4 h-14 border-b border-gray-100">
+        
+        {/* LEFT: Logo */}
+        <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group">
+            <div className="p-1 sm:p-1.5 bg-gradient-to-br from-primary to-serengeti-500 rounded-lg">
+              <Home className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+            </div>
+            <span className="hidden sm:inline text-base sm:text-lg font-bold bg-gradient-to-r from-primary to-serengeti-600 bg-clip-text text-transparent">
+              NyumbaLink
+            </span>
+          </Link>
+        </div>
 
-                {/* Desktop/large label: NyumbaLink Tz */}
-                <span className="hidden md:inline text-base sm:text-lg lg:text-2xl font-bold bg-gradient-to-r from-primary to-serengeti-600 
-                                bg-clip-text text-transparent">NyumbaLink</span>
-                <span className="hidden md:inline text-base sm:text-lg lg:text-2xl font-bold text-serengeti-600"> </span>
-              </div>
-            </Link>
-            
-            {/* Removed "Become a Host" button - All users can access dashboard */}
+        {/* CENTER: Search Bar (YouTube-style) - Hidden on mobile */}
+        <div className="hidden md:flex flex-1 max-w-2xl mx-4">
+          <NavbarSearchBar />
+        </div>
+
+        {/* RIGHT: Actions */}
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+
+          {/* Mode Toggle - Hidden on small mobile */}
+          {user && (
+            <div className="hidden sm:block">
+              <ModeToggle />
+            </div>
+          )}
+
+          {/* Language Toggle - Hidden on small mobile */}
+          <div className="hidden sm:block">
+            <LanguageToggle />
           </div>
 
-          {/* Enhanced Desktop Navigation Menu - Menyu ya uongozaji wa kompyuta */}
-          <div className="hidden md:flex items-center space-x-2">
-            {/* Home Link - Kiungo cha nyumbani */}
-            <Link to="/">
-              <Button
-                variant="ghost"
-                className={`px-4 py-2 rounded-full transition-all duration-300 text-sm sm:text-base
-                           hover:bg-primary/10 hover:text-primary hover:scale-105 ${
-                  location.pathname === '/' 
-                    ? 'bg-primary/15 text-primary font-semibold shadow-md border border-primary/20' 
-                    : 'hover:bg-gray-100'
-                }`}
-              >
-                {t('navigation.home')}
-              </Button>
-            </Link>
-            
-            {/* Browse Properties Link - Kiungo cha kutazama nyumba */}
-            <Link to="/browse">
-              <Button
-                variant="ghost"
-                className={`px-4 py-2 rounded-full transition-all duration-300 text-sm sm:text-base
-                           hover:bg-primary/10 hover:text-primary hover:scale-105 ${
-                  location.pathname === '/browse' 
-                    ? 'bg-primary/15 text-primary font-semibold shadow-md border border-primary/20' 
-                    : 'hover:bg-gray-100'
-                }`}
-              >
-                {t('navigation.browse')}
-              </Button>
-            </Link>
-            
-            {/* About Us Link - Kiungo cha kuhusu */}
-            <Link to="/about">
-              <Button
-                variant="ghost"
-                className={`px-4 py-2 rounded-full transition-all duration-300 text-sm sm:text-base
-                           hover:bg-primary/10 hover:text-primary hover:scale-105 ${
-                  location.pathname === '/about' 
-                    ? 'bg-primary/15 text-primary font-semibold shadow-md border border-primary/20' 
-                    : 'hover:bg-gray-100'
-                }`}
-              >
-                {t('navigation.about')}
-              </Button>
-            </Link>
-          </div>
+          {/* Mobile Menu Toggle - On the right */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-2 hover:bg-gray-100 rounded-full md:hidden"
+          >
+            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
 
-          {/* Enhanced Desktop Right Side Controls - Vidhibiti vya upande wa kulia vya kompyuta */}
-          <div className="hidden md:flex items-center space-x-3 sm:space-x-4">
-            {/* Search Icon - Aikoni ya kutafuta */}
-            <Link to="/browse">
-              <Button
-                variant="ghost"
-                className="flex items-center space-x-2 px-3 py-2 rounded-full hover:bg-primary/10 
-                           hover:text-primary hover:scale-105 transition-all duration-300"
-                title={t('navigation.browse')}
-              >
-                <Search className="h-4 w-4" />
-                <span className="hidden lg:inline text-sm font-medium">{t('common.search')}</span>
-              </Button>
-            </Link>
-
-            {/* Mode Toggle - only show for authenticated users */}
-            {user && (
-              <div className="hidden lg:block">
-                <ModeToggle />
-              </div>
-            )}
-
-            {/* Enhanced User Account Menu - Menyu ya akaunti ya mtumiaji */}
-            {user ? (
-              <>
-                {/* User Menu Component (Hamburger with Dropdown) */}
+          {/* User Actions */}
+          {user ? (
+            <>
+              {/* User Menu - Hidden on mobile, shown on desktop */}
+              <div className="hidden sm:block">
                 <UserMenu
                   user={user}
                   profile={profile}
                   favoritesCount={getFavoritesCount()}
                   onSignOut={() => signOut(navigate)}
                 />
-                
-                {/* User Avatar Display - Clickable to navigate to profile */}
-                <Link to="/profile" className="cursor-pointer hover:opacity-80 transition-opacity duration-200">
-                  {profile?.avatar_url ? (
-                    <img
-                      src={profile.avatar_url}
-                      alt={profile.name || 'User'}
-                      className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 hover:border-primary transition-colors duration-200"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 bg-gradient-to-br from-primary to-serengeti-500 rounded-full flex items-center justify-center border-2 border-gray-200 hover:border-primary transition-colors duration-200">
-                      <span className="text-white text-base font-semibold">
-                        {profile?.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || 'U'}
-                      </span>
-                    </div>
-                  )}
-                </Link>
-              </>
-            ) : (
-              <>
-                {/* Become a Host Button */}
-                <Link to="/signup">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-sm px-4 py-2 border-gray-300 hover:bg-gray-50 
-                               transition-all duration-300 hover:scale-105"
-                  >
-                    Become a Host
-                  </Button>
-                </Link>
-                
-                {/* Sign In Button */}
-                <Link to="/signin">
-                  <Button size="sm" className="bg-gradient-to-r from-primary to-serengeti-500 
-                                              hover:from-primary/90 hover:to-serengeti-400 text-sm px-4 py-2
-                                              shadow-lg hover:shadow-xl transform hover:scale-105 
-                                              transition-all duration-300">
-                    {t('navigation.signIn')}
-                  </Button>
-                </Link>
-              </>
-            )}
+              </div>
+              
+              {/* User Avatar */}
+              <Link to="/profile" className="hover:opacity-80">
+                {profile?.avatar_url ? (
+                  <img
+                    src={profile.avatar_url}
+                    alt={profile.name || 'User'}
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-primary to-serengeti-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs sm:text-sm font-semibold">
+                      {profile?.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || 'U'}
+                    </span>
+                  </div>
+                )}
+              </Link>
+            </>
+          ) : (
+            <>
+              {/* Become a Host - Hidden on small mobile */}
+              <Link to="/signup" className="hidden sm:block">
+                <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
+                  Become a Host
+                </Button>
+              </Link>
+              
+              {/* Sign In Button */}
+              <Link to="/signin">
+                <Button size="sm" className="bg-primary hover:bg-primary/90 text-xs sm:text-sm px-3 sm:px-4">
+                  {t('navigation.signIn')}
+                </Button>
+              </Link>
+            </>
+          )}
+        </div>
+        </div>
 
-            {/* Language Dropdown - Globe icon only */}
-            <LanguageToggle />
-          </div>
+        {/* SECOND ROW: Navigation Items (YouTube-style category tabs) - Desktop only, always visible */}
+        <div className="hidden md:flex items-center justify-center gap-1 px-4 py-2 overflow-x-auto">
+        <Link to="/">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
+              location.pathname === '/'
+                ? 'bg-primary/15 text-primary hover:bg-primary/20 border border-primary/20'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {t('navigation.home')}
+          </Button>
+        </Link>
 
-          {/* Enhanced Mobile Menu Toggle Button - Kitufe cha menyu ya simu */}
-          <div className="md:hidden flex items-center space-x-1">
-            {/* Mobile Search Button - Takes user to browse page */}
-            <Link to="/browse">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="p-1.5 hover:bg-primary/10 hover:text-primary rounded-full transition-all duration-300 hover:scale-105"
-              >
-                <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
-              </Button>
-            </Link>
-            
-            {/* Mobile Menu Toggle */}
+        <Link to="/browse">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
+              location.pathname === '/browse'
+                ? 'bg-primary/15 text-primary hover:bg-primary/20 border border-primary/20'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {t('navigation.browse')}
+          </Button>
+        </Link>
+
+        <Link to="/about">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
+              location.pathname === '/about'
+                ? 'bg-primary/15 text-primary hover:bg-primary/20 border border-primary/20'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {t('navigation.about')}
+          </Button>
+        </Link>
+
+        {user && (
+          <Link to="/dashboard">
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-1.5 hover:bg-gray-100 rounded-full transition-all duration-300 hover:scale-105"
+              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
+                location.pathname === '/dashboard'
+                  ? 'bg-primary/15 text-primary hover:bg-primary/20 border border-primary/20'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
             >
-              {isMenuOpen ? (
-                <X className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
-              ) : (
-                <Menu className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
-              )}
+              {t('navigation.dashboard')}
             </Button>
-          </div>
+          </Link>
+        )}
         </div>
-
-        {/* Mobile Menu Component */}
-        <MobileMenu
-          isOpen={isMenuOpen}
-          onClose={() => setIsMenuOpen(false)}
-          user={user}
-          profile={profile}
-          onSignOut={() => signOut(navigate)}
-          onLanguageToggle={toggleLanguage}
-        />
       </div>
-    </nav>
+
+      {/* MOBILE SEARCH BAR - Sticky on mobile, scrolls away on desktop */}
+      <div className="md:hidden sticky top-0 z-50 bg-white px-2 py-2 border-b border-gray-200 shadow-sm">
+        <NavbarSearchBar />
+      </div>
+
+      {/* Mobile Menu */}
+      <MobileMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        user={user}
+        profile={profile}
+        onSignOut={() => signOut(navigate)}
+        onLanguageToggle={toggleLanguage}
+      />
+    </>
   );
 };
 

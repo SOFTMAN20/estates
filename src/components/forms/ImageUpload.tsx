@@ -1,9 +1,9 @@
 
-import React, { useState } from 'react';
+import React, { useState, DragEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Upload, X, Image, Loader2 } from 'lucide-react';
+import { Upload, X, Image, Loader2, ImagePlus } from 'lucide-react';
 import { supabase } from '@/lib/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -20,13 +20,14 @@ interface ImageUploadProps {
 const ImageUpload: React.FC<ImageUploadProps> = ({ 
   images, 
   onImagesChange, 
-  maxImages = 5 
+  maxImages = 6 
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
   const [compressionStatus, setCompressionStatus] = useState<string>('');
+  const [isDragging, setIsDragging] = useState(false);
 
   /**
    * CLIENT-SIDE COMPRESSION (First Stage)
@@ -218,9 +219,40 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     return { isValid: true };
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
+  /**
+   * DRAG AND DROP HANDLERS
+   * ======================
+   */
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
     if (!files || !user) return;
+
+    // Convert FileList to File array and process
+    await processFiles(Array.from(files));
+  };
+
+  /**
+   * PROCESS FILES (shared by both file input and drag-drop)
+   * =======================================================
+   */
+  const processFiles = async (fileList: File[]) => {
+    if (!user) return;
 
     // Rate limiting check
     const userId = user.id;
@@ -233,12 +265,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       return;
     }
 
-    if (images.length + files.length > maxImages) {
+    if (images.length + fileList.length > maxImages) {
       setCompressionStatus('❌ Too many images selected');
       toast({
         variant: "destructive",
         title: t('common.error'),
-        description: t('dashboard.canAddMore', { remaining: maxImages })
+        description: `You can only upload ${maxImages} images maximum. Currently have ${images.length}.`
       });
       return;
     }
@@ -248,18 +280,17 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     const validFiles: File[] = [];
 
     // Validate all files first
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+    for (let i = 0; i < fileList.length; i++) {
+      const file = fileList[i];
       const validation = validateImageFile(file);
         
       if (!validation.isValid) {
-          toast({
-            variant: "destructive",
-            title: t('common.error'),
+        toast({
+          variant: "destructive",
+          title: t('common.error'),
           description: validation.error
         });
         setUploading(false);
-        event.target.value = '';
         return;
       }
       
@@ -309,9 +340,18 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       });
     } finally {
       setUploading(false);
-      // Reset input
-      event.target.value = '';
     }
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || !user) return;
+
+    await processFiles(Array.from(files));
+    
+    // Reset input
+    event.target.value = '';
+
   };
 
   const removeImage = (indexToRemove: number) => {
@@ -321,11 +361,23 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
   return (
     <div className="space-y-4">
-      <Label>{t('dashboard.propertyImages', { current: images.length, max: maxImages })}</Label>
+      <Label className="text-sm sm:text-base font-medium">
+        {t('dashboard.propertyImages', { current: images.length, max: maxImages })}
+      </Label>
       
-      {/* Upload button */}
-      <div className="space-y-3">
-      <div className="flex items-center gap-4">
+      {/* Drag and Drop Upload Area */}
+      <div
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={`relative border-2 border-dashed rounded-xl p-6 sm:p-8 transition-all duration-300 ${
+          isDragging
+            ? 'border-primary bg-primary/10 scale-[1.02]'
+            : uploading || images.length >= maxImages
+            ? 'border-gray-200 bg-gray-50 opacity-60'
+            : 'border-gray-300 hover:border-primary hover:bg-primary/5'
+        }`}
+      >
         <Input
           type="file"
           accept="image/*"
@@ -335,27 +387,52 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           className="hidden"
           id="image-upload"
         />
-        <Label 
-          htmlFor="image-upload" 
-            className={`cursor-pointer flex items-center gap-2 px-4 py-2 border-2 border-dashed rounded-lg transition-all duration-200 ${
-            uploading || images.length >= maxImages 
-                ? 'opacity-50 cursor-not-allowed bg-gray-50' 
-                : 'border-gray-300 hover:border-primary hover:bg-primary/5'
-          }`}
-        >
-            {uploading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-          <Upload className="h-4 w-4" />
-            )}
-            {uploading ? 'Processing...' : t('dashboard.selectImages')}
-        </Label>
-          {images.length < maxImages && !uploading && (
-          <span className="text-sm text-gray-600">
-            {t('dashboard.canAddMore', { remaining: maxImages - images.length })}
-          </span>
-        )}
+        
+        <div className="text-center">
+          {uploading ? (
+            <div className="space-y-3">
+              <Loader2 className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-primary animate-spin" />
+              <p className="text-sm sm:text-base font-medium text-gray-700">Processing images...</p>
+              <p className="text-xs sm:text-sm text-gray-500">Please wait while we optimize your images</p>
+            </div>
+          ) : isDragging ? (
+            <div className="space-y-3">
+              <ImagePlus className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-primary animate-bounce" />
+              <p className="text-sm sm:text-base font-medium text-primary">Drop images here!</p>
+              <p className="text-xs sm:text-sm text-gray-600">Release to upload</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <Upload className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-gray-400" />
+              <div>
+                <Label 
+                  htmlFor="image-upload" 
+                  className="cursor-pointer text-sm sm:text-base font-semibold text-primary hover:text-primary/80 transition-colors"
+                >
+                  Click to upload
+                </Label>
+                <span className="text-sm sm:text-base text-gray-600"> or drag and drop</span>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-500">
+                PNG, JPG, WebP up to 5MB
+              </p>
+              {images.length < maxImages && (
+                <p className="text-xs sm:text-sm font-medium text-gray-700">
+                  {maxImages - images.length} more image{maxImages - images.length !== 1 ? 's' : ''} can be added
+                </p>
+              )}
+              {images.length >= maxImages && (
+                <p className="text-xs sm:text-sm font-medium text-red-600">
+                  Maximum {maxImages} images reached
+                </p>
+              )}
+            </div>
+          )}
         </div>
+      </div>
+
+      {/* Upload Status */}
+      <div className="space-y-3">
 
         {/* Compression Status Display */}
         {compressionStatus && (

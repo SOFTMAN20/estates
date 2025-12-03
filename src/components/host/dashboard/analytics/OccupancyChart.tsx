@@ -1,13 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import type { OccupancyChartProps } from '@/types/analytics';
 
-interface OccupancyChartProps {
-  data: { month: string; occupancy: number; available: number }[];
-  timeRange: '7d' | '30d' | '90d' | '1y';
+interface OccupancyChartPropsExtended extends OccupancyChartProps {
   propertyId?: string;
 }
 
-export default function OccupancyChart({ data, timeRange, propertyId }: OccupancyChartProps) {
+export default function OccupancyChart({ data, timeRange, propertyId }: OccupancyChartPropsExtended) {
 
   return (
     <Card className="shadow-lg border-0">

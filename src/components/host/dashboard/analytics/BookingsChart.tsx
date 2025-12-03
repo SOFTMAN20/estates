@@ -1,13 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import type { BookingsChartProps } from '@/types/analytics';
 
-interface BookingsChartProps {
-  data: { date: string; bookings: number; cancellations: number }[];
-  timeRange: '7d' | '30d' | '90d' | '1y';
+interface BookingsChartPropsExtended extends BookingsChartProps {
   propertyId?: string;
 }
 
-export default function BookingsChart({ data, timeRange, propertyId }: BookingsChartProps) {
+export default function BookingsChart({ data, timeRange, propertyId }: BookingsChartPropsExtended) {
 
   return (
     <Card className="shadow-lg border-0">

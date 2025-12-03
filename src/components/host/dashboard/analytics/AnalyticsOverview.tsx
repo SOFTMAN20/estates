@@ -14,10 +14,9 @@ import BookingsStatusChart from '@/components/host/dashboard/analytics/BookingsS
 import AnalyticsSidebar from '@/components/host/dashboard/analytics/AnalyticsSidebar';
 import { useAnalytics } from '@/hooks/analyticsHooks/useAnalytics';
 import { useAuth } from '@/hooks/useAuth';
+import type { AnalyticsOverviewProps } from '@/types/analytics';
 
-interface AnalyticsOverviewProps {
-  propertyId?: string;
-  onPropertyChange?: (propertyId: string) => void;
+interface AnalyticsOverviewPropsExtended extends AnalyticsOverviewProps {
   propertyList?: { id: string; title: string }[];
 }
 
@@ -25,7 +24,7 @@ export default function AnalyticsOverview({
   propertyId, 
   onPropertyChange = () => {}, 
   propertyList = [] 
-}: AnalyticsOverviewProps) {
+}: AnalyticsOverviewPropsExtended) {
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
   const [activeTab, setActiveTab] = useState('revenue');
   const { user } = useAuth();

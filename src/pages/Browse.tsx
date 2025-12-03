@@ -56,6 +56,8 @@ import { usePropertyFilters } from '@/hooks/browseHooks/usePropertyFilters';
 import { usePropertySearch } from '@/hooks/browseHooks/usePropertySearch';
 import { useTranslation } from 'react-i18next';
 
+import type { UIState } from '@/types/search';
+
 /**
  * UI STATE INTERFACE
  * ==================
@@ -63,10 +65,6 @@ import { useTranslation } from 'react-i18next';
  * Defines the structure for UI-related state.
  * Separates UI state from business logic.
  */
-interface UIState {
-  showFilters: boolean;
-  viewMode: 'grid' | 'list';
-}
 
 /**
  * BROWSE COMPONENT

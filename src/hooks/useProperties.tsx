@@ -61,12 +61,9 @@ import type { Tables } from '@/lib/integrations/supabase/types';
  * Used throughout the app for consistent property data structure.
  * Enables type-safe access to property and host information.
  */
-export type Property = Tables<'properties'> & {
-  profiles?: {
-    name: string | null;
-    phone: string | null;
-  };
-};
+import type { ExtendedProperty } from '@/types/property';
+
+export type Property = ExtendedProperty;
 
 /**
  * PROPERTIES QUERY HOOK

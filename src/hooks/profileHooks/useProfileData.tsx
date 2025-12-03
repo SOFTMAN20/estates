@@ -22,18 +22,7 @@ import type { User } from '@supabase/supabase-js';
 
 type Profile = Tables<'profiles'>;
 
-/**
- * Profile form data interface
- * Muundo wa data ya fomu ya wasifu
- */
-export interface ProfileFormData {
-  name: string;
-  phone: string;
-  bio: string;
-  location: string;
-  is_host: boolean;
-  avatar_url: string;
-}
+import type { ProfileFormData } from '@/types/user';
 
 /**
  * Hook return type interface

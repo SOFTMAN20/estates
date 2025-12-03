@@ -26,17 +26,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
-interface PropertySearchBarProps {
-  searchQuery: string;
-  onSearchChange: (value: string) => void;
-  priceRange: string;
-  onPriceRangeChange: (value: string) => void;
-  showFilters: boolean;
-  onToggleFilters: () => void;
-  onSearch?: () => void;
-  className?: string;
-}
+import type { PropertySearchBarProps } from '@/types/search';
 
 const PropertySearchBar: React.FC<PropertySearchBarProps> = ({
   searchQuery,

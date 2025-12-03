@@ -19,7 +19,7 @@ import { useState } from 'react';
 import { supabase } from '@/lib/integrations/supabase/client';
 import type { Tables } from '@/lib/integrations/supabase/types';
 import type { User } from '@supabase/supabase-js';
-import type { ProfileFormData } from './useProfileData';
+import type { ProfileFormData } from '@/types/user';
 
 type Profile = Tables<'profiles'>;
 

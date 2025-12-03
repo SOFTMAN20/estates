@@ -37,15 +37,14 @@
 
 import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/layout/navbarLayout/Navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Eye, EyeOff, Home } from 'lucide-react';
+import { Home } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+import { LoginForm } from '@/components/auth';
+import type { LoginFormData } from '@/types/auth';
 
 /**
  * SIGNIN COMPONENT
@@ -55,72 +54,31 @@ import { motion } from 'framer-motion';
  * Integrates with Supabase Auth for secure authentication.
  */
 const SignIn = () => {
-  // Password visibility toggle state
-  const [showPassword, setShowPassword] = useState(false);
-  
-  // Form data state - stores email and password
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
-  
-  // Loading state for submit button
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Navigation and authentication hooks
   const navigate = useNavigate();
   const { signIn, user, loading, checkUserTypeAndRedirect } = useAuth();
   const { t } = useTranslation();
 
-  /**
-   * AUTO-REDIRECT EFFECT
-   * ===================
-   * 
-   * Redirects already authenticated users to their appropriate page.
-   * Prevents logged-in users from seeing the login page.
-   */
+  // Auto-redirect authenticated users
   useEffect(() => {
     if (!loading && user) {
       checkUserTypeAndRedirect(navigate);
     }
   }, [user, loading, navigate, checkUserTypeAndRedirect]);
 
-  /**
-   * FORM SUBMIT HANDLER
-   * ==================
-   * 
-   * Handles the login form submission:
-   * 1. Prevents default form behavior
-   * 2. Sets loading state
-   * 3. Calls signIn from useAuth hook
-   * 4. On success, redirects based on user role
-   * 5. On error, displays error message via toast
-   */
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Handle form submission
+  const handleSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     
-    const { error } = await signIn(formData.email, formData.password);
+    const { error } = await signIn(data.email, data.password);
     
     if (!error) {
-      // Wait for user state to update, then redirect based on role
       setTimeout(() => {
         checkUserTypeAndRedirect(navigate);
       }, 500);
     }
     
     setIsLoading(false);
-  };
-
-  /**
-   * INPUT CHANGE HANDLER
-   * ===================
-   * 
-   * Updates form data state when user types in input fields.
-   * Uses functional update to ensure latest state.
-   */
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -173,74 +131,13 @@ const SignIn = () => {
                 <p className="text-center text-sm text-gray-600 mt-2">Ingia katika akaunti yako</p>
               </CardHeader>
               <CardContent className="relative z-10">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <Label htmlFor="email">{t('auth.email')}</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    placeholder={t('auth.emailPlaceholder')}
-                    required
-                    className="mt-1"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="password">{t('auth.password')}</Label>
-                  <div className="relative mt-1">
-                    <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={formData.password}
-                      onChange={(e) => handleInputChange('password', e.target.value)}
-                      placeholder={t('auth.passwordPlaceholder')}
-                      required
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-gray-400" />
-                      ) : (
-                        <Eye className="h-4 w-4 text-gray-400" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    <span className="text-sm text-gray-600">{t('auth.rememberMe')}</span>
-                  </label>
-                  <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-                    {t('auth.forgotPassword')}
-                  </Link>
-                </div>
-
-                <Button 
-                  type="submit" 
-                  className="w-full bg-gradient-to-r from-primary via-serengeti-500 to-kilimanjaro-600 hover:from-primary/90 hover:via-serengeti-400 hover:to-kilimanjaro-500 text-white font-bold py-3 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-                  disabled={isLoading}
-                >
-                  {isLoading ? t('auth.signing') : t('auth.signIn')}
-                </Button>
-              </form>
-
-              <div className="mt-6 text-center">
-                <p className="text-sm text-gray-600">
-                  {t('auth.noAccount')}{' '}
-                  <Link to="/signup" className="text-primary hover:underline font-medium">
-                    {t('auth.signUpHere')}
-                  </Link>
-                </p>
-              </div>
+                <LoginForm 
+                  onSubmit={handleSubmit}
+                  isLoading={isLoading}
+                  showRememberMe={true}
+                  showForgotPassword={true}
+                  showSignUpLink={true}
+                />
               </CardContent>
             </Card>
           </motion.div>

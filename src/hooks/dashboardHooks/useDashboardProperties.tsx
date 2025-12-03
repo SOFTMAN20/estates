@@ -10,26 +10,15 @@ import { useState } from 'react';
 import { supabase } from '@/lib/integrations/supabase/client';
 import type { Tables } from '@/lib/integrations/supabase/types';
 import type { User } from '@supabase/supabase-js';
+import type { PropertyFormData as BasePropertyFormData } from '@/types/property';
 
 type Property = Tables<'properties'>;
 type Profile = Tables<'profiles'>;
 
-export interface PropertyFormData {
-  title: string;
-  description: string;
-  price: string;
+// Extend the base PropertyFormData with dashboard-specific fields
+export interface PropertyFormData extends BasePropertyFormData {
   price_period: string;
-  location: string;
-  full_address: string;
-  property_type: string;
-  bedrooms: string;
-  bathrooms: string;
   square_meters: string;
-  contact_phone: string;
-  contact_whatsapp_phone: string;
-  amenities: string[];
-  nearby_services: string[];
-  images: string[];
 }
 
 interface UseDashboardPropertiesReturn {
@@ -72,6 +61,7 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     property_type: '',
     bedrooms: '',
     bathrooms: '',
+    area_sqm: '',
     square_meters: '',
     contact_phone: '',
     contact_whatsapp_phone: '',
@@ -356,6 +346,7 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       property_type: property.property_type || '',
       bedrooms: property.bedrooms?.toString() || '',
       bathrooms: property.bathrooms?.toString() || '',
+      area_sqm: property.square_meters?.toString() || '',
       square_meters: property.square_meters?.toString() || '',
       contact_phone: property.contact_phone || profile?.phone || '',
       contact_whatsapp_phone: property.contact_whatsapp_phone || profile?.phone || '',
@@ -417,6 +408,7 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       property_type: '',
       bedrooms: '',
       bathrooms: '',
+      area_sqm: '',
       square_meters: '',
       contact_phone: profile?.phone || '',
       contact_whatsapp_phone: profile?.phone || '',

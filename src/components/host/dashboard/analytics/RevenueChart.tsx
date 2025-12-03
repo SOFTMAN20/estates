@@ -1,13 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import type { RevenueChartProps } from '@/types/analytics';
 
-interface RevenueChartProps {
-  data: { date: string; revenue: number; expenses: number; profit: number }[];
-  timeRange: '7d' | '30d' | '90d' | '1y';
+interface RevenueChartPropsExtended extends RevenueChartProps {
   propertyId?: string;
 }
 
-export default function RevenueChart({ data, timeRange, propertyId }: RevenueChartProps) {
+export default function RevenueChart({ data, timeRange, propertyId }: RevenueChartPropsExtended) {
 
   return (
     <Card className="shadow-lg border-0">

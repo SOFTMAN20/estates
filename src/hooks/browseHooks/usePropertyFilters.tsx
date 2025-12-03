@@ -20,19 +20,9 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import type { FilterState } from '@/types/search';
 
-export interface FilterState {
-  searchQuery: string;
-  priceRange: string;
-  minPrice: string;
-  maxPrice: string;
-  propertyType: string;
-  bedrooms: string;
-  bathrooms: string;
-  utilities: string[];
-  nearbyServices: string[];
-  sortBy: string;
-}
+export type { FilterState };
 
 const getInitialFilterState = (searchParams: URLSearchParams): FilterState => {
   // Parse utilities from URL (comma-separated)

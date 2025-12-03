@@ -59,24 +59,7 @@ import { csrfProtection } from '@/utils/csrf';
  * - Strict typing prevents runtime errors
  * - Metadata parameter allows flexible user data
  */
-interface SignUpMetadata {
-  full_name: string;
-  user_type: 'landlord' | 'tenant' | 'user' | 'admin' | 'super_admin';
-}
-
-interface AuthError {
-  message?: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  session: Session | null;
-  loading: boolean;
-  signUp: (email: string, password: string, metadata: SignUpMetadata) => Promise<{ error: AuthError | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
-  signOut: (navigate?: (path: string, options?: Record<string, unknown>) => void) => Promise<void>;
-  checkUserTypeAndRedirect: (navigate: (path: string, options?: Record<string, unknown>) => void) => Promise<void>;
-}
+import type { SignUpMetadata, AuthError, AuthContextType } from '@/types/auth';
 
 /**
  * AUTHENTICATION CONTEXT CREATION
@@ -237,7 +220,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Sanitize metadata
     const sanitizedMetadata = {
       full_name: validateInput.text(metadata.full_name || '', 100).sanitized,
-      user_type: ['landlord', 'tenant', 'user', 'admin', 'super_admin'].includes(metadata.user_type) ? metadata.user_type : 'user'
+      role: metadata.role || 'user'
     };
 
     const redirectUrl = `${window.location.origin}/`;

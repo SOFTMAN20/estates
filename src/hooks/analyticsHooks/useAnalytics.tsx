@@ -1,64 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/integrations/supabase/client';
 import { startOfMonth, endOfMonth, subMonths, startOfWeek, subDays } from 'date-fns';
+import type { AnalyticsData, TimeRange } from '@/types/analytics';
 
-export interface AnalyticsData {
-  summary: {
-    totalRevenue: number;
-    totalBookings: number;
-    avgOccupancy: number;
-    avgRating: number;
-    revenueChange: number;
-    bookingsChange: number;
-    occupancyChange: number;
-    ratingChange: number;
-  };
-  revenue: {
-    date: string;
-    revenue: number;
-    expenses: number;
-    profit: number;
-  }[];
-  bookings: {
-    date: string;
-    bookings: number;
-    cancellations: number;
-  }[];
-  occupancy: {
-    month: string;
-    occupancy: number;
-    available: number;
-  }[];
-  reviews: {
-    averageRating: number;
-    totalReviews: number;
-    distribution: { stars: number; count: number; percentage: number }[];
-    categories: { name: string; rating: number }[];
-  };
-  properties: {
-    property: string;
-    revenue: number;
-    bookings: number;
-    rating: number;
-  }[];
-  earnings: {
-    income: { name: string; value: number; color: string }[];
-    expenses: { category: string; amount: number; percentage: number }[];
-  };
-  views: {
-    total_views: number;
-    views_this_month: number;
-    view_to_booking_rate: number;
-    views_trend: { date: string; views: number }[];
-  };
-  bookingStatus: {
-    status: string;
-    count: number;
-    percentage: number;
-  }[];
-}
-
-export function useAnalytics(userId: string | undefined, propertyId?: string, timeRange: '7d' | '30d' | '90d' | '1y' = '30d') {
+export function useAnalytics(userId: string | undefined, propertyId?: string, timeRange: TimeRange = '30d') {
   return useQuery({
     queryKey: ['analytics', userId, propertyId, timeRange],
     queryFn: async () => {
@@ -129,21 +74,20 @@ export function useAnalytics(userId: string | undefined, propertyId?: string, ti
       }
 
       // Fetch reviews for user's properties
-      const reviewsResult = await supabase
-        .from('reviews')
-        .select('*')
-        .in('property_id', propertyIds);
-
-      if (reviewsResult.error) throw reviewsResult.error;
-      let reviews: Review[] = (reviewsResult.data || []).map((r: {
-        id: string;
-        property_id: string;
-        rating: number;
-      }) => ({
-        id: r.id,
-        property_id: r.property_id,
-        rating: r.rating
-      }));
+      // TODO: Uncomment when reviews table is created
+      // const reviewsResult = await supabase
+      //   .from('reviews')
+      //   .select('*')
+      //   .in('property_id', propertyIds);
+      // if (reviewsResult.error) throw reviewsResult.error;
+      
+      let reviews: Review[] = [];
+      // Temporary: Use empty array until reviews table exists
+      // reviews = (reviewsResult.data || []).map((r: any) => ({
+      //   id: r.id,
+      //   property_id: r.property_id,
+      //   rating: r.rating
+      // }));
 
       // Filter by specific property if provided
       if (propertyId) {
@@ -151,13 +95,16 @@ export function useAnalytics(userId: string | undefined, propertyId?: string, ti
       }
 
       // Fetch property views
-      const viewsResult = await supabase
-        .from('property_views')
-        .select('*')
-        .in('property_id', propertyIds)
-        .gte('viewed_at', startDate.toISOString());
+      // TODO: Uncomment when property_views table is created
+      // const viewsResult = await supabase
+      //   .from('property_views')
+      //   .select('*')
+      //   .in('property_id', propertyIds)
+      //   .gte('viewed_at', startDate.toISOString());
 
-      let views = (viewsResult.data || []) as PropertyView[];
+      let views: PropertyView[] = [];
+      // Temporary: Use empty array until property_views table exists
+      // views = (viewsResult.data || []) as PropertyView[];
 
       // Filter by specific property if provided
       if (propertyId) {

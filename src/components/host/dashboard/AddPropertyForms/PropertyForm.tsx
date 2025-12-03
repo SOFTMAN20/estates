@@ -27,24 +27,13 @@ import {
 } from '@/components/host/dashboard/AddPropertyForms/propertyFormSteps';
 
 type Property = Tables<'properties'>;
+import type { PropertyFormData as BasePropertyFormData } from '@/types/property';
+
 type Profile = Tables<'profiles'>;
 
-interface PropertyFormData {
-  title: string;
-  description: string;
-  price: string;
+interface PropertyFormData extends BasePropertyFormData {
   price_period: string;
-  location: string;
-  full_address: string;
-  property_type: string;
-  bedrooms: string;
-  bathrooms: string;
   square_meters: string;
-  contact_phone: string;
-  contact_whatsapp_phone: string;
-  amenities: string[];
-  nearby_services: string[];
-  images: string[];
 }
 
 interface PropertyFormProps {

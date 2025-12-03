@@ -25,43 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
-interface PropertyFiltersPanelProps {
-  // Price filters
-  minPrice: string;
-  maxPrice: string;
-  onMinPriceChange: (value: string) => void;
-  onMaxPriceChange: (value: string) => void;
-  
-  // Property type filter
-  propertyType?: string;
-  onPropertyTypeChange?: (value: string) => void;
-  
-  // Bedrooms filter
-  bedrooms?: string;
-  onBedroomsChange?: (value: string) => void;
-  
-  // Bathrooms filter
-  bathrooms?: string;
-  onBathroomsChange?: (value: string) => void;
-  
-  // Utilities filters
-  utilities: string[];
-  onUtilityToggle: (utility: string) => void;
-  
-  // Nearby services filters
-  nearbyServices: string[];
-  onNearbyServiceToggle: (service: string) => void;
-  
-  // Sort
-  sortBy: string;
-  onSortChange: (value: string) => void;
-  
-  // Actions
-  onClearAll: () => void;
-  
-  className?: string;
-}
+import type { PropertyFiltersPanelProps } from '@/types/search';
 
 const PropertyFiltersPanel: React.FC<PropertyFiltersPanelProps> = ({
   minPrice,

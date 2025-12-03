@@ -13,7 +13,7 @@
 
 import React, { useEffect } from 'react';
 import Navigation from '@/components/layout/navbarLayout/Navigation';
-import PropertyCard from '@/components/common/propertyCommon/PropertyCard';
+import PropertyCard from '@/components/properties/propertyCommon/PropertyCard';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Heart, Search } from 'lucide-react';
@@ -109,8 +109,6 @@ const Favorites = () => {
                 phone={property.profiles?.phone || undefined}
                 contactPhone={property.contact_phone || undefined}
                 contactWhatsappPhone={property.contact_whatsapp_phone || undefined}
-                electricity={property.electricity || false}
-                water={property.water || false}
                 bedrooms={property.bedrooms || undefined}
                 isFavorited={isFavorited(property.id)}
                 onToggleFavorite={toggleFavorite}

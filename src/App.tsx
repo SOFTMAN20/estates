@@ -66,14 +66,14 @@ import PerformanceDashboard from "./components/common/PerformanceDashboard";
 // Lazy load pages for code splitting
 const Index = lazy(() => import("./pages/Index"));
 const Browse = lazy(() => import("./pages/Browse"));
-const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
+const PropertyDetail = lazy(() => import("./pages/host/PropertyDetail"));
+const Dashboard = lazy(() => import("./pages/host/Dashboard"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Favorites = lazy(() => import("./pages/Favorites"));
-const Analytics = lazy(() => import("./pages/Analytics"));
+const Analytics = lazy(() => import("./pages/host/Analytics"));
 const SignIn = lazy(() => import("./pages/SignIn"));
 const SignUp = lazy(() => import("./pages/SignUp"));
-const PropertyExample = lazy(() => import("./pages/PropertyExample"));
+const PropertyExample = lazy(() => import("./pages/host/PropertyExample"));
 const About = lazy(() => import("./pages/About"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ColorPalette = lazy(() => import("./components/common/ColorPalette"));

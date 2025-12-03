@@ -31,13 +31,13 @@
 
 import React, { useEffect } from 'react';
 import Navigation from '@/components/layout/navbarLayout/Navigation';
-import QuickActions from '@/components/common/dashboardCommon/QuickActions';
-import StatsSection from '@/components/common/dashboardCommon/StatsSection';
-import PropertyManagement from '@/components/common/dashboardCommon/PropertyManagement';
-import PropertyForm from '@/components/forms/HostingForm/PropertyForm';
-import ProfileSettings from '@/components/forms/ProfileSettings';
-import GetHelpSection from '@/components/common/dashboardCommon/GetHelpSection';
-import { PropertyGridSkeleton } from '@/components/common/propertyCommon/PropertyCardSkeleton';
+import QuickActions from '@/components/host/dashboard/dashboardCommon/QuickActions';
+import StatsSection from '@/components/host/dashboard/dashboardCommon/StatsSection';
+import PropertyManagement from '@/components/host/dashboard/dashboardCommon/PropertyManagement';
+import { PropertyForm } from '@/components/host/dashboard/AddPropertyForms';
+import { ProfileSettings } from '@/components/forms';
+import GetHelpSection from '@/components/host/dashboard/dashboardCommon/GetHelpSection';
+import { PropertyGridSkeleton } from '@/components/properties/propertyCommon/PropertyCardSkeleton';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';

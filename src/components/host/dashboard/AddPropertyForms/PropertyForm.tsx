@@ -19,12 +19,12 @@ import type { Tables } from '@/lib/integrations/supabase/types';
 import {
   Step1BasicInfo,
   Step2PropertyAddress,
-  Step2PropertyDetails,
-  Step3ContactInfo,
+  Step3PropertyDetails,
   Step4PhotoUpload,
+  Step5ContactInfo,
   StepNavigation,
   FormNavigationButtons
-} from '@/components/forms/HostingForm/propertyFormSteps';
+} from '@/components/host/dashboard/AddPropertyForms/propertyFormSteps';
 
 type Property = Tables<'properties'>;
 type Profile = Tables<'profiles'>;
@@ -268,7 +268,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
         );
       case 3:
         return (
-          <Step2PropertyDetails
+          <Step3PropertyDetails
             formData={{
               property_type: formData.property_type,
               bedrooms: formData.bedrooms,
@@ -294,7 +294,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
         );
       case 5:
         return (
-          <Step3ContactInfo
+          <Step5ContactInfo
             formData={{
               contact_phone: formData.contact_phone,
               contact_whatsapp_phone: formData.contact_whatsapp_phone

@@ -24,7 +24,7 @@ interface Step3ContactInfoProps {
   isValid: boolean;
 }
 
-export const Step3ContactInfo: React.FC<Step3ContactInfoProps> = ({
+export const Step5ContactInfo: React.FC<Step3ContactInfoProps> = ({
   formData,
   onInputChange,
   isValid,
@@ -96,4 +96,4 @@ export const Step3ContactInfo: React.FC<Step3ContactInfoProps> = ({
   );
 };
 
-export default Step3ContactInfo;
+export default Step5ContactInfo;

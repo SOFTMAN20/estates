@@ -6,7 +6,7 @@ import { Star, MapPin, Wifi, Car, Utensils, Zap, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProperties, type Property } from '@/hooks/useProperties';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import { PropertyGridSkeleton } from '@/components/common/propertyCommon/PropertyCardSkeleton';
+import { PropertyGridSkeleton } from '@/components/properties/propertyCommon/PropertyCardSkeleton';
 import { useTranslation } from 'react-i18next';
 
 /**

@@ -2,27 +2,17 @@
  * Form Components Index
  * =====================
  * 
- * Central export point for all form components.
- * Makes imports cleaner and more maintainable.
+ * Central export point for general form components.
+ * For property-specific forms, see @/components/host/dashboard/AddPropertyForms
  * 
  * @example
  * ```tsx
- * import { PriceInput, PropertyTypeSelector, AmenitiesSelector } from '@/components/forms';
+ * import { AvatarUpload, ProfileSettings } from '@/components/forms';
  * ```
  */
 
-// Input Components
-export { PriceInput, type PricePeriod } from './HostingForm/property_formInput/PriceInput';
-export { RoomCounter } from './HostingForm/property_formInput/RoomCounter';
-
-// Selector Components
-export { PropertyTypeSelector, type PropertyType } from './HostingForm/property_formInput/PropertyTypeSelector';
-export { AmenitiesSelector, type AmenityKey } from './HostingForm/property_formInput/AmenitiesSelector';
-
 // Upload Components
-export { default as ImageUpload } from './ImageUpload';
 export { default as AvatarUpload } from './AvatarUpload';
 
 // Form Components
 export { default as ProfileSettings } from './ProfileSettings';
-export { default as PropertyForm } from './HostingForm/PropertyForm';

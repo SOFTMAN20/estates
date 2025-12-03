@@ -20,14 +20,15 @@
  */
 
 import React from 'react';
-import WelcomeBanner from '@/components/common/dashboardCommon/WelcomeBanner';
+import WelcomeBanner from '@/components/host/dashboard/dashboardCommon/WelcomeBanner';
 import type { Tables } from '@/lib/integrations/supabase/types';
+import type { User } from '@supabase/supabase-js';
 
 type Profile = Tables<'profiles'>;
 
 interface DashboardHeaderProps {
   profile: Profile | null;
-  user: any;
+  user: User | null;
   isNewUser: boolean;
   onProfileEdit: () => void;
   onDismissWelcome: () => void;

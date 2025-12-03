@@ -30,8 +30,8 @@ import HeroSection from "@/components/layout/HeroSection";
 import { Link } from 'react-router-dom';
 
 // Lazy load below-the-fold components
-const PopularDestinations = lazy(() => import("@/components/common/propertyCommon/PopularDestinations"));
-const FeaturedProperties = lazy(() => import("@/components/common/propertyCommon/FeaturedProperties"));
+const PopularDestinations = lazy(() => import("@/components/properties/propertyCommon/PopularDestinations"));
+const FeaturedProperties = lazy(() => import("@/components/properties/propertyCommon/FeaturedProperties"));
 const Footer = lazy(() => import("@/components/layout/Footer"));
 
 /**

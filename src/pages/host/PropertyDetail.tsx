@@ -27,15 +27,15 @@ import Navigation from '@/components/layout/navbarLayout/Navigation';
 import Footer from '@/components/layout/Footer';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import Map from '@/components/ui/map';
-import ShareDropdown from '@/components/common/PropertyDetails/ShareDropdown';
-import PropertyAmenities from '@/components/properties/PropertyAmenities';
-import PropertyFeatures from '@/components/properties/PropertyFeatures';
-import NearbyServices from '@/components/properties/NearbyServices';
-import PropertyHeader from '@/components/properties/PropertyHeader';
-import PropertyDescription from '@/components/properties/PropertyDescription';
-import LandlordContact from '@/components/properties/LandlordContact';
-import PropertyLocation from '@/components/properties/PropertyLocation';
-import SafetyTips from '@/components/properties/SafetyTips';
+import ShareDropdown from '@/components/properties/PropertyDetails/ShareDropdown';
+import PropertyAmenities from '@/components/properties/PropertyDetails/PropertyAmenities';
+import PropertyFeatures from '@/components/properties/PropertyDetails/PropertyFeatures';
+import NearbyServices from '@/components/properties/PropertyDetails/NearbyServices';
+import PropertyHeader from '@/components/properties/PropertyDetails/PropertyHeader';
+import PropertyDescription from '@/components/properties/PropertyDetails/PropertyDescription';
+import LandlordContact from '@/components/properties/PropertyDetails/LandlordContact';
+import PropertyLocation from '@/components/properties/PropertyDetails/PropertyLocation';
+import SafetyTips from '@/components/properties/PropertyDetails/SafetyTips';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -69,7 +69,7 @@ import {
 import { useProperties, type Property } from '@/hooks/useProperties';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useTranslation } from 'react-i18next';
-import ServiceFeeCalculator from '@/components/common/PropertyDetails/ServiceFeeCalculator';
+import ServiceFeeCalculator from '@/components/properties/PropertyDetails/ServiceFeeCalculator';
 
 /**
  * PROPERTY DETAIL COMPONENT

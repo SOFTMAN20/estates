@@ -8,7 +8,7 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import ImageUpload from '@/components/forms/ImageUpload';
+import ImageUpload from '@/components/host/dashboard/AddPropertyForms/ImageUpload';
 import { Camera, Info, CheckCircle, X } from 'lucide-react';
 
 interface Step4PhotoUploadProps {

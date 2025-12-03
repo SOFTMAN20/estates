@@ -34,7 +34,7 @@ interface Step2PropertyDetailsProps {
   isValid: boolean;
 }
 
-export const Step2PropertyDetails: React.FC<Step2PropertyDetailsProps> = ({
+export const Step3PropertyDetails: React.FC<Step2PropertyDetailsProps> = ({
   formData,
   onInputChange,
   onAmenityToggle,
@@ -281,4 +281,4 @@ export const Step2PropertyDetails: React.FC<Step2PropertyDetailsProps> = ({
   );
 };
 
-export default Step2PropertyDetails;
+export default Step3PropertyDetails;

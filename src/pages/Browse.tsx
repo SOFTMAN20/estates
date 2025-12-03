@@ -42,13 +42,13 @@
 
 import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/layout/navbarLayout/Navigation';
-import PropertyCard from '@/components/common/propertyCommon/PropertyCard';
+import PropertyCard from '@/components/properties/propertyCommon/PropertyCard';
 import PropertyFiltersPanel from '@/components/search/PropertyFiltersPanel';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import { PropertyGridSkeleton } from '@/components/common/propertyCommon/PropertyCardSkeleton';
+import { PropertyGridSkeleton } from '@/components/properties/propertyCommon/PropertyCardSkeleton';
 import { Search } from 'lucide-react';
 import { useProperties } from '@/hooks/useProperties';
 import { useFavorites } from '@/hooks/useFavorites';

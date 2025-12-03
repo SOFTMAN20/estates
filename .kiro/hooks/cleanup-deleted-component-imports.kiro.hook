@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "name": "Clean Up Deleted Component Imports",
+  "description": "When a component file is deleted, this hook finds all imports of that component across the codebase, removes or comments out those import statements, and suggests replacement components if appropriate",
+  "version": "1",
+  "when": {
+    "type": "fileDeleted",
+    "patterns": [
+      "src/components/**/*.tsx",
+      "src/components/**/*.ts",
+      "src/components/**/*.jsx",
+      "src/components/**/*.js"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A component file has been deleted: {filePath}\n\nPlease perform the following tasks:\n\n1. **Identify the deleted component**: Extract the component name from the deleted file path.\n\n2. **Search for imports**: Find all files in the codebase that import this component. Look for:\n   - Named imports: `import { ComponentName } from '...'`\n   - Default imports: `import ComponentName from '...'`\n   - Dynamic imports: `import('...')`\n\n3. **Clean up imports**: For each file that imports the deleted component:\n   - Remove the import statement if it's the only import from that path\n   - Remove just the component name if it's part of a multi-import statement\n   - Comment out the import with a note like: `// REMOVED: ComponentName was deleted`\n\n4. **Check for usage**: Scan each file for actual usage of the deleted component:\n   - JSX usage: `<ComponentName />`\n   - Function calls or references\n   - Comment out or remove these usages with helpful notes\n\n5. **Suggest replacements**: Based on the component name and location, suggest appropriate replacement components if available:\n   - Look for similar components in the same directory\n   - Suggest UI library alternatives (e.g., if a custom Button was deleted, suggest using the shadcn Button)\n   - Provide migration guidance\n\n6. **Report findings**: Create a summary showing:\n   - Files affected (with file paths)\n   - Import statements removed/commented\n   - Usage locations that need attention\n   - Suggested replacements with examples\n\nPlease be thorough but cautious - comment out rather than delete if there's any uncertainty about whether the code is still needed."
+  }
+}

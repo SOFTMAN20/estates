@@ -35,11 +35,14 @@ interface PropertyManagementProps {
   filterStatus: string;
   viewMode: 'grid' | 'list';
   onSearchChange: (query: string) => void;
-  onFilterChange: (status: string) => void;
+  onFilterChange: (status: 'all' | 'active' | 'pending' | 'inactive') => void;
   onViewModeChange: (mode: 'grid' | 'list') => void;
   onEditProperty: (property: Property) => void;
   onDeleteProperty: (id: string) => Promise<void>;
   onAddProperty: () => void;
+  limit?: number;
+  showViewAll?: boolean;
+  onViewAll?: () => void;
 }
 
 /**
@@ -62,7 +65,10 @@ const PropertyManagement: React.FC<PropertyManagementProps> = ({
   onViewModeChange,
   onEditProperty,
   onDeleteProperty,
-  onAddProperty
+  onAddProperty,
+  limit,
+  showViewAll = false,
+  onViewAll
 }) => {
   const { t } = useTranslation();
 
@@ -112,6 +118,10 @@ const PropertyManagement: React.FC<PropertyManagementProps> = ({
     
     return matchesSearch && matchesStatus;
   });
+
+  // Apply limit if specified
+  const displayedProperties = limit ? filteredProperties.slice(0, limit) : filteredProperties;
+  const hasMoreProperties = limit && filteredProperties.length > limit;
 
   /**
    * SEARCH AND FILTER CONTROLS
@@ -170,29 +180,63 @@ const PropertyManagement: React.FC<PropertyManagementProps> = ({
   );
 
   return (
-    <Card className="border-0 shadow-lg">
-      <CardHeader className="border-b bg-white/50">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <CardTitle className="text-2xl font-bold text-gray-900">
-              {t('dashboard.yourProperties', { count: filteredProperties.length })}
-            </CardTitle>
-            <p className="text-gray-600 mt-1">
-              {t('dashboard.manageProperties')}
-            </p>
+    <Card className="border-0 shadow-lg overflow-hidden">
+      <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-transparent">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900">
+                {showViewAll ? t('dashboard.yourPropertiesTitle') : t('dashboard.yourProperties', { count: filteredProperties.length })}
+              </CardTitle>
+              <p className="text-sm sm:text-base text-gray-600 mt-1">
+                {showViewAll 
+                  ? t('dashboard.propertyCount', { count: displayedProperties.length })
+                  : t('dashboard.manageProperties')}
+              </p>
+            </div>
+            
+            {showViewAll && (
+              <Button
+                onClick={onAddProperty}
+                size="default"
+                className="w-full sm:w-auto"
+              >
+                <span className="text-lg mr-2">+</span>
+                <span className="hidden sm:inline">{t('dashboard.addProperty')}</span>
+                <span className="sm:hidden">{t('dashboard.add')}</span>
+              </Button>
+            )}
           </div>
           
-          {renderSearchAndFilters()}
+          {!showViewAll && (
+            <div className="flex flex-col sm:flex-row gap-3">
+              {renderSearchAndFilters()}
+            </div>
+          )}
         </div>
       </CardHeader>
       
-      <CardContent className="p-6">
+      <CardContent className="p-4 sm:p-6">
         <PropertyGrid
-          properties={filteredProperties}
+          properties={displayedProperties}
           onEdit={onEditProperty}
           onDelete={onDeleteProperty}
           onAddProperty={onAddProperty}
         />
+        
+        {showViewAll && hasMoreProperties && (
+          <div className="mt-6 text-center">
+            <Button
+              onClick={onViewAll}
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto sm:min-w-[200px] group hover:bg-primary hover:text-white transition-all"
+            >
+              <span>{t('dashboard.viewAll')} ({filteredProperties.length})</span>
+              <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

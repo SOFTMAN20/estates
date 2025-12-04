@@ -1,11 +1,11 @@
 ---
-inclusion:  manual
+inclusion:  always
 ---
 
 # Code Style & Conventions
 
 ## Overview
-NyumbaLink follows modern React and TypeScript best practices with a focus on maintainability, readability, and type safety.
+NyumbaLink follows modern React and TypeScript best practices with a focus on modularity,maintainability, readability, reusability and type safety.
 
 ## Naming Conventions
 

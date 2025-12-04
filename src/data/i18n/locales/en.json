@@ -341,7 +341,14 @@
     "supportNumber": "Support Number:",
     "availableLanguages": "Available 24/7 - Swahili and English Service",
     "encouragementMessage": "Remember: No question is too small! We're here to help you succeed in your property business.",
-    "noQuestionTooSmall": "💡 Remember:"
+    "noQuestionTooSmall": "💡 Remember:",
+    "yourPropertiesTitle": "Your Properties",
+    "propertyCount_one": "{{count}} house",
+    "propertyCount_other": "{{count}} houses",
+    "viewAll": "View All",
+    "add": "Add",
+    "viewAllProperties": "View All Properties",
+    "viewAllPropertiesDesc": "View complete list of your properties"
   },
   "about": {
     "title": "About Nyumba Link",
@@ -443,6 +450,10 @@
     "ok": "OK",
     "confirm": "Confirm",
     "back": "Back"
+  },
+  "property": {
+    "edit": "Edit",
+    "delete": "Delete"
   },
   "footer": {
     "description": "A modern platform for finding and renting houses in Tanzania. We connect landlords and tenants easily and securely.",

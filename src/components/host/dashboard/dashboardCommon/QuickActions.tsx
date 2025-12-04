@@ -1,15 +1,9 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
   Plus, 
-  User, 
   BarChart3, 
-  MessageSquare,
   Eye,
-  Settings,
-  HelpCircle,
-  Zap,
   Headphones
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +11,6 @@ import { useNavigate } from 'react-router-dom';
 
 interface QuickActionsProps {
   onAddProperty: () => void;
-  onEditProfile: () => void;
   onShowHelp: () => void;
   isNewUser: boolean;
   propertiesCount: number;
@@ -25,7 +18,6 @@ interface QuickActionsProps {
 
 const QuickActions: React.FC<QuickActionsProps> = ({
   onAddProperty,
-  onEditProfile,
   onShowHelp,
   isNewUser,
   propertiesCount
@@ -45,12 +37,13 @@ const QuickActions: React.FC<QuickActionsProps> = ({
       color: 'bg-primary hover:bg-primary/90'
     },
     {
-      id: 'edit-profile',
-      title: t('dashboard.updateAccountInfo'),
-      description: t('dashboard.changeAccountDetails'),
-      icon: User,
-      onClick: onEditProfile,
+      id: 'view-properties',
+      title: t('dashboard.viewAllProperties'),
+      description: t('dashboard.viewAllPropertiesDesc'),
+      icon: Eye,
+      onClick: () => navigate('/host/properties'),
       primary: false,
+      disabled: propertiesCount === 0,
       color: 'bg-blue-500 hover:bg-blue-600'
     },
     {

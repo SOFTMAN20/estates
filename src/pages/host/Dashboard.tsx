@@ -37,11 +37,11 @@ import PropertyManagement from '@/components/host/dashboard/dashboardCommon/Prop
 import { PropertyForm } from '@/components/host/dashboard/AddPropertyForms';
 import { ProfileSettings } from '@/components/forms';
 import GetHelpSection from '@/components/host/dashboard/dashboardCommon/GetHelpSection';
-import { PropertyGridSkeleton } from '@/components/properties/propertyCommon/PropertyCardSkeleton';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 // Import custom dashboard hooks
 import {
@@ -65,6 +65,7 @@ const Dashboard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   
   // UI State Management Hook
   const {
@@ -267,17 +268,6 @@ const Dashboard = () => {
             ))}
           </div>
           
-          {/* Property Management Section Skeleton */}
-          <div className="bg-white rounded-lg shadow-sm">
-            <div className="p-6 border-b">
-              <div className="h-6 bg-gray-200 rounded w-1/4 mb-2 animate-pulse"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/3 animate-pulse"></div>
-            </div>
-            <div className="p-6">
-              <PropertyGridSkeleton count={6} viewMode="grid" />
-            </div>
-          </div>
-          
         </div>
       </div>
     );
@@ -297,7 +287,6 @@ const Dashboard = () => {
         {/* Quick Actions */}
         <QuickActions
           onAddProperty={openAddForm}
-          onEditProfile={openProfileDialog}
           onShowHelp={openHelpDialog}
           isNewUser={uiState.isNewUser}
           propertiesCount={properties.length}
@@ -306,7 +295,7 @@ const Dashboard = () => {
         {/* Statistics Section */}
         <StatsSection properties={properties} totalBookings={totalBookings} />
 
-        {/* Property Management */}
+        {/* Property Management - Limited to 4 properties */}
         <PropertyManagement
           properties={properties}
           searchQuery={uiState.searchQuery}
@@ -321,6 +310,9 @@ const Dashboard = () => {
           }}
           onDeleteProperty={(id) => handleDeleteProperty(id, onPropertyDeleteSuccess, onPropertyDeleteError)}
           onAddProperty={openAddForm}
+          limit={4}
+          showViewAll={true}
+          onViewAll={() => navigate('/host/properties')}
         />
 
         {/* Property Form Modal */}

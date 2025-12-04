@@ -68,6 +68,7 @@ const Index = lazy(() => import("./pages/Index"));
 const Browse = lazy(() => import("./pages/Browse"));
 const PropertyDetail = lazy(() => import("./pages/host/PropertyDetail"));
 const Dashboard = lazy(() => import("./pages/host/Dashboard"));
+const Properties = lazy(() => import("./pages/host/Properties"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Favorites = lazy(() => import("./pages/Favorites"));
 const Analytics = lazy(() => import("./pages/host/Analytics"));
@@ -156,6 +157,7 @@ const App = () => (
 
                 {/* User-specific routes - Njia za mtumiaji */}
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/host/properties" element={<Properties />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/analytics" element={<Analytics />} />

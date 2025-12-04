@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "name": "i18n Translation Completeness Check",
+  "description": "Monitors changes to translation files (en.json and sw.json) and prompts the agent to verify that both files have matching keys and proper translations following the i18n management guidelines",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/data/i18n/locales/en.json",
+      "src/data/i18n/locales/sw.json"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A translation file has been modified. Please review the changes and ensure:\n\n1. **Key Parity**: Both en.json and sw.json have the same translation keys\n2. **Translation Quality**: All new keys have proper translations in both English and Swahili\n3. **Naming Convention**: Keys follow the hierarchical pattern (e.g., section.subsection.key)\n4. **No Hardcoded Text**: Check if there are components using hardcoded text that should use these translations\n5. **Context Appropriateness**: Swahili translations are contextually appropriate\n\nReview the translation files at:\n- src/data/i18n/locales/en.json\n- src/data/i18n/locales/sw.json\n\nIf you find any issues:\n- Missing keys in either file\n- Untranslated values (English text in sw.json)\n- Inconsistent key structures\n- Opportunities to use common.* keys for reusable translations\n\nPlease fix them and ensure both files are synchronized and complete."
+  }
+}

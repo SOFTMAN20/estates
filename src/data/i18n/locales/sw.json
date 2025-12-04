@@ -341,7 +341,14 @@
     "supportNumber": "Nambari ya Msaada:",
     "availableLanguages": "Inapatikana 24/7 - Huduma ya Kiswahili na Kiingereza",
     "encouragementMessage": "Usisahau: Hakuna swali dogo sana! Tuko hapa kukusaidia kufanikiwa kwenye biashara yako ya nyumba.",
-    "noQuestionTooSmall": "💡 Usisahau:"
+    "noQuestionTooSmall": "💡 Usisahau:",
+    "yourPropertiesTitle": "Nyumba Zako",
+    "propertyCount_one": "Nyumba {{count}}",
+    "propertyCount_other": "Nyumba {{count}}",
+    "viewAll": "Tazama Zote",
+    "add": "Ongeza",
+    "viewAllProperties": "Tazama Nyumba Zote",
+    "viewAllPropertiesDesc": "Angalia orodha kamili ya nyumba zako"
   },
   "footer": {
     "description": "Jukwaa la kisasa la kutafuta na kukodia nyumba nchini Tanzania. Tunawachanganya wenye nyumba na wapangaji kwa urahisi na usalama.",
@@ -475,5 +482,9 @@
     "ok": "Sawa",
     "confirm": "Thibitisha",
     "back": "Rudi"
+  },
+  "property": {
+    "edit": "Hariri",
+    "delete": "Futa"
   }
 }

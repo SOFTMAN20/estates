@@ -1,6 +1,8 @@
 ---
-inclusion:  manual
+inclusion: fileMatch
+fileMatchPattern: '**/{api,functions,edge-functions,supabase/functions,lib/integrations,hooks}/**'
 ---
+
 
 # API Standards & Conventions
 

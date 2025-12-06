@@ -591,25 +591,31 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
    * Loads saved form data from localStorage
    */
   const loadSavedDraft = (profile: Profile | null): boolean => {
+    console.log('🔍 Attempting to load saved draft...');
+    
     try {
       const savedFormData = localStorage.getItem('nyumba_link_property_form_data');
       
-      if (savedFormData) {
-        const parsedData = JSON.parse(savedFormData);
-        console.log('📂 Loading saved draft from localStorage:', parsedData);
-        
-        // Merge saved data with profile phone if available
-        setFormData({
-          ...parsedData,
-          contact_phone: parsedData.contact_phone || profile?.phone || '',
-          contact_whatsapp_phone: parsedData.contact_whatsapp_phone || profile?.phone || '',
-        });
-        
-        console.log('✅ Draft loaded successfully');
-        return true;
+      if (!savedFormData) {
+        console.log('ℹ️ No saved draft found in localStorage');
+        return false;
       }
       
-      return false;
+      const parsedData = JSON.parse(savedFormData);
+      console.log('📂 Found saved draft in localStorage:', parsedData);
+      
+      // Merge saved data with profile phone if available
+      const mergedData = {
+        ...parsedData,
+        contact_phone: parsedData.contact_phone || profile?.phone || '',
+        contact_whatsapp_phone: parsedData.contact_whatsapp_phone || profile?.phone || '',
+      };
+      
+      console.log('🔄 Setting form data with merged data:', mergedData);
+      setFormData(mergedData);
+      
+      console.log('✅ Draft loaded successfully!');
+      return true;
     } catch (error) {
       console.error('❌ Error loading saved draft:', error);
       localStorage.removeItem('nyumba_link_property_form_data');

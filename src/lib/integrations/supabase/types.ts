@@ -73,6 +73,7 @@ export type Database = {
           host_id: string
           id: string
           images: string[]
+          is_available: boolean | null
           location: string
           nearby_services: string[] | null
           price: number
@@ -100,6 +101,7 @@ export type Database = {
           host_id: string
           id?: string
           images?: string[]
+          is_available?: boolean | null
           location: string
           nearby_services?: string[] | null
           price: number
@@ -127,6 +129,7 @@ export type Database = {
           host_id?: string
           id?: string
           images?: string[]
+          is_available?: boolean | null
           location?: string
           nearby_services?: string[] | null
           price?: number

@@ -6,11 +6,12 @@
  * Each step is now a separate, reusable component with single responsibility.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { X, Home, Building, Phone, Camera, MapPin } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { X, Home, Building, Phone, Camera, MapPin, Save, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
 import type { Tables } from '@/lib/integrations/supabase/types';
@@ -64,50 +65,108 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
   const { t } = useTranslation();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSaveDataRef = useRef<string>('');
 
   const FORM_STORAGE_KEY = 'nyumba_link_property_form_data';
   const STEP_STORAGE_KEY = 'nyumba_link_property_form_step';
+  const LAST_SAVED_KEY = 'nyumba_link_property_form_last_saved';
+  const AUTO_SAVE_INTERVAL = 30000; // 30 seconds
 
+  /**
+   * SAVE DRAFT FUNCTION
+   * ===================
+   * Saves form data to localStorage with timestamp
+   */
+  const saveDraft = () => {
+    if (!isOpen || editingProperty) {
+      console.log('⏭️ Skipping save - form closed or editing existing property');
+      return;
+    }
+
+    try {
+      const currentData = JSON.stringify(formData);
+      
+      // Only save if data has changed
+      if (currentData === lastSaveDataRef.current) {
+        console.log('⏭️ Skipping save - no changes detected');
+        return;
+      }
+
+      setIsSaving(true);
+      localStorage.setItem(FORM_STORAGE_KEY, currentData);
+      localStorage.setItem(STEP_STORAGE_KEY, currentStep.toString());
+      
+      const now = new Date();
+      localStorage.setItem(LAST_SAVED_KEY, now.toISOString());
+      setLastSaved(now);
+      lastSaveDataRef.current = currentData;
+
+      console.log('✅ Draft auto-saved at', now.toLocaleTimeString(), '- Step:', currentStep);
+      console.log('💾 Saved data:', formData);
+    } catch (error) {
+      console.error('❌ Error saving draft:', error);
+    } finally {
+      setTimeout(() => setIsSaving(false), 500);
+    }
+  };
+
+  // Load saved step and timestamp on mount (data is loaded in parent hook)
   useEffect(() => {
     if (isOpen && !editingProperty) {
       try {
-        const savedFormData = localStorage.getItem(FORM_STORAGE_KEY);
         const savedStep = localStorage.getItem(STEP_STORAGE_KEY);
-        
-        if (savedFormData) {
-          const parsedData = JSON.parse(savedFormData);
-          Object.keys(parsedData).forEach((key) => {
-            if (parsedData[key] !== undefined && parsedData[key] !== null) {
-              onInputChange(key as keyof PropertyFormData, parsedData[key]);
-            }
-          });
-        }
+        const savedTime = localStorage.getItem(LAST_SAVED_KEY);
+        const savedFormData = localStorage.getItem(FORM_STORAGE_KEY);
         
         if (savedStep) {
           const stepNumber = parseInt(savedStep, 10);
-          if (stepNumber >= 1 && stepNumber <= 4) {
+          if (stepNumber >= 1 && stepNumber <= 5) {
             setCurrentStep(stepNumber);
+            console.log('📍 Restored to step:', stepNumber);
           }
         }
+
+        if (savedTime) {
+          setLastSaved(new Date(savedTime));
+        }
+
+        if (savedFormData) {
+          lastSaveDataRef.current = savedFormData;
+        }
       } catch (error) {
-        console.error('Error loading saved form data:', error);
-        localStorage.removeItem(FORM_STORAGE_KEY);
-        localStorage.removeItem(STEP_STORAGE_KEY);
+        console.error('❌ Error loading saved form metadata:', error);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, editingProperty]);
 
+  // Auto-save every 30 seconds
   useEffect(() => {
     if (isOpen && !editingProperty) {
-      try {
-        localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formData));
-      } catch (error) {
-        console.error('Error saving form data:', error);
+      // Clear any existing timer
+      if (autoSaveTimerRef.current) {
+        clearInterval(autoSaveTimerRef.current);
       }
-    }
-  }, [formData, isOpen, editingProperty]);
 
+      // Set up new auto-save interval
+      autoSaveTimerRef.current = setInterval(() => {
+        saveDraft();
+      }, AUTO_SAVE_INTERVAL);
+
+      // Cleanup on unmount or when form closes
+      return () => {
+        if (autoSaveTimerRef.current) {
+          clearInterval(autoSaveTimerRef.current);
+          autoSaveTimerRef.current = null;
+        }
+      };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, editingProperty, formData]);
+
+  // Save step changes immediately
   useEffect(() => {
     if (isOpen && !editingProperty) {
       try {
@@ -172,6 +231,15 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
     try {
       localStorage.removeItem(FORM_STORAGE_KEY);
       localStorage.removeItem(STEP_STORAGE_KEY);
+      localStorage.removeItem(LAST_SAVED_KEY);
+      setLastSaved(null);
+      lastSaveDataRef.current = '';
+      
+      // Clear auto-save timer
+      if (autoSaveTimerRef.current) {
+        clearInterval(autoSaveTimerRef.current);
+        autoSaveTimerRef.current = null;
+      }
     } catch (error) {
       console.error('Error clearing saved form data:', error);
     }

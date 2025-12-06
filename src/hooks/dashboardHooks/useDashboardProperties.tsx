@@ -10,15 +10,28 @@ import { useState } from 'react';
 import { supabase } from '@/lib/integrations/supabase/client';
 import type { Tables } from '@/lib/integrations/supabase/types';
 import type { User } from '@supabase/supabase-js';
-import type { PropertyFormData as BasePropertyFormData } from '@/types/property';
 
 type Property = Tables<'properties'>;
 type Profile = Tables<'profiles'>;
 
 // Extend the base PropertyFormData with dashboard-specific fields
-export interface PropertyFormData extends BasePropertyFormData {
+export interface PropertyFormData {
+  title: string;
+  description: string;
+  price: string;
   price_period: string;
+  location: string;
+  full_address: string;
+  property_type: string;
+  bedrooms: string;
+  bathrooms: string;
+  area_sqm: string;
   square_meters: string;
+  contact_phone: string;
+  contact_whatsapp_phone: string;
+  amenities: string[];
+  nearby_services: string[];
+  images: string[];
 }
 
 interface UseDashboardPropertiesReturn {
@@ -30,20 +43,30 @@ interface UseDashboardPropertiesReturn {
   setFormData: (data: PropertyFormData) => void;
   setEditingProperty: (property: Property | null) => void;
   setSubmitting: (submitting: boolean) => void;
-  fetchProperties: (user: User) => Promise<void>;
-  handlePropertySubmit: (
+  // Core CRUD operations - Renamed for clarity
+  getMyProperties: (user: User) => Promise<void>;
+  createProperty: (
     e: React.FormEvent,
     user: User,
-    editingProperty: Property | null,
     onSuccess: () => void,
     onError: (message: string) => void
   ) => Promise<void>;
-  handleEditProperty: (property: Property, profile: Profile | null) => Promise<void>;
-  handleDeleteProperty: (id: string, onSuccess: () => void, onError: () => void) => Promise<void>;
+  updateProperty: (
+    e: React.FormEvent,
+    user: User,
+    propertyId: string,
+    onSuccess: () => void,
+    onError: (message: string) => void
+  ) => Promise<void>;
+  deleteProperty: (id: string, onSuccess: () => void, onError: () => void) => Promise<void>;
+  toggleAvailability: (id: string, currentStatus: boolean, onSuccess: () => void, onError: () => void) => Promise<void>;
+  // Helper functions
+  preparePropertyForEdit: (property: Property, profile: Profile | null) => Promise<void>;
   handleInputChange: (field: keyof PropertyFormData, value: unknown) => void;
   handleServiceToggle: (service: string) => void;
   handleAmenityToggle: (amenity: string) => void;
   resetForm: (profile: Profile | null) => void;
+  loadSavedDraft: (profile: Profile | null) => boolean;
   validateFormData: () => { isValid: boolean; errors: string[] };
 }
 
@@ -70,7 +93,12 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     images: []
   });
 
-  const fetchProperties = async (user: User): Promise<void> => {
+  /**
+   * GET MY PROPERTIES
+   * =================
+   * Fetches all properties owned by the current user
+   */
+  const getMyProperties = async (user: User): Promise<void> => {
     if (!user) return;
 
     try {
@@ -162,12 +190,12 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
   const buildPropertyData = (user: User) => {
     return {
       host_id: user.id,
-      title: formData.title?.trim(),
-      description: formData.description?.trim(),
+      title: formData.title?.trim() || '',
+      description: formData.description?.trim() || '',
       price: parseFloat(formData.price) || 0,
       price_period: formData.price_period || 'per_month',
-      location: formData.location?.trim(),
-      property_type: formData.property_type?.trim() || null,
+      location: formData.location?.trim() || '',
+      property_type: formData.property_type?.trim() || 'Apartment',
       bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : 0,
       bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : 1,
       square_meters: formData.square_meters ? parseInt(formData.square_meters) : null,
@@ -179,10 +207,63 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     };
   };
 
-  const handlePropertySubmit = async (
+  /**
+   * SAVE PROPERTY ADDRESS
+   * ====================
+   * Helper function to save/update property address
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const savePropertyAddress = async (client: any, propertyId: string, fullAddress: string) => {
+    if (!fullAddress) return;
+
+    const addressLines = fullAddress.split('\n');
+    const addressData = {
+      property_id: propertyId,
+      full_address: fullAddress,
+      street: addressLines[0]?.trim() || null,
+      city: addressLines[2]?.trim() || null,
+      region: addressLines[3]?.trim() || null,
+      postal_code: addressLines[4]?.trim() || null,
+      country: 'Tanzania'
+    };
+    
+    // Check if address already exists
+    const { data: existingAddress } = await client
+      .from('property_addresses')
+      .select('id')
+      .eq('property_id', propertyId)
+      .single();
+    
+    if (existingAddress) {
+      // Update existing address
+      const { error: addressError } = await client
+        .from('property_addresses')
+        .update(addressData)
+        .eq('property_id', propertyId);
+      
+      if (addressError) {
+        console.error('Error updating property address:', addressError);
+      }
+    } else {
+      // Insert new address
+      const { error: addressError } = await client
+        .from('property_addresses')
+        .insert([addressData]);
+      
+      if (addressError) {
+        console.error('Error inserting property address:', addressError);
+      }
+    }
+  };
+
+  /**
+   * CREATE PROPERTY
+   * ===============
+   * Creates a new property listing
+   */
+  const createProperty = async (
     e: React.FormEvent,
     user: User,
-    editingProperty: Property | null,
     onSuccess: () => void,
     onError: (message: string) => void
   ): Promise<void> => {
@@ -226,82 +307,28 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
         }
       );
       
-      let propertyId: string;
-      
-      if (editingProperty) {
-        // Update existing property
-        const { error } = await authenticatedClient
-          .from('properties')
-          .update(propertyData)
-          .eq('id', editingProperty.id)
-          .select();
+      // Create new property
+      const { data, error } = await authenticatedClient
+        .from('properties')
+        .insert([propertyData])
+        .select();
 
-        if (error) {
-          if (error.message.includes('row-level security')) {
-            throw new Error('Huna ruhusa ya kusasisha nyumba hii.');
-          }
-          throw new Error(`Hitilafu ya database: ${error.message}`);
+      if (error) {
+        console.error('Database error details:', error);
+        console.error('Property data being sent:', propertyData);
+        
+        if (error.message.includes('row-level security')) {
+          throw new Error('Huna ruhusa ya kuongeza nyumba.');
+        } else if (error.code === '23514') {
+          throw new Error('Taarifa ulizojaza hazikidhi mahitaji ya database.');
         }
-        propertyId = editingProperty.id;
-      } else {
-        // Create new property
-        const { data, error } = await authenticatedClient
-          .from('properties')
-          .insert([propertyData])
-          .select();
-
-        if (error) {
-          if (error.message.includes('row-level security')) {
-            throw new Error('Huna ruhusa ya kuongeza nyumba.');
-          } else if (error.code === '23514') {
-            throw new Error('Taarifa ulizojaza hazikidhi mahitaji ya database.');
-          }
-          throw new Error(`Hitilafu ya database: ${error.message}`);
-        }
-        propertyId = data[0].id;
+        throw new Error(`Hitilafu ya database: ${error.message}`);
       }
       
-      // Parse and save address details to property_addresses table
-      if (formData.full_address) {
-        const addressLines = formData.full_address.split('\n');
-        const addressData = {
-          property_id: propertyId,
-          full_address: formData.full_address,
-          street: addressLines[0]?.trim() || null,
-          city: addressLines[2]?.trim() || null,
-          region: addressLines[3]?.trim() || null,
-          postal_code: addressLines[4]?.trim() || null,
-          country: 'Tanzania'
-        };
-        
-        // Check if address already exists
-        const { data: existingAddress } = await authenticatedClient
-          .from('property_addresses')
-          .select('id')
-          .eq('property_id', propertyId)
-          .single();
-        
-        if (existingAddress) {
-          // Update existing address
-          const { error: addressError } = await authenticatedClient
-            .from('property_addresses')
-            .update(addressData)
-            .eq('property_id', propertyId);
-          
-          if (addressError) {
-            console.error('Error updating property address:', addressError);
-          }
-        } else {
-          // Insert new address
-          const { error: addressError } = await authenticatedClient
-            .from('property_addresses')
-            .insert([addressData]);
-          
-          if (addressError) {
-            console.error('Error inserting property address:', addressError);
-          }
-        }
-      }
+      const propertyId = data[0].id;
+      
+      // Save address details
+      await savePropertyAddress(authenticatedClient, propertyId, formData.full_address);
       
       // Clear saved form data
       localStorage.removeItem('nyumba_link_property_form_data');
@@ -309,7 +336,7 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       
       onSuccess();
     } catch (error) {
-      console.error('Error saving property:', error);
+      console.error('Error creating property:', error);
       const errorMessage = error instanceof Error ? error.message : 'Imeshindikana kuongeza nyumba yako.';
       onError(errorMessage);
     } finally {
@@ -317,7 +344,98 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     }
   };
 
-  const handleEditProperty = async (property: Property, profile: Profile | null): Promise<void> => {
+  /**
+   * UPDATE PROPERTY
+   * ===============
+   * Updates an existing property listing
+   */
+  const updateProperty = async (
+    e: React.FormEvent,
+    user: User,
+    propertyId: string,
+    onSuccess: () => void,
+    onError: (message: string) => void
+  ): Promise<void> => {
+    e.preventDefault();
+    
+    if (!user) {
+      onError('Lazima uingie kwanza kabla ya kusasisha nyumba');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      
+      // Verify session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        onError('Hujaingia kikamilifu. Tafadhali ingia tena.');
+        return;
+      }
+      
+      // Validate form
+      const validationResult = validateFormData();
+      if (!validationResult.isValid) {
+        onError(validationResult.errors[0] || 'Tafadhali jaza taarifa zote za lazima');
+        return;
+      }
+      
+      const propertyData = buildPropertyData(user);
+      
+      // Create authenticated client
+      const { createClient } = await import('@supabase/supabase-js');
+      const authenticatedClient = createClient(
+        import.meta.env.VITE_SUPABASE_URL,
+        import.meta.env.VITE_SUPABASE_ANON_KEY,
+        {
+          global: {
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+          },
+        }
+      );
+      
+      // Update existing property
+      const { error } = await authenticatedClient
+        .from('properties')
+        .update(propertyData)
+        .eq('id', propertyId)
+        .select();
+
+      if (error) {
+        console.error('Database error details:', error);
+        console.error('Property data being sent:', propertyData);
+        
+        if (error.message.includes('row-level security')) {
+          throw new Error('Huna ruhusa ya kusasisha nyumba hii.');
+        }
+        throw new Error(`Hitilafu ya database: ${error.message}`);
+      }
+      
+      // Save address details
+      await savePropertyAddress(authenticatedClient, propertyId, formData.full_address);
+      
+      // Clear saved form data
+      localStorage.removeItem('nyumba_link_property_form_data');
+      localStorage.removeItem('nyumba_link_property_form_step');
+      
+      onSuccess();
+    } catch (error) {
+      console.error('Error updating property:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Imeshindikana kusasisha nyumba yako.';
+      onError(errorMessage);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  /**
+   * PREPARE PROPERTY FOR EDIT
+   * =========================
+   * Loads property data into form for editing
+   */
+  const preparePropertyForEdit = async (property: Property, profile: Profile | null): Promise<void> => {
     setEditingProperty(property);
     
     // Fetch address from property_addresses table
@@ -356,7 +474,12 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     });
   };
 
-  const handleDeleteProperty = async (
+  /**
+   * DELETE PROPERTY
+   * ===============
+   * Deletes a property listing
+   */
+  const deleteProperty = async (
     id: string,
     onSuccess: () => void,
     onError: () => void
@@ -371,6 +494,50 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       onSuccess();
     } catch (error) {
       console.error('Error deleting property:', error);
+      onError();
+    }
+  };
+
+  /**
+   * TOGGLE PROPERTY AVAILABILITY
+   * ============================
+   * 
+   * Toggles the is_available status of a property.
+   * This allows hosts to temporarily hide/show properties without admin re-approval.
+   * 
+   * @param id - Property ID
+   * @param currentStatus - Current availability status
+   * @param onSuccess - Success callback
+   * @param onError - Error callback
+   */
+  const toggleAvailability = async (
+    id: string,
+    currentStatus: boolean,
+    onSuccess: () => void,
+    onError: () => void
+  ): Promise<void> => {
+    try {
+      const newStatus = !currentStatus;
+      
+      const { error } = await supabase
+        .from('properties')
+        .update({ is_available: newStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Update local state
+      setProperties(prevProperties =>
+        prevProperties.map(property =>
+          property.id === id
+            ? { ...property, is_available: newStatus }
+            : property
+        )
+      );
+
+      onSuccess();
+    } catch (error) {
+      console.error('Error toggling property availability:', error);
       onError();
     }
   };
@@ -418,6 +585,40 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     });
   };
 
+  /**
+   * LOAD SAVED DRAFT
+   * ================
+   * Loads saved form data from localStorage
+   */
+  const loadSavedDraft = (profile: Profile | null): boolean => {
+    try {
+      const savedFormData = localStorage.getItem('nyumba_link_property_form_data');
+      
+      if (savedFormData) {
+        const parsedData = JSON.parse(savedFormData);
+        console.log('📂 Loading saved draft from localStorage:', parsedData);
+        
+        // Merge saved data with profile phone if available
+        setFormData({
+          ...parsedData,
+          contact_phone: parsedData.contact_phone || profile?.phone || '',
+          contact_whatsapp_phone: parsedData.contact_whatsapp_phone || profile?.phone || '',
+        });
+        
+        console.log('✅ Draft loaded successfully');
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('❌ Error loading saved draft:', error);
+      localStorage.removeItem('nyumba_link_property_form_data');
+      localStorage.removeItem('nyumba_link_property_form_step');
+      localStorage.removeItem('nyumba_link_property_form_last_saved');
+      return false;
+    }
+  };
+
   return {
     properties,
     formData,
@@ -427,14 +628,19 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     setFormData,
     setEditingProperty,
     setSubmitting,
-    fetchProperties,
-    handlePropertySubmit,
-    handleEditProperty,
-    handleDeleteProperty,
+    // Core CRUD operations with clear names
+    getMyProperties,
+    createProperty,
+    updateProperty,
+    deleteProperty,
+    toggleAvailability,
+    // Helper functions
+    preparePropertyForEdit,
     handleInputChange,
     handleServiceToggle,
     handleAmenityToggle,
     resetForm,
+    loadSavedDraft,
     validateFormData
   };
 };

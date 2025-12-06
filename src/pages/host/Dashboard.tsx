@@ -97,10 +97,12 @@ const Dashboard = () => {
     editingProperty,
     submitting,
     setEditingProperty,
-    fetchProperties,
-    handlePropertySubmit,
-    handleEditProperty,
-    handleDeleteProperty,
+    getMyProperties,
+    createProperty,
+    updateProperty,
+    deleteProperty,
+    toggleAvailability,
+    preparePropertyForEdit,
     handleInputChange,
     handleServiceToggle,
     handleAmenityToggle,
@@ -121,13 +123,13 @@ const Dashboard = () => {
       // Fetch profile and properties in parallel
       const results = await Promise.allSettled([
         fetchProfile(user),
-        fetchProperties(user)
+        getMyProperties(user)
       ]);
       
       // Log any failures
       results.forEach((result, index) => {
         if (result.status === 'rejected') {
-          const operation = index === 0 ? 'fetchProfile' : 'fetchProperties';
+          const operation = index === 0 ? 'fetchProfile' : 'getMyProperties';
           console.warn(`${operation} failed:`, result.reason);
         }
       });
@@ -180,7 +182,7 @@ const Dashboard = () => {
     );
     handleCloseForm();
     if (user) {
-      await fetchProperties(user);
+      await getMyProperties(user);
     }
   };
 
@@ -200,7 +202,7 @@ const Dashboard = () => {
   const onPropertyDeleteSuccess = async (): Promise<void> => {
     showSuccessToast('Nyumba imefutwa kikamilifu');
     if (user) {
-      await fetchProperties(user);
+      await getMyProperties(user);
     }
   };
 
@@ -305,10 +307,10 @@ const Dashboard = () => {
           onFilterChange={(status) => updateUIState({ filterStatus: status })}
           onViewModeChange={(mode) => updateUIState({ viewMode: mode })}
           onEditProperty={async (property) => {
-            await handleEditProperty(property, profile);
+            await preparePropertyForEdit(property, profile);
             openAddForm();
           }}
-          onDeleteProperty={(id) => handleDeleteProperty(id, onPropertyDeleteSuccess, onPropertyDeleteError)}
+          onDeleteProperty={(id) => deleteProperty(id, onPropertyDeleteSuccess, onPropertyDeleteError)}
           onAddProperty={openAddForm}
           limit={4}
           showViewAll={true}
@@ -325,13 +327,22 @@ const Dashboard = () => {
           onClose={handleCloseForm}
           onSubmit={async (e) => {
             if (user) {
-              await handlePropertySubmit(
-                e,
-                user,
-                editingProperty,
-                onPropertySubmitSuccess,
-                onPropertySubmitError
-              );
+              if (editingProperty) {
+                await updateProperty(
+                  e,
+                  user,
+                  editingProperty.id,
+                  onPropertySubmitSuccess,
+                  onPropertySubmitError
+                );
+              } else {
+                await createProperty(
+                  e,
+                  user,
+                  onPropertySubmitSuccess,
+                  onPropertySubmitError
+                );
+              }
             }
           }}
           onInputChange={handleInputChange}

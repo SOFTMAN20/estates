@@ -65,14 +65,17 @@ const Properties = () => {
     editingProperty,
     submitting,
     setEditingProperty,
-    fetchProperties,
-    handlePropertySubmit,
-    handleEditProperty,
-    handleDeleteProperty,
+    getMyProperties,
+    createProperty,
+    updateProperty,
+    deleteProperty,
+    toggleAvailability,
+    preparePropertyForEdit,
     handleInputChange,
     handleServiceToggle,
     handleAmenityToggle,
-    resetForm
+    resetForm,
+    loadSavedDraft
   } = useDashboardProperties();
 
   // Initialize page
@@ -83,7 +86,7 @@ const Properties = () => {
       try {
         await Promise.allSettled([
           fetchProfile(user),
-          fetchProperties(user)
+          getMyProperties(user)
         ]);
       } catch (error) {
         console.error('Failed to load properties:', error);
@@ -132,7 +135,7 @@ const Properties = () => {
     });
     handleCloseForm();
     if (user) {
-      await fetchProperties(user);
+      await getMyProperties(user);
     }
   };
 
@@ -155,7 +158,7 @@ const Properties = () => {
       description: 'Nyumba imefutwa kikamilifu'
     });
     if (user) {
-      await fetchProperties(user);
+      await getMyProperties(user);
     }
   };
 
@@ -169,7 +172,7 @@ const Properties = () => {
 
   const handleConfirmDelete = async () => {
     if (propertyToDelete) {
-      await handleDeleteProperty(propertyToDelete, onPropertyDeleteSuccess, onPropertyDeleteError);
+      await deleteProperty(propertyToDelete, onPropertyDeleteSuccess, onPropertyDeleteError);
       setDeleteDialogOpen(false);
       setPropertyToDelete(null);
     }
@@ -231,16 +234,40 @@ const Properties = () => {
               <span>{property.bathrooms}</span>
             </div>
             <div className="flex items-center gap-1.5 ml-auto">
-              <span className="text-xs text-gray-500">Available</span>
+              <span className="text-xs text-gray-500">
+                {property.is_available ? 'Available' : 'Hidden'}
+              </span>
               <Switch
-                checked={isAvailable}
-                disabled
+                checked={property.is_available ?? true}
+                disabled={property.status !== 'approved'}
                 className="scale-75 sm:scale-100"
                 onCheckedChange={() => {
-                  toast({
-                    title: "Info",
-                    description: "Availability is controlled by approval status"
-                  });
+                  if (property.status !== 'approved') {
+                    toast({
+                      title: "Info",
+                      description: "Property must be approved before toggling availability"
+                    });
+                    return;
+                  }
+                  
+                  toggleAvailability(
+                    property.id,
+                    property.is_available ?? true,
+                    () => {
+                      toast({
+                        title: "Success",
+                        description: `Property ${property.is_available ? 'hidden' : 'made available'} successfully`
+                      });
+                      getMyProperties(user!);
+                    },
+                    () => {
+                      toast({
+                        variant: "destructive",
+                        title: "Error",
+                        description: "Failed to update property availability"
+                      });
+                    }
+                  );
                 }}
               />
             </div>
@@ -252,7 +279,7 @@ const Properties = () => {
               variant="outline"
               className="flex-1 text-xs sm:text-sm"
               onClick={async () => {
-                await handleEditProperty(property, profile);
+                await preparePropertyForEdit(property, profile);
                 setShowAddForm(true);
               }}
             >
@@ -316,7 +343,14 @@ const Properties = () => {
               </p>
             </div>
             <Button 
-              onClick={() => setShowAddForm(true)} 
+              onClick={() => {
+                // Try to load saved draft, if none exists, reset form
+                const hasSavedDraft = loadSavedDraft(profile);
+                if (!hasSavedDraft) {
+                  resetForm(profile);
+                }
+                setShowAddForm(true);
+              }} 
               size="default"
               className="w-full sm:w-auto"
             >
@@ -391,7 +425,14 @@ const Properties = () => {
                   </p>
                   {!searchQuery && (
                     <Button 
-                      onClick={() => setShowAddForm(true)} 
+                      onClick={() => {
+                        // Try to load saved draft, if none exists, reset form
+                        const hasSavedDraft = loadSavedDraft(profile);
+                        if (!hasSavedDraft) {
+                          resetForm(profile);
+                        }
+                        setShowAddForm(true);
+                      }} 
                       size="lg"
                       className="w-full sm:w-auto"
                     >
@@ -421,13 +462,22 @@ const Properties = () => {
           onClose={handleCloseForm}
           onSubmit={async (e) => {
             if (user) {
-              await handlePropertySubmit(
-                e,
-                user,
-                editingProperty,
-                onPropertySubmitSuccess,
-                onPropertySubmitError
-              );
+              if (editingProperty) {
+                await updateProperty(
+                  e,
+                  user,
+                  editingProperty.id,
+                  onPropertySubmitSuccess,
+                  onPropertySubmitError
+                );
+              } else {
+                await createProperty(
+                  e,
+                  user,
+                  onPropertySubmitSuccess,
+                  onPropertySubmitError
+                );
+              }
             }
           }}
           onInputChange={handleInputChange}

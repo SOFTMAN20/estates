@@ -50,8 +50,8 @@ export const Step3PropertyDetails: React.FC<Step2PropertyDetailsProps> = ({
         <div className="w-16 h-16 bg-gradient-to-br from-serengeti-500 to-kilimanjaro-500 rounded-full flex items-center justify-center mx-auto mb-4">
           <Building className="h-8 w-8 text-white" />
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">Maelezo ya Nyumba</h3>
-        <p className="text-gray-600">Eleza nyumba yako kwa undani</p>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('dashboard.step2Title')}</h3>
+        <p className="text-gray-600">{t('dashboard.step2Description')}</p>
       </div>
 
       {/* Property Type */}
@@ -179,26 +179,6 @@ export const Step3PropertyDetails: React.FC<Step2PropertyDetailsProps> = ({
               min="0"
             />
           </div>
-        </div>
-      </div>
-
-      {/* Description */}
-      <div className="space-y-2">
-        <Label htmlFor="description" className="flex items-center gap-2 text-sm font-medium">
-          <Info className="h-4 w-4 text-primary" />
-          {t('dashboard.description')} *
-        </Label>
-        <Textarea
-          id="description"
-          value={formData.description}
-          onChange={(e) => onInputChange('description', e.target.value)}
-          placeholder={t('dashboard.describeProperty')}
-          rows={6}
-          className={`transition-all duration-200 border-2 border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 ${formData.description ? 'border-green-400 bg-green-50' : 'hover:border-gray-400'}`}
-          required
-        />
-        <div className="text-xs text-gray-500 text-right">
-          {formData.description.length}/500 herufi
         </div>
       </div>
 

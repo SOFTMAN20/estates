@@ -38,8 +38,8 @@ export const Step5ContactInfo: React.FC<Step3ContactInfoProps> = ({
         <div className="w-16 h-16 bg-gradient-to-br from-kilimanjaro-500 to-safari-500 rounded-full flex items-center justify-center mx-auto mb-4">
           <Phone className="h-8 w-8 text-white" />
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">Maelezo ya Mawasiliano</h3>
-        <p className="text-gray-600">Weka maelezo ya mawasiliano ili wapangaji waweze kuwasiliana nawe</p>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('dashboard.step5Title')}</h3>
+        <p className="text-gray-600">{t('dashboard.contactInfoDescription')}</p>
       </div>
 
       {/* Contact Phone */}
@@ -60,7 +60,7 @@ export const Step5ContactInfo: React.FC<Step3ContactInfoProps> = ({
         {formData.contact_phone && formData.contact_phone.startsWith('+') && (
           <div className="flex items-center gap-1 text-green-600 text-xs">
             <CheckCircle className="h-3 w-3" />
-            Nambari ya simu imejazwa
+            {t('dashboard.phoneFilled')}
           </div>
         )}
         {formData.contact_phone && !formData.contact_phone.startsWith('+') && (

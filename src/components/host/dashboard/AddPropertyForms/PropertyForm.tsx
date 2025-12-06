@@ -18,8 +18,8 @@ import type { Tables } from '@/lib/integrations/supabase/types';
 // Import modular step components
 import {
   Step1BasicInfo,
-  Step2PropertyAddress,
-  Step3PropertyDetails,
+  Step2PropertyAddress, // Exported from Step3PropertyAddress.tsx
+  Step3PropertyDetails, // Exported from Step2PropertyDetails.tsx
   Step4PhotoUpload,
   Step5ContactInfo,
   StepNavigation,
@@ -142,11 +142,11 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
   const isStepValid = (step: number): boolean => {
     switch (step) {
       case 1:
-        return !!(formData.title?.trim() && formData.price?.trim() && formData.location?.trim());
+        return !!(formData.title?.trim() && formData.price?.trim() && formData.location?.trim() && formData.description?.trim() && formData.description.length >= 10);
       case 2:
-        return !!(formData.full_address?.trim());
+        return !!(formData.property_type?.trim());
       case 3:
-        return !!(formData.description?.trim() && formData.property_type?.trim());
+        return !!(formData.full_address?.trim());
       case 4:
         return formData.images && formData.images.length >= 3;
       case 5:
@@ -224,8 +224,8 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
 
   const steps = [
     { id: 1, title: t('dashboard.basicInfo'), icon: Home, description: 'Jina, bei na eneo' },
-    { id: 2, title: 'Anwani', icon: MapPin, description: 'Anwani kamili ya nyumba' },
-    { id: 3, title: t('dashboard.details'), icon: Building, description: 'Maelezo na aina ya nyumba' },
+    { id: 2, title: t('dashboard.details'), icon: Building, description: 'Maelezo na aina ya nyumba' },
+    { id: 3, title: 'Anwani', icon: MapPin, description: 'Anwani kamili ya nyumba' },
     { id: 4, title: t('dashboard.photos'), icon: Camera, description: 'Picha za nyumba (za lazima)' },
     { id: 5, title: t('dashboard.contact'), icon: Phone, description: 'Maelezo ya mawasiliano' }
   ];
@@ -239,23 +239,14 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
               title: formData.title,
               price: formData.price,
               price_period: formData.price_period,
-              location: formData.location
+              location: formData.location,
+              description: formData.description
             }}
             onInputChange={onInputChange}
             isValid={isStepValid(1)}
           />
         );
       case 2:
-        return (
-          <Step2PropertyAddress
-            formData={{
-              full_address: formData.full_address
-            }}
-            onInputChange={onInputChange}
-            isValid={isStepValid(2)}
-          />
-        );
-      case 3:
         return (
           <Step3PropertyDetails
             formData={{
@@ -270,6 +261,16 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
             onInputChange={onInputChange}
             onAmenityToggle={onAmenityToggle}
             onServiceToggle={onServiceToggle}
+            isValid={isStepValid(2)}
+          />
+        );
+      case 3:
+        return (
+          <Step2PropertyAddress
+            formData={{
+              full_address: formData.full_address
+            }}
+            onInputChange={onInputChange}
             isValid={isStepValid(3)}
           />
         );

@@ -34,8 +34,8 @@ export const Step2PropertyAddress: React.FC<Step2PropertyAddressProps> = ({
         <div className="w-16 h-16 bg-gradient-to-br from-serengeti-500 to-kilimanjaro-500 rounded-full flex items-center justify-center mx-auto mb-4">
           <MapPin className="h-8 w-8 text-white" />
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">Anwani ya Nyumba</h3>
-        <p className="text-gray-600">Weka anwani kamili ya nyumba yako</p>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('dashboard.step3Title')}</h3>
+        <p className="text-gray-600">{t('dashboard.step3Description')}</p>
       </div>
 
       {/* Country/Region - Fixed for Tanzania */}
@@ -173,9 +173,9 @@ export const Step2PropertyAddress: React.FC<Step2PropertyAddressProps> = ({
         <div className="flex gap-3">
           <MapPin className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-blue-800">
-            <p className="font-medium mb-1">Kwa nini anwani kamili ni muhimu?</p>
+            <p className="font-medium mb-1">{t('dashboard.addressImportance')}</p>
             <p className="text-blue-700">
-              Anwani kamili inasaidia wapangaji kukupata kwa urahisi na kuongeza imani katika matangazo yako.
+              {t('dashboard.addressImportanceText')}
             </p>
           </div>
         </div>

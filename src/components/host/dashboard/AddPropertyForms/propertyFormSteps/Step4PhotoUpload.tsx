@@ -10,6 +10,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import ImageUpload from '@/components/host/dashboard/AddPropertyForms/ImageUpload';
 import { Camera, Info, CheckCircle, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Step4PhotoUploadProps {
   images: string[];
@@ -22,6 +23,8 @@ export const Step4PhotoUpload: React.FC<Step4PhotoUploadProps> = ({
   onImagesChange,
   isValid,
 }) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
@@ -29,9 +32,9 @@ export const Step4PhotoUpload: React.FC<Step4PhotoUploadProps> = ({
         <div className="w-16 h-16 bg-gradient-to-br from-safari-500 to-primary rounded-full flex items-center justify-center mx-auto mb-4">
           <Camera className="h-8 w-8 text-white" />
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">Picha za Nyumba *</h3>
-        <p className="text-gray-600">Ongeza picha nzuri za nyumba yako ili kuvutia wapangaji</p>
-        <p className="text-sm text-red-600 font-medium">⚠️ Picha ni za lazima - ongeza angalau picha 3</p>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('dashboard.step4Title')} *</h3>
+        <p className="text-gray-600">{t('dashboard.step4Description')}</p>
+        <p className="text-sm text-red-600 font-medium">{t('dashboard.photosRequired')}</p>
       </div>
 
       {/* Photo Upload Component */}
@@ -46,13 +49,13 @@ export const Step4PhotoUpload: React.FC<Step4PhotoUploadProps> = ({
       <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
         <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
           <Info className="h-4 w-4" />
-          Vidokezo vya Picha Nzuri
+          {t('dashboard.photoTipsTitle')}
         </h4>
         <ul className="text-sm text-blue-800 space-y-1">
-          <li>• Piga picha za sebule, chumba cha kulala, na jiko</li>
-          <li>• Hakikisha mwanga wa kutosha</li>
-          <li>• Onyesha mazingira ya nje ya nyumba</li>
-          <li>• Tumia picha za quality nzuri</li>
+          <li>{t('dashboard.photoTip1')}</li>
+          <li>{t('dashboard.photoTip2')}</li>
+          <li>{t('dashboard.photoTip3')}</li>
+          <li>{t('dashboard.photoTip4')}</li>
         </ul>
       </div>
 

@@ -37,6 +37,7 @@ import {
   Sparkles,
   LucideIcon,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface PropertyAmenitiesProps {
   amenities?: string[] | null;
@@ -52,65 +53,54 @@ interface AmenityConfig {
 /**
  * AMENITY ICON MAPPING
  * ===================
- * Maps amenity keys to their icons, labels, and colors
- * Matches the AmenitiesSelector configuration
+ * Maps amenity keys to their icons and colors
+ * Labels are now handled via translations
  */
-const amenityConfig: Record<string, AmenityConfig> = {
-  electricity: {
-    icon: Zap,
-    label: 'Umeme',
-    colorClass: 'bg-yellow-50 text-yellow-600 border-yellow-200',
-  },
-  water: {
-    icon: Droplets,
-    label: 'Maji',
-    colorClass: 'bg-blue-50 text-blue-600 border-blue-200',
-  },
-  furnished: {
-    icon: Sofa,
-    label: 'Samani',
-    colorClass: 'bg-purple-50 text-purple-600 border-purple-200',
-  },
-  parking: {
-    icon: Car,
-    label: 'Maegesho',
-    colorClass: 'bg-green-50 text-green-600 border-green-200',
-  },
-  security: {
-    icon: Shield,
-    label: 'Usalama',
-    colorClass: 'bg-red-50 text-red-600 border-red-200',
-  },
-  wifi: {
-    icon: Wifi,
-    label: 'WiFi',
-    colorClass: 'bg-indigo-50 text-indigo-600 border-indigo-200',
-  },
-  ac: {
-    icon: Wind,
-    label: 'AC',
-    colorClass: 'bg-cyan-50 text-cyan-600 border-cyan-200',
-  },
-  tv: {
-    icon: Tv,
-    label: 'TV',
-    colorClass: 'bg-pink-50 text-pink-600 border-pink-200',
-  },
-};
+const getAmenityIconConfig = (amenity: string): { icon: LucideIcon; colorClass: string } => {
+  const amenityMap: Record<string, { icon: LucideIcon; colorClass: string }> = {
+    electricity: {
+      icon: Zap,
+      colorClass: 'bg-yellow-50 text-yellow-600 border-yellow-200',
+    },
+    water: {
+      icon: Droplets,
+      colorClass: 'bg-blue-50 text-blue-600 border-blue-200',
+    },
+    furnished: {
+      icon: Sofa,
+      colorClass: 'bg-purple-50 text-purple-600 border-purple-200',
+    },
+    parking: {
+      icon: Car,
+      colorClass: 'bg-green-50 text-green-600 border-green-200',
+    },
+    security: {
+      icon: Shield,
+      colorClass: 'bg-red-50 text-red-600 border-red-200',
+    },
+    wifi: {
+      icon: Wifi,
+      colorClass: 'bg-indigo-50 text-indigo-600 border-indigo-200',
+    },
+    ac: {
+      icon: Wind,
+      colorClass: 'bg-cyan-50 text-cyan-600 border-cyan-200',
+    },
+    tv: {
+      icon: Tv,
+      colorClass: 'bg-pink-50 text-pink-600 border-pink-200',
+    },
+  };
 
-/**
- * Get amenity configuration based on key
- */
-const getAmenityConfig = (amenity: string): AmenityConfig => {
   const lowerAmenity = amenity.toLowerCase();
 
   // Check for exact match
-  if (amenityConfig[lowerAmenity]) {
-    return amenityConfig[lowerAmenity];
+  if (amenityMap[lowerAmenity]) {
+    return amenityMap[lowerAmenity];
   }
 
   // Check for partial match
-  for (const [key, config] of Object.entries(amenityConfig)) {
+  for (const [key, config] of Object.entries(amenityMap)) {
     if (lowerAmenity.includes(key) || key.includes(lowerAmenity)) {
       return config;
     }
@@ -119,7 +109,6 @@ const getAmenityConfig = (amenity: string): AmenityConfig => {
   // Default configuration
   return {
     icon: Sparkles,
-    label: amenity,
     colorClass: 'bg-gray-50 text-gray-600 border-gray-200',
   };
 };
@@ -132,6 +121,7 @@ const PropertyAmenities: React.FC<PropertyAmenitiesProps> = ({
   amenities,
   className = '',
 }) => {
+  const { t } = useTranslation();
   const [showAllModal, setShowAllModal] = useState(false);
   const PREVIEW_LIMIT = 10;
 
@@ -139,6 +129,29 @@ const PropertyAmenities: React.FC<PropertyAmenitiesProps> = ({
   if (!amenities || amenities.length === 0) {
     return null;
   }
+
+  /**
+   * Get translated label for amenity
+   * Uses translation keys from propertyDetail.amenities
+   */
+  const getAmenityLabel = (amenity: string): string => {
+    const lowerAmenity = amenity.toLowerCase();
+    
+    // Map amenity keys to translation keys
+    const translationMap: Record<string, string> = {
+      electricity: 'propertyDetail.amenities.electricity',
+      water: 'propertyDetail.amenities.water',
+      furnished: 'propertyDetail.amenities.furnished',
+      parking: 'propertyDetail.amenities.parking',
+      security: 'propertyDetail.amenities.security',
+      wifi: 'propertyDetail.amenities.wifi',
+      ac: 'propertyDetail.amenities.ac',
+      tv: 'propertyDetail.amenities.tv',
+    };
+
+    // Return translated label or fallback to original amenity name
+    return translationMap[lowerAmenity] ? t(translationMap[lowerAmenity]) : amenity;
+  };
 
   const previewAmenities = amenities.slice(0, PREVIEW_LIMIT);
   const hasMore = amenities.length > PREVIEW_LIMIT;
@@ -151,17 +164,18 @@ const PropertyAmenities: React.FC<PropertyAmenitiesProps> = ({
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           {previewAmenities.map((amenity, index) => {
-            const config = getAmenityConfig(amenity);
-            const Icon = config.icon;
+            const iconConfig = getAmenityIconConfig(amenity);
+            const Icon = iconConfig.icon;
+            const label = getAmenityLabel(amenity);
 
             return (
               <div 
                 key={index} 
-                className={`flex items-center gap-3 p-3 sm:p-4 rounded-lg border-2 transition-all hover:shadow-md ${config.colorClass}`}
+                className={`flex items-center gap-3 p-3 sm:p-4 rounded-lg border-2 transition-all hover:shadow-md ${iconConfig.colorClass}`}
               >
                 <Icon className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
                 <span className="text-sm sm:text-base font-medium break-words">
-                  {config.label}
+                  {label}
                 </span>
               </div>
             );
@@ -190,17 +204,18 @@ const PropertyAmenities: React.FC<PropertyAmenitiesProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 py-4">
             {amenities.map((amenity, index) => {
-              const config = getAmenityConfig(amenity);
-              const Icon = config.icon;
+              const iconConfig = getAmenityIconConfig(amenity);
+              const Icon = iconConfig.icon;
+              const label = getAmenityLabel(amenity);
 
               return (
                 <div 
                   key={index} 
-                  className={`flex items-center gap-3 p-3 sm:p-4 rounded-lg border-2 transition-all hover:shadow-md ${config.colorClass}`}
+                  className={`flex items-center gap-3 p-3 sm:p-4 rounded-lg border-2 transition-all hover:shadow-md ${iconConfig.colorClass}`}
                 >
                   <Icon className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
                   <span className="text-sm sm:text-base font-medium break-words">
-                    {config.label}
+                    {label}
                   </span>
                 </div>
               );

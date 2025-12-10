@@ -33,7 +33,7 @@ import PropertyFeatures from '@/components/properties/PropertyDetails/PropertyFe
 import NearbyServices from '@/components/properties/PropertyDetails/NearbyServices';
 import PropertyHeader from '@/components/properties/PropertyDetails/PropertyHeader';
 import PropertyDescription from '@/components/properties/PropertyDetails/PropertyDescription';
-import LandlordContact from '@/components/properties/PropertyDetails/LandlordContact';
+import HostInformationCard from '@/components/properties/PropertyDetails/HostInformationCard';
 import PropertyLocation from '@/components/properties/PropertyDetails/PropertyLocation';
 import SafetyTips from '@/components/properties/PropertyDetails/SafetyTips';
 import { Button } from '@/components/ui/button';
@@ -116,6 +116,16 @@ const PropertyDetail = () => {
    * kwa kutumia ID kutoka vigezo vya URL.
    */
   const property = typedProperties.find(p => p.id === id);
+
+  /**
+   * HOST PROPERTY COUNT
+   * ==================
+   * 
+   * Count total properties owned by this host
+   */
+  const hostPropertyCount = property?.host_id 
+    ? typedProperties.filter(p => p.host_id === property.host_id).length 
+    : 1;
 
   /**
    * SERVICE ICONS MAPPING
@@ -554,12 +564,16 @@ const PropertyDetail = () => {
             {/* Service Fee Calculator */}
             <ServiceFeeCalculator monthlyRent={Number(property.price)} />
 
-            {/* Landlord Contact Card */}
-            <LandlordContact
-              landlordName={property.profiles?.name}
+            {/* Host Information Card */}
+            <HostInformationCard
+              hostName={property.profiles?.name}
+              hostAvatar={property.profiles?.avatar_url}
+              memberSince={property.profiles?.created_at}
+              totalProperties={hostPropertyCount}
               contactPhone={property.contact_phone}
               whatsappPhone={property.contact_whatsapp_phone}
               propertyTitle={property.title}
+              isVerified={true}
             />
 
             {/* Location Map */}

@@ -98,6 +98,8 @@
     "customPrice": "Custom Price",
     "minPriceLabel": "Min price (TZS)",
     "maxPriceLabel": "Max price (TZS)",
+    "minimum": "Minimum (TZS)",
+    "maximum": "Maximum (TZS)",
     "basicUtilities": "Basic Utilities",
     "electricity": "Electricity",
     "water": "Water",
@@ -105,6 +107,8 @@
     "school": "School",
     "hospital": "Hospital",
     "market": "Market",
+    "bank": "Bank",
+    "transport": "Transport",
     "sortBy": "Sort By",
     "newest": "Newest",
     "priceLow": "Price: Low to High",
@@ -117,7 +121,23 @@
     "loadingProperties": "Loading properties...",
     "errorLoading": "Error loading properties",
     "tryAgainLater": "Please try again later.",
-    "tryAgain": "Try Again"
+    "tryAgain": "Try Again",
+    "propertyType": "Property Type",
+    "allTypes": "All Types",
+    "apartment": "Apartment",
+    "house": "House",
+    "studio": "Studio",
+    "room": "Room",
+    "villa": "Villa",
+    "commercial": "Commercial",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "any": "Any",
+    "bedroomPlus": "{{count}}+ Bedroom",
+    "bedroomsPlus": "{{count}}+ Bedrooms",
+    "bathroomPlus": "{{count}}+ Bathroom",
+    "bathroomsPlus": "{{count}}+ Bathrooms",
+    "amenitiesServices": "Amenities & Services"
   },
   "propertyCard": {
     "perMonth": "/month",
@@ -161,14 +181,21 @@
       "house": "House",
       "room": "Room",
       "studio": "Studio",
-      "office": "Office"
+      "office": "Office",
+      "villa": "Villa",
+      "bedsitter": "Bedsitter",
+      "lodge": "Lodge",
+      "hotel": "Hotel"
     },
     "amenities": {
       "electricity": "Electricity",
       "water": "Water",
       "furnished": "Furnished",
       "parking": "Parking",
-      "security": "Security"
+      "security": "Security",
+      "wifi": "WiFi",
+      "ac": "AC",
+      "tv": "TV"
     },
     "nearbyServices": {
       "school": "School",
@@ -176,6 +203,29 @@
       "market": "Market",
       "bank": "Bank",
       "transport": "Transport"
+    },
+    "hostCard": {
+      "propertyHost": "Property Host",
+      "verified": "Verified",
+      "memberSince": "Member Since",
+      "memberFor": "Member for {{count}} {{unit}}",
+      "year": "year",
+      "years": "years",
+      "month": "month",
+      "months": "months",
+      "newMember": "New member",
+      "properties": "Properties",
+      "listing": "listing",
+      "listings": "listings",
+      "contactHost": "Contact Host",
+      "responseTime": "Response time: Usually within a few hours",
+      "chooseContact": "Choose how you'd like to get in touch with the host",
+      "call": "Call",
+      "whatsapp": "WhatsApp",
+      "noContact": "No contact information available",
+      "checkLater": "Please check back later or contact support",
+      "safetyReminder": "Safety Reminder",
+      "neverSendMoney": "Never send money before viewing the property in person"
     }
   },
   "auth": {
@@ -478,36 +528,5 @@
   "property": {
     "edit": "Edit",
     "delete": "Delete"
-  },
-  "footer": {
-    "description": "A modern platform for finding and renting houses in Tanzania. We connect landlords and tenants easily and securely.",
-    "location": "Mbeya, MUST University",
-    "importantPages": "Important Pages",
-    "home": "Home",
-    "searchHouses": "Search Houses",
-    "becomeLandlord": "Become Landlord",
-    "dashboard": "Dashboard",
-    "supportLegal": "Support & Legal",
-    "faq": "Frequently Asked Questions",
-    "contactUs": "Contact Us",
-    "privacyPolicy": "Privacy Policy",
-    "termsOfUse": "Terms of Use",
-    "safetyGuidelines": "Safety Guidelines",
-    "ourServices": "Our Services",
-    "easySearch": "Easy house search",
-    "directCommunication": "Direct communication",
-    "highSecurity": "High data security",
-    "customerService": "24/7 customer service",
-    "modernFilters": "Modern filters",
-    "registeredHouses": "Registered Houses",
-    "landlords": "Landlords",
-    "cities": "Cities",
-    "users": "Users",
-    "rightsReserved": "All rights reserved.",
-    "createdWith": "Created with",
-    "poweredBy": "Powered by React & Supabase",
-    "madeWith": "Made with TypeScript",
-    "hostedOn": "Hosted on Lovable",
-    "aiDescription": "This application was built with modern AI technologies and designed for the Tanzanian community"
   }
 }

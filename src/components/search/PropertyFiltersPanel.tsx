@@ -56,20 +56,20 @@ const PropertyFiltersPanel: React.FC<PropertyFiltersPanelProps> = ({
           <div className="bg-gray-50 p-3 sm:p-4 rounded-lg border border-gray-200">
             <label className="flex items-center gap-2 text-sm sm:text-base font-semibold text-gray-900 mb-2 sm:mb-3">
               <span className="text-lg">🏠</span>
-              Property Type
+              {t('browse.propertyType')}
             </label>
             <Select value={propertyType} onValueChange={onPropertyTypeChange}>
               <SelectTrigger className="text-sm sm:text-base h-10 sm:h-11">
-                <SelectValue placeholder="All Types" />
+                <SelectValue placeholder={t('browse.allTypes')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="apartment">🏢 Apartment</SelectItem>
-                <SelectItem value="house">🏡 House</SelectItem>
-                <SelectItem value="studio">🛋️ Studio</SelectItem>
-                <SelectItem value="room">🚪 Room</SelectItem>
-                <SelectItem value="villa">🏰 Villa</SelectItem>
-                <SelectItem value="commercial">🏪 Commercial</SelectItem>
+                <SelectItem value="all">{t('browse.allTypes')}</SelectItem>
+                <SelectItem value="apartment">🏢 {t('browse.apartment')}</SelectItem>
+                <SelectItem value="house">🏡 {t('browse.house')}</SelectItem>
+                <SelectItem value="studio">🛋️ {t('browse.studio')}</SelectItem>
+                <SelectItem value="room">🚪 {t('browse.room')}</SelectItem>
+                <SelectItem value="villa">🏰 {t('browse.villa')}</SelectItem>
+                <SelectItem value="commercial">🏪 {t('browse.commercial')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -78,19 +78,19 @@ const PropertyFiltersPanel: React.FC<PropertyFiltersPanelProps> = ({
           <div className="bg-gray-50 p-3 sm:p-4 rounded-lg border border-gray-200">
             <label className="flex items-center gap-2 text-sm sm:text-base font-semibold text-gray-900 mb-2 sm:mb-3">
               <span className="text-lg">🛏️</span>
-              Bedrooms
+              {t('browse.bedrooms')}
             </label>
             <Select value={bedrooms} onValueChange={onBedroomsChange}>
               <SelectTrigger className="text-sm sm:text-base h-10 sm:h-11">
-                <SelectValue placeholder="Any" />
+                <SelectValue placeholder={t('browse.any')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Any</SelectItem>
-                <SelectItem value="1">1+ Bedroom</SelectItem>
-                <SelectItem value="2">2+ Bedrooms</SelectItem>
-                <SelectItem value="3">3+ Bedrooms</SelectItem>
-                <SelectItem value="4">4+ Bedrooms</SelectItem>
-                <SelectItem value="5">5+ Bedrooms</SelectItem>
+                <SelectItem value="all">{t('browse.any')}</SelectItem>
+                <SelectItem value="1">{t('browse.bedroomPlus', { count: 1 })}</SelectItem>
+                <SelectItem value="2">{t('browse.bedroomsPlus', { count: 2 })}</SelectItem>
+                <SelectItem value="3">{t('browse.bedroomsPlus', { count: 3 })}</SelectItem>
+                <SelectItem value="4">{t('browse.bedroomsPlus', { count: 4 })}</SelectItem>
+                <SelectItem value="5">{t('browse.bedroomsPlus', { count: 5 })}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -99,18 +99,18 @@ const PropertyFiltersPanel: React.FC<PropertyFiltersPanelProps> = ({
           <div className="bg-gray-50 p-3 sm:p-4 rounded-lg border border-gray-200">
             <label className="flex items-center gap-2 text-sm sm:text-base font-semibold text-gray-900 mb-2 sm:mb-3">
               <span className="text-lg">🚿</span>
-              Bathrooms
+              {t('browse.bathrooms')}
             </label>
             <Select value={bathrooms} onValueChange={onBathroomsChange}>
               <SelectTrigger className="text-sm sm:text-base h-10 sm:h-11">
-                <SelectValue placeholder="Any" />
+                <SelectValue placeholder={t('browse.any')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Any</SelectItem>
-                <SelectItem value="1">1+ Bathroom</SelectItem>
-                <SelectItem value="2">2+ Bathrooms</SelectItem>
-                <SelectItem value="3">3+ Bathrooms</SelectItem>
-                <SelectItem value="4">4+ Bathrooms</SelectItem>
+                <SelectItem value="all">{t('browse.any')}</SelectItem>
+                <SelectItem value="1">{t('browse.bathroomPlus', { count: 1 })}</SelectItem>
+                <SelectItem value="2">{t('browse.bathroomsPlus', { count: 2 })}</SelectItem>
+                <SelectItem value="3">{t('browse.bathroomsPlus', { count: 3 })}</SelectItem>
+                <SelectItem value="4">{t('browse.bathroomsPlus', { count: 4 })}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -124,7 +124,7 @@ const PropertyFiltersPanel: React.FC<PropertyFiltersPanelProps> = ({
             <div className="space-y-3">
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
-                  Minimum (TZS)
+                  {t('browse.minimum')}
                 </label>
                 <Input
                   type="number"
@@ -136,7 +136,7 @@ const PropertyFiltersPanel: React.FC<PropertyFiltersPanelProps> = ({
               </div>
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
-                  Maximum (TZS)
+                  {t('browse.maximum')}
                 </label>
                 <Input
                   type="number"
@@ -174,20 +174,26 @@ const PropertyFiltersPanel: React.FC<PropertyFiltersPanelProps> = ({
           <div className="w-full border-t border-gray-300"></div>
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-white px-3 text-xs sm:text-sm font-medium text-gray-500">Amenities & Services</span>
+          <span className="bg-white px-3 text-xs sm:text-sm font-medium text-gray-500">{t('browse.amenitiesServices')}</span>
         </div>
       </div>
 
       {/* Utilities and Nearby Services */}
       <div className="space-y-5 sm:space-y-6">
-        {/* Utilities Filter */}
+        {/* Amenities & Services Filter */}
         <div className="bg-blue-50 p-3 sm:p-4 rounded-lg border border-blue-200">
-          <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-3">{t('browse.basicUtilities')}</h4>
+          <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-3">{t('browse.amenitiesServices')}</h4>
           <div className="flex flex-wrap gap-2 sm:gap-3">
               {[
-                { key: 'electricity', label: t('browse.electricity'), icon: '⚡' },
-                { key: 'water', label: t('browse.water'), icon: '💧' }
-              ].map(({ key, label, icon }) => (
+                { key: 'electricity', translationKey: 'propertyDetail.amenities.electricity', icon: '⚡' },
+                { key: 'water', translationKey: 'propertyDetail.amenities.water', icon: '💧' },
+                { key: 'furnished', translationKey: 'propertyDetail.amenities.furnished', icon: '🛋️' },
+                { key: 'parking', translationKey: 'propertyDetail.amenities.parking', icon: '🚗' },
+                { key: 'security', translationKey: 'propertyDetail.amenities.security', icon: '🛡️' },
+                { key: 'wifi', translationKey: 'propertyDetail.amenities.wifi', icon: '📶' },
+                { key: 'ac', translationKey: 'propertyDetail.amenities.ac', icon: '❄️' },
+                { key: 'tv', translationKey: 'propertyDetail.amenities.tv', icon: '📺' }
+              ].map(({ key, translationKey, icon }) => (
                 <label 
                   key={key} 
                   className={`flex items-center cursor-pointer px-3 sm:px-4 py-2 sm:py-2.5 border-2 rounded-lg transition-all duration-200 text-sm sm:text-base ${
@@ -203,7 +209,7 @@ const PropertyFiltersPanel: React.FC<PropertyFiltersPanelProps> = ({
                     className="sr-only"
                   />
                   <span className="mr-2 text-base sm:text-lg">{icon}</span>
-                  <span className="font-medium">{label}</span>
+                  <span className="font-medium">{t(translationKey)}</span>
                 </label>
               ))}
           </div>
@@ -216,7 +222,9 @@ const PropertyFiltersPanel: React.FC<PropertyFiltersPanelProps> = ({
               {[
                 { key: 'school', label: t('browse.school'), icon: '🏫' },
                 { key: 'hospital', label: t('browse.hospital'), icon: '🏥' },
-                { key: 'market', label: t('browse.market'), icon: '🏪' }
+                { key: 'market', label: t('browse.market'), icon: '🏪' },
+                { key: 'bank', label: t('browse.bank'), icon: '🏦' },
+                { key: 'transport', label: t('browse.transport'), icon: '🚌' }
               ].map(({ key, label, icon }) => (
                 <label 
                   key={key} 

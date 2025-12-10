@@ -31,6 +31,8 @@ export type ExtendedProperty = Tables<'properties'> & {
   profiles?: {
     name: string | null;
     phone: string | null;
+    avatar_url: string | null;
+    created_at: string | null;
   };
 };
 

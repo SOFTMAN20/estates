@@ -14,5 +14,6 @@ export { default as NearbyServices } from './NearbyServices';
 export { default as PropertyHeader } from './PropertyHeader';
 export { default as PropertyDescription } from './PropertyDescription';
 export { default as LandlordContact } from './LandlordContact';
+export { default as HostInformationCard } from './HostInformationCard';
 export { default as PropertyLocation } from './PropertyLocation';
 export { default as SafetyTips } from './SafetyTips';

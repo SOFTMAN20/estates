@@ -146,7 +146,9 @@ export const useProperties = () => {
           *,
           profiles:host_id (
             name,
-            phone
+            phone,
+            avatar_url,
+            created_at
           )
         `)
         .eq('status', 'approved')

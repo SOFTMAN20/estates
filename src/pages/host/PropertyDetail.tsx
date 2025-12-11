@@ -26,7 +26,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Navigation from '@/components/layout/navbarLayout/Navigation';
 import Footer from '@/components/layout/Footer';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import Map from '@/components/ui/map';
 import ShareDropdown from '@/components/properties/PropertyDetails/ShareDropdown';
 import PropertyAmenities from '@/components/properties/PropertyDetails/PropertyAmenities';
 import PropertyFeatures from '@/components/properties/PropertyDetails/PropertyFeatures';
@@ -38,38 +37,25 @@ import PropertyLocation from '@/components/properties/PropertyDetails/PropertyLo
 import SafetyTips from '@/components/properties/PropertyDetails/SafetyTips';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   ArrowLeft,
   Heart,
-  MapPin,
-  Zap,
-  Droplets,
   School,
   Building2,
   ShoppingCart,
-  Phone,
-  Mail,
-  User,
   ChevronLeft,
   ChevronRight,
   Home,
   AlertCircle,
-  Images,
-  Shield,
-  Wifi,
-  Car,
-  Wind,
-  Tv,
-  Sofa,
-  Sparkles
+  Images
 } from 'lucide-react';
 import { useProperties, type Property } from '@/hooks/useProperties';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useTranslation } from 'react-i18next';
-import ServiceFeeCalculator from '@/components/properties/PropertyDetails/ServiceFeeCalculator';
+import { BookingForm } from '@/components/bookings/BookingForm';
+import { toast } from 'sonner';
 
 /**
  * PROPERTY DETAIL COMPONENT
@@ -128,24 +114,6 @@ const PropertyDetail = () => {
     : 1;
 
   /**
-   * SERVICE ICONS MAPPING
-   * ====================
-   * 
-   * Maps service names to their corresponding icons and labels
-   * for consistent display across the component.
-   * 
-   * Kuunganisha majina ya huduma na ikoni zao na lebo
-   * kwa kuonyesha kwa njia sawa katika kipengele.
-   */
-  const serviceIcons = {
-    school: { icon: School, label: 'Shule' },
-    hospital: { icon: Building2, label: 'Hospitali' },
-    market: { icon: ShoppingCart, label: 'Soko' },
-    bank: { icon: Building2, label: 'Benki' },
-    transport: { icon: Building2, label: 'Usafiri' }
-  };
-
-  /**
    * IMAGE NAVIGATION FUNCTIONS
    * =========================
    * 
@@ -170,27 +138,6 @@ const PropertyDetail = () => {
   };
 
   /**
-   * WHATSAPP INTEGRATION
-   * ===================
-   * 
-   * Creates a WhatsApp link with pre-filled message for easy communication
-   * between potential tenants and landlords.
-   * 
-   * Kuunda kiungo cha WhatsApp na ujumbe uliojazwa awali kwa mawasiliano rahisi
-   * kati ya wapangaji watarajiwa na wenye nyumba.
-   */
-  const getWhatsAppLink = () => {
-    if (!property?.contact_whatsapp_phone && !property?.contact_phone) return '#';
-
-    const phoneNumber = property.contact_whatsapp_phone || property.contact_phone;
-    const cleanPhone = phoneNumber!.replace(/[^0-9]/g, '');
-    const message = `Hujambo, ninapenda kujua zaidi kuhusu nyumba hii: ${property.title}`;
-    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-  };
-
-
-
-  /**
    * FAVORITE TOGGLE HANDLER
    * ======================
    * 
@@ -204,6 +151,31 @@ const PropertyDetail = () => {
     if (!property?.id) return;
 
     await toggleFavorite(property.id);
+  };
+
+  /**
+   * BOOKING HANDLER
+   * ==============
+   * 
+   * Handles booking submission from the BookingForm component.
+   * Kushughulikia kuwasilisha hifadhi kutoka kipengele cha BookingForm.
+   */
+  const handleBooking = (bookingData: {
+    propertyId: string;
+    checkIn: Date;
+    checkOut: Date;
+    months: number;
+    subtotal: number;
+    serviceFee: number;
+    totalAmount: number;
+  }) => {
+    // TODO: Implement booking creation logic with Supabase
+    console.log('Booking data:', bookingData);
+    toast.success(
+      t('propertyDetail.bookingSuccess', 'Booking request submitted successfully!')
+    );
+    // Navigate to booking confirmation or payment page
+    // navigate(`/bookings/confirm/${bookingData.propertyId}`);
   };
 
   /**
@@ -561,8 +533,12 @@ const PropertyDetail = () => {
 
           {/* Sidebar Section - Sehemu ya upande */}
           <div className="space-y-3 sm:space-y-4 lg:space-y-6">
-            {/* Service Fee Calculator */}
-            <ServiceFeeCalculator monthlyRent={Number(property.price)} />
+            {/* Booking Form */}
+            <BookingForm
+              propertyId={property.id}
+              pricePerMonth={Number(property.price)}
+              onBookNow={handleBooking}
+            />
 
             {/* Host Information Card */}
             <HostInformationCard

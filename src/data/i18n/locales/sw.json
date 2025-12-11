@@ -226,7 +226,8 @@
       "checkLater": "Tafadhali angalia baadaye au wasiliana na msaada",
       "safetyReminder": "Kikumbusho cha Usalama",
       "neverSendMoney": "Usitume fedha kabla ya kuona nyumba mwenyewe"
-    }
+    },
+    "bookingSuccess": "Ombi la kuhifadhi limewasilishwa kwa mafanikio!"
   },
   "auth": {
     "welcomeBack": "Karibu Tena!",

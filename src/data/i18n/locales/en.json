@@ -226,7 +226,8 @@
       "checkLater": "Please check back later or contact support",
       "safetyReminder": "Safety Reminder",
       "neverSendMoney": "Never send money before viewing the property in person"
-    }
+    },
+    "bookingSuccess": "Booking request submitted successfully!"
   },
   "auth": {
     "welcomeBack": "Welcome Back!",

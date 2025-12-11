@@ -56,6 +56,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { useTranslation } from 'react-i18next';
 import { BookingForm } from '@/components/bookings/BookingForm';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 /**
  * PROPERTY DETAIL COMPONENT
@@ -79,6 +80,9 @@ const PropertyDetail = () => {
 
   // Favorites functionality - Utendakazi wa vipendwa
   const { isFavorited, toggleFavorite } = useFavorites();
+
+  // Auth - Get current user
+  const { user } = useAuth();
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -157,25 +161,29 @@ const PropertyDetail = () => {
    * BOOKING HANDLER
    * ==============
    * 
-   * Handles booking submission from the BookingForm component.
-   * Kushughulikia kuwasilisha hifadhi kutoka kipengele cha BookingForm.
+   * Handles booking confirmation from the BookingModal component.
+   * Kushughulikia kuthibitisha hifadhi kutoka kipengele cha BookingModal.
    */
-  const handleBooking = (bookingData: {
-    propertyId: string;
-    checkIn: Date;
-    checkOut: Date;
-    months: number;
-    subtotal: number;
-    serviceFee: number;
-    totalAmount: number;
-  }) => {
+  const handleConfirmBooking = (
+    bookingData: {
+      propertyId: string;
+      checkIn: Date;
+      checkOut: Date;
+      months: number;
+      subtotal: number;
+      serviceFee: number;
+      totalAmount: number;
+    },
+    specialRequests: string
+  ) => {
     // TODO: Implement booking creation logic with Supabase
     console.log('Booking data:', bookingData);
+    console.log('Special requests:', specialRequests);
     toast.success(
       t('propertyDetail.bookingSuccess', 'Booking request submitted successfully!')
     );
     // Navigate to booking confirmation or payment page
-    // navigate(`/bookings/confirm/${bookingData.propertyId}`);
+    // navigate(`/bookings/${bookingId}`);
   };
 
   /**
@@ -537,7 +545,22 @@ const PropertyDetail = () => {
             <BookingForm
               propertyId={property.id}
               pricePerMonth={Number(property.price)}
-              onBookNow={handleBooking}
+              property={{
+                id: property.id,
+                title: property.title,
+                location: property.location,
+                images: property.images || [],
+                property_type: property.property_type,
+                price: Number(property.price)
+              }}
+              guestInfo={{
+                id: user?.id || '',
+                name: user?.user_metadata?.full_name || user?.email || null,
+                email: user?.email || null,
+                phone: user?.user_metadata?.phone || null
+              }}
+              onConfirmBooking={handleConfirmBooking}
+              isLoading={false}
             />
 
             {/* Host Information Card */}

@@ -27,12 +27,28 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { BookingModal } from './BookingModal';
 
 interface BookingFormProps {
   propertyId: string;
   pricePerMonth: number;
-  onBookNow?: (bookingData: BookingData) => void;
+  property: {
+    id: string;
+    title: string;
+    location: string;
+    images: string[];
+    property_type: string;
+    price: number;
+  };
+  guestInfo: {
+    id: string;
+    name: string | null;
+    email: string | null;
+    phone: string | null;
+  };
+  onConfirmBooking?: (bookingData: BookingData, specialRequests: string) => void;
   className?: string;
+  isLoading?: boolean;
 }
 
 export interface BookingData {
@@ -50,12 +66,16 @@ const PLATFORM_COMMISSION = 0.1; // 10% service fee
 export function BookingForm({
   propertyId,
   pricePerMonth,
-  onBookNow,
-  className
+  property,
+  guestInfo,
+  onConfirmBooking,
+  className,
+  isLoading = false
 }: BookingFormProps) {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Calculate booking details
   const bookingDetails = useMemo(() => {
@@ -89,8 +109,14 @@ export function BookingForm({
     }
   };
 
-  // Handle booking submission
+  // Handle "Book Now" button click - opens modal
   const handleBookNow = () => {
+    if (!checkIn || !checkOut || !bookingDetails) return;
+    setIsModalOpen(true);
+  };
+
+  // Handle booking confirmation from modal
+  const handleConfirmBooking = (specialRequests: string) => {
     if (!checkIn || !checkOut || !bookingDetails) return;
 
     const bookingData: BookingData = {
@@ -103,7 +129,7 @@ export function BookingForm({
       totalAmount: bookingDetails.totalAmount
     };
 
-    onBookNow?.(bookingData);
+    onConfirmBooking?.(bookingData, specialRequests);
   };
 
   // Format currency
@@ -346,6 +372,26 @@ export function BookingForm({
         {/* Decorative bottom accent */}
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-primary/10 to-transparent rounded-tr-full"></div>
       </CardContent>
+
+      {/* Booking Modal - Only render when modal is open and all data is available */}
+      {isModalOpen && checkIn && checkOut && bookingDetails && (
+        <BookingModal
+          open={isModalOpen}
+          onOpenChange={setIsModalOpen}
+          property={property}
+          bookingData={{
+            checkIn,
+            checkOut,
+            months: bookingDetails.months,
+            subtotal: bookingDetails.subtotal,
+            serviceFee: bookingDetails.serviceFee,
+            totalAmount: bookingDetails.totalAmount
+          }}
+          guestInfo={guestInfo}
+          onConfirm={handleConfirmBooking}
+          isLoading={isLoading}
+        />
+      )}
     </Card>
   );
 }

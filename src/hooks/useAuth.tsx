@@ -380,7 +380,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Redirect based on role only
       const userRole = (data as { role: string | null }).role;
-      if (userRole === 'admin' || userRole === 'super_admin') {
+      if (userRole === 'admin') {
         navigate('/admin', { replace: true });
       } else {
         // All regular users go to homepage

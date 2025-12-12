@@ -84,6 +84,17 @@ const Typography = lazy(() => import("./components/common/Typography"));
 const LoadingStates = lazy(() => import("./components/common/LoadingStates"));
 const ComponentLibrary = lazy(() => import("./components/ui/ComponentLibrary"));
 
+// Admin pages
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminProperties = lazy(() => import("./pages/admin/properties"));
+const AdminUsers = lazy(() => import("./pages/admin/Users"));
+const AdminBookings = lazy(() => import("./pages/admin/Bookings"));
+const AdminPayments = lazy(() => import("./pages/admin/payments"));
+const AdminSettings = lazy(() => import("./pages/admin/settings"));
+const AdminAnalytics = lazy(() => import("./pages/admin/Analytics"));
+const AdminReports = lazy(() => import("./pages/admin/Reports"));
+const AdminActivityLog = lazy(() => import("./pages/admin/ActivityLog"));
+
 /**
  * REACT QUERY CLIENT CONFIGURATION
  * ================================
@@ -170,6 +181,17 @@ const App = () => (
                 {/* Authentication routes - Njia za uthibitisho */}
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<SignUp />} />
+
+                {/* Admin routes - Njia za msimamizi */}
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/properties" element={<AdminProperties />} />
+                <Route path="/admin/users" element={<AdminUsers />} />
+                <Route path="/admin/bookings" element={<AdminBookings />} />
+                <Route path="/admin/payments" element={<AdminPayments />} />
+                <Route path="/admin/analytics" element={<AdminAnalytics />} />
+                <Route path="/admin/reports" element={<AdminReports />} />
+                <Route path="/admin/activity-log" element={<AdminActivityLog />} />
+                <Route path="/admin/settings" element={<AdminSettings />} />
 
                 {/* Catch-all route for 404 errors */}
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

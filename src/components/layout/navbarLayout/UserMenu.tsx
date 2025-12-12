@@ -159,16 +159,16 @@ const UserMenu: React.FC<UserMenuProps> = ({
         {/* Mode-specific menu items */}
         {currentMode === 'guest' ? (
           <DropdownMenuItem asChild>
-            <Link to="/my-bookings" className="flex items-center cursor-pointer">
+            <Link to="/bookings" className="flex items-center cursor-pointer">
               <Calendar className="mr-2 h-4 w-4" />
-              <span>My Bookings</span>
+              <span>{t('userMenu.myBookings', 'My Bookings')}</span>
             </Link>
           </DropdownMenuItem>
         ) : (
           <DropdownMenuItem asChild>
             <Link to="/dashboard" className="flex items-center cursor-pointer">
               <HomeIcon className="mr-2 h-4 w-4" />
-              <span>My Listings</span>
+              <span>{t('userMenu.myListings', 'My Listings')}</span>
             </Link>
           </DropdownMenuItem>
         )}

@@ -57,6 +57,8 @@ import { useTranslation } from 'react-i18next';
 import { BookingForm } from '@/components/bookings/BookingForm';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { useCreateBooking } from '@/hooks/useBookings';
+import { format } from 'date-fns';
 
 /**
  * PROPERTY DETAIL COMPONENT
@@ -83,6 +85,9 @@ const PropertyDetail = () => {
 
   // Auth - Get current user
   const { user } = useAuth();
+
+  // Booking mutation
+  const createBookingMutation = useCreateBooking();
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -164,7 +169,7 @@ const PropertyDetail = () => {
    * Handles booking confirmation from the BookingModal component.
    * Kushughulikia kuthibitisha hifadhi kutoka kipengele cha BookingModal.
    */
-  const handleConfirmBooking = (
+  const handleConfirmBooking = async (
     bookingData: {
       propertyId: string;
       checkIn: Date;
@@ -176,14 +181,52 @@ const PropertyDetail = () => {
     },
     specialRequests: string
   ) => {
-    // TODO: Implement booking creation logic with Supabase
-    console.log('Booking data:', bookingData);
-    console.log('Special requests:', specialRequests);
-    toast.success(
-      t('propertyDetail.bookingSuccess', 'Booking request submitted successfully!')
-    );
-    // Navigate to booking confirmation or payment page
-    // navigate(`/bookings/${bookingId}`);
+    // Validate user is logged in
+    if (!user) {
+      toast.error(
+        t('propertyDetail.loginRequired', 'Please login to make a booking')
+      );
+      navigate('/login');
+      return;
+    }
+
+    // Validate property and host exist
+    if (!property || !property.host_id) {
+      toast.error(
+        t('propertyDetail.propertyError', 'Property information is missing')
+      );
+      return;
+    }
+
+    try {
+      // Create booking with updated schema
+      const newBooking = await createBookingMutation.mutateAsync({
+        property_id: bookingData.propertyId,
+        guest_id: user.id,
+        host_id: property.host_id,
+        check_in: format(bookingData.checkIn, 'yyyy-MM-dd'),
+        check_out: format(bookingData.checkOut, 'yyyy-MM-dd'),
+        total_months: bookingData.months,
+        monthly_rent: bookingData.subtotal / bookingData.months,
+        service_fee: bookingData.serviceFee,
+        total_amount: bookingData.totalAmount,
+        special_requests: specialRequests || undefined,
+        status: 'pending',
+      });
+
+      // Show success message
+      toast.success(
+        t('propertyDetail.bookingSuccess', 'Booking request submitted successfully!')
+      );
+
+      // Navigate to booking detail page
+      navigate(`/bookings/${newBooking.id}`);
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      toast.error(
+        t('propertyDetail.bookingError', 'Failed to create booking. Please try again.')
+      );
+    }
   };
 
   /**
@@ -560,7 +603,7 @@ const PropertyDetail = () => {
                 phone: user?.user_metadata?.phone || null
               }}
               onConfirmBooking={handleConfirmBooking}
-              isLoading={false}
+              isLoading={createBookingMutation.isPending}
             />
 
             {/* Host Information Card */}

@@ -4,10 +4,6 @@
  * 
  * Custom hook for managing bookings with React Query
  * Provides functions to create, read, update, and delete bookings
- * 
- * ⚠️ IMPORTANT: This file uses 'any' types temporarily until the database migration is applied.
- * After applying the migration and regenerating TypeScript types, these can be replaced with proper types.
- * See: docs/BOOKINGS_SETUP_GUIDE.md for migration instructions.
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -22,9 +18,6 @@ import type {
 
 /**
  * Fetch bookings with optional filters
- * 
- * ⚠️ Note: This function uses type assertions to work with the current database schema.
- * After applying the migration and regenerating types, these assertions can be removed.
  */
 async function fetchBookings(filters?: BookingFilters): Promise<any[]> {
   let query = supabase
@@ -38,6 +31,18 @@ async function fetchBookings(filters?: BookingFilters): Promise<any[]> {
         images,
         property_type,
         price
+      ),
+      guest_profile:profiles!bookings_guest_id_fkey (
+        id,
+        name,
+        phone,
+        avatar_url
+      ),
+      host_profile:profiles!bookings_host_id_fkey (
+        id,
+        name,
+        phone,
+        avatar_url
       )
     `)
     .order('created_at', { ascending: false });
@@ -47,23 +52,19 @@ async function fetchBookings(filters?: BookingFilters): Promise<any[]> {
     query = query.eq('status', filters.status);
   }
   if (filters?.guest_id) {
-    // Note: Current schema uses 'user_id', will be 'guest_id' after migration
-    query = query.eq('user_id', filters.guest_id);
+    query = query.eq('guest_id', filters.guest_id);
   }
   if (filters?.host_id) {
-    // Note: host_id will be available after migration
-    // For now, filter by property owner
+    query = query.eq('host_id', filters.host_id);
   }
   if (filters?.property_id) {
     query = query.eq('property_id', filters.property_id);
   }
   if (filters?.from_date) {
-    // Note: Current schema uses 'start_date', will be 'check_in' after migration
-    query = query.gte('start_date', filters.from_date);
+    query = query.gte('check_in', filters.from_date);
   }
   if (filters?.to_date) {
-    // Note: Current schema uses 'end_date', will be 'check_out' after migration
-    query = query.lte('end_date', filters.to_date);
+    query = query.lte('check_out', filters.to_date);
   }
 
   const { data, error } = await query;
@@ -91,6 +92,18 @@ async function fetchBookingById(bookingId: string): Promise<any> {
         images,
         property_type,
         price
+      ),
+      guest_profile:profiles!bookings_guest_id_fkey (
+        id,
+        name,
+        phone,
+        avatar_url
+      ),
+      host_profile:profiles!bookings_host_id_fkey (
+        id,
+        name,
+        phone,
+        avatar_url
       )
     `)
     .eq('id', bookingId)
@@ -106,27 +119,34 @@ async function fetchBookingById(bookingId: string): Promise<any> {
 
 /**
  * Create a new booking
- * 
- * ⚠️ Note: This function maps new field names to current database schema.
- * After migration, this mapping can be removed.
  */
 async function createBooking(bookingData: BookingFormData): Promise<any> {
-  // Map new field names to current database schema
-  const dbData = {
-    property_id: bookingData.property_id,
-    user_id: bookingData.guest_id, // Maps to current 'user_id' field
-    start_date: bookingData.check_in, // Maps to current 'start_date' field
-    end_date: bookingData.check_out, // Maps to current 'end_date' field
-    total_price: bookingData.total_amount, // Maps to current 'total_price' field
-    status: bookingData.status || 'pending',
-    // Note: special_requests, total_months, monthly_rent, service_fee, host_id
-    // will be available after migration
-  };
-
   const { data, error } = await supabase
     .from('bookings')
-    .insert(dbData as any)
-    .select()
+    .insert({
+      property_id: bookingData.property_id,
+      guest_id: bookingData.guest_id,
+      host_id: bookingData.host_id,
+      check_in: bookingData.check_in,
+      check_out: bookingData.check_out,
+      total_months: bookingData.total_months,
+      monthly_rent: bookingData.monthly_rent,
+      service_fee: bookingData.service_fee,
+      total_amount: bookingData.total_amount,
+      special_requests: bookingData.special_requests || null,
+      status: bookingData.status || 'pending',
+    } as any)
+    .select(`
+      *,
+      properties:property_id (
+        id,
+        title,
+        location,
+        images,
+        property_type,
+        price
+      )
+    `)
     .single();
 
   if (error) {
@@ -144,20 +164,21 @@ async function updateBooking(
   bookingId: string, 
   updates: BookingUpdateData
 ): Promise<any> {
-  // Map new field names to current database schema if needed
-  const dbUpdates: any = {};
-  
-  if (updates.status) dbUpdates.status = updates.status;
-  if (updates.check_in) dbUpdates.start_date = updates.check_in;
-  if (updates.check_out) dbUpdates.end_date = updates.check_out;
-  if (updates.total_amount) dbUpdates.total_price = updates.total_amount;
-  // Note: Other fields will be available after migration
-
   const { data, error } = await supabase
     .from('bookings')
-    .update(dbUpdates)
+    .update(updates as any)
     .eq('id', bookingId)
-    .select()
+    .select(`
+      *,
+      properties:property_id (
+        id,
+        title,
+        location,
+        images,
+        property_type,
+        price
+      )
+    `)
     .single();
 
   if (error) {
@@ -176,13 +197,10 @@ async function cancelBooking(
   reason?: string
 ): Promise<any> {
   const updates: any = { 
-    status: 'cancelled'
+    status: 'cancelled',
+    cancellation_reason: reason || null,
+    cancellation_date: new Date().toISOString(),
   };
-  
-  // Note: cancellation_reason and cancellation_date will be available after migration
-  if (reason) {
-    updates.cancellation_date = new Date().toISOString();
-  }
 
   return updateBooking(bookingId, updates);
 }

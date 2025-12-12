@@ -71,6 +71,8 @@ const Dashboard = lazy(() => import("./pages/host/Dashboard"));
 const Properties = lazy(() => import("./pages/host/Properties"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Favorites = lazy(() => import("./pages/Favorites"));
+const Bookings = lazy(() => import("./pages/Bookings"));
+const BookingDetail = lazy(() => import("./pages/BookingDetail"));
 const Analytics = lazy(() => import("./pages/host/Analytics"));
 const SignIn = lazy(() => import("./pages/SignIn"));
 const SignUp = lazy(() => import("./pages/SignUp"));
@@ -160,6 +162,8 @@ const App = () => (
                 <Route path="/host/properties" element={<Properties />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/favorites" element={<Favorites />} />
+                <Route path="/bookings" element={<Bookings />} />
+                <Route path="/bookings/:id" element={<BookingDetail />} />
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/property-example" element={<PropertyExample />} />
 

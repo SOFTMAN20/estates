@@ -36,7 +36,7 @@ NyumbaLink is a full-featured rental management platform built with React, Supab
   - Row Level Security (RLS)
 
 ### Key Integrations
-- **M-Pesa API / Azampay** for payment processing
+- **M-Pesa API / PalmPay** for payment processing
 - **SendGrid / Resend** for email notifications
 - **Google Analytics 4** for analytics
 - **Sentry** for error monitoring

@@ -44,8 +44,9 @@ async function fetchBookings(filters?: BookingFilters): Promise<any[]> {
         phone,
         avatar_url
       )
-    `)
-    .order('created_at', { ascending: false });
+    `) as any;
+
+  query = query.order('created_at', { ascending: false });
 
   // Apply filters
   if (filters?.status) {
@@ -81,7 +82,7 @@ async function fetchBookings(filters?: BookingFilters): Promise<any[]> {
  * Fetch a single booking by ID
  */
 async function fetchBookingById(bookingId: string): Promise<any> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase
     .from('bookings')
     .select(`
       *,
@@ -107,7 +108,7 @@ async function fetchBookingById(bookingId: string): Promise<any> {
       )
     `)
     .eq('id', bookingId)
-    .single();
+    .single() as any);
 
   if (error) {
     console.error('Error fetching booking:', error);

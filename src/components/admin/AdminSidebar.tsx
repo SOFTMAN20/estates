@@ -102,9 +102,9 @@ export function AdminSidebar() {
 
   return (
     <div className="w-64 bg-gradient-to-b from-gray-50 to-white border-r border-gray-200 h-screen flex flex-col sticky top-0 shadow-sm">
-      {/* Logo & Brand */}
-      <div className="p-6 flex-shrink-0">
-        <div className="flex items-center gap-3 mb-2">
+      {/* Logo & Brand - Fixed at top */}
+      <div className="p-6 flex-shrink-0 bg-white border-b border-gray-200">
+        <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-lg flex items-center justify-center shadow-md">
             <Shield className="h-6 w-6 text-white" />
           </div>
@@ -113,92 +113,94 @@ export function AdminSidebar() {
             <p className="text-xs text-gray-500">Admin Panel</p>
           </div>
         </div>
-        <Separator className="mt-4" />
       </div>
 
-      {/* Navigation - Scrollable */}
-      <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-        {navigation.map((item) => {
-          const isActive = location.pathname === item.href;
-          return (
-            <Link
-              key={item.name}
-              to={item.href}
-              className={`group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-                isActive
-                  ? 'bg-primary text-white shadow-md shadow-primary/20'
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-              }`}
-            >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500 group-hover:text-primary'}`}>
-                  <item.icon className="h-5 w-5" />
+      {/* Scrollable Content - Navigation + User Section */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        {/* Navigation */}
+        <nav className="px-3 py-4 space-y-1">
+          {navigation.map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                  isActive
+                    ? 'bg-primary text-white shadow-md shadow-primary/20'
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                }`}
+              >
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500 group-hover:text-primary'}`}>
+                    <item.icon className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium truncate">{item.name}</div>
+                    {!isActive && (
+                      <div className="text-xs text-gray-500 group-hover:text-gray-600 truncate">
+                        {item.description}
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">{item.name}</div>
-                  {!isActive && (
-                    <div className="text-xs text-gray-500 group-hover:text-gray-600 truncate">
-                      {item.description}
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              {item.badge && (
-                <Badge 
-                  variant={item.badgeVariant} 
-                  className={`ml-2 flex-shrink-0 ${isActive ? 'bg-white/20 text-white border-white/30' : ''}`}
-                >
-                  {item.badge}
-                </Badge>
-              )}
-              
-              {isActive && (
-                <ChevronRight className="h-4 w-4 ml-2 flex-shrink-0" />
-              )}
-            </Link>
-          );
-        })}
-      </nav>
+                
+                {item.badge && (
+                  <Badge 
+                    variant={item.badgeVariant} 
+                    className={`ml-2 flex-shrink-0 ${isActive ? 'bg-white/20 text-white border-white/30' : ''}`}
+                  >
+                    {item.badge}
+                  </Badge>
+                )}
+                
+                {isActive && (
+                  <ChevronRight className="h-4 w-4 ml-2 flex-shrink-0" />
+                )}
+              </Link>
+            );
+          })}
+        </nav>
 
-      {/* User Section */}
-      <div className="p-4 border-t border-gray-200 space-y-3 flex-shrink-0 bg-white">
-        {/* User Info */}
-        <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-gray-50">
-          <Avatar className="h-9 w-9 border-2 border-white shadow-sm">
-            <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-white text-sm font-semibold">
-              {user?.email?.charAt(0).toUpperCase() || 'A'}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium text-gray-900 truncate">Admin User</div>
-            <div className="text-xs text-gray-500 truncate">{user?.email || 'admin@nyumbalink.com'}</div>
+        {/* User Section - Scrolls with navigation */}
+        <div className="p-4 border-t border-gray-200 space-y-3 bg-white mt-4">
+          {/* User Info */}
+          <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-gray-50">
+            <Avatar className="h-9 w-9 border-2 border-white shadow-sm">
+              <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-white text-sm font-semibold">
+                {user?.email?.charAt(0).toUpperCase() || 'A'}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium text-gray-900 truncate">Admin User</div>
+              <div className="text-xs text-gray-500 truncate">{user?.email || 'admin@nyumbalink.com'}</div>
+            </div>
           </div>
-        </div>
 
-        <Separator />
+          <Separator />
 
-        {/* Action Buttons */}
-        <div className="space-y-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full justify-start hover:bg-gray-50 transition-colors"
-            onClick={() => navigate('/')}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Exit Admin
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors"
-            onClick={handleSignOut}
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
+          {/* Action Buttons */}
+          <div className="space-y-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full justify-start hover:bg-gray-50 transition-colors"
+              onClick={() => navigate('/')}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Exit Admin
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors"
+              onClick={handleSignOut}
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
         </div>
       </div>
     </div>

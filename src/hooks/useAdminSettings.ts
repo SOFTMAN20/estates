@@ -39,6 +39,13 @@ export interface SettingsFormData {
   email_notifications_enabled: boolean;
   admin_alerts_enabled: boolean;
   
+  // Moderation Settings
+  auto_approve_after_days_enabled: boolean;
+  auto_approve_days: number;
+  auto_approve_verified_hosts: boolean;
+  content_guidelines: string;
+  prohibited_words: string;
+  
   // Maintenance Mode
   maintenance_mode_enabled: boolean;
   maintenance_message: string;
@@ -100,6 +107,13 @@ export function useSettingsValues() {
     // Notification Settings
     email_notifications_enabled: settings.email_notifications_enabled?.value === 'true',
     admin_alerts_enabled: settings.admin_alerts_enabled?.value === 'true',
+    
+    // Moderation Settings
+    auto_approve_after_days_enabled: settings.auto_approve_after_days_enabled?.value === 'true',
+    auto_approve_days: Number(settings.auto_approve_days?.value || 7),
+    auto_approve_verified_hosts: settings.auto_approve_verified_hosts?.value === 'true',
+    content_guidelines: settings.content_guidelines?.value || 'All property listings must include accurate information. Photos must be recent and represent the actual property. Misleading information will result in listing removal.',
+    prohibited_words: settings.prohibited_words?.value || '',
     
     // Maintenance Mode
     maintenance_mode_enabled: settings.maintenance_mode_enabled?.value === 'true',
@@ -177,6 +191,23 @@ export function useUpdateSettings() {
       }
       if (settings.admin_alerts_enabled !== undefined) {
         updates.push({ key: 'admin_alerts_enabled', value: String(settings.admin_alerts_enabled), data_type: 'boolean' });
+      }
+
+      // Moderation Settings
+      if (settings.auto_approve_after_days_enabled !== undefined) {
+        updates.push({ key: 'auto_approve_after_days_enabled', value: String(settings.auto_approve_after_days_enabled), data_type: 'boolean' });
+      }
+      if (settings.auto_approve_days !== undefined) {
+        updates.push({ key: 'auto_approve_days', value: String(settings.auto_approve_days), data_type: 'number' });
+      }
+      if (settings.auto_approve_verified_hosts !== undefined) {
+        updates.push({ key: 'auto_approve_verified_hosts', value: String(settings.auto_approve_verified_hosts), data_type: 'boolean' });
+      }
+      if (settings.content_guidelines !== undefined) {
+        updates.push({ key: 'content_guidelines', value: settings.content_guidelines, data_type: 'string' });
+      }
+      if (settings.prohibited_words !== undefined) {
+        updates.push({ key: 'prohibited_words', value: settings.prohibited_words, data_type: 'string' });
       }
 
       // Maintenance Mode

@@ -506,7 +506,10 @@ export default function AdminSettings() {
                     <Label>Auto-Approve After X Days</Label>
                     <p className="text-sm text-muted-foreground">Automatically approve properties after specified days</p>
                   </div>
-                  <Switch />
+                  <Switch 
+                    checked={formData.auto_approve_after_days_enabled}
+                    onCheckedChange={(checked) => handleInputChange('auto_approve_after_days_enabled', checked)}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -514,7 +517,8 @@ export default function AdminSettings() {
                   <Input 
                     id="auto-approve-days" 
                     type="number" 
-                    defaultValue="7"
+                    value={formData.auto_approve_days}
+                    onChange={(e) => handleInputChange('auto_approve_days', Number(e.target.value))}
                     min="1" 
                     max="30" 
                   />
@@ -527,7 +531,10 @@ export default function AdminSettings() {
                     <Label>Auto-Approve from Verified Hosts</Label>
                     <p className="text-sm text-muted-foreground">Skip review for verified hosts</p>
                   </div>
-                  <Switch />
+                  <Switch 
+                    checked={formData.auto_approve_verified_hosts}
+                    onCheckedChange={(checked) => handleInputChange('auto_approve_verified_hosts', checked)}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -543,7 +550,8 @@ export default function AdminSettings() {
                   <Textarea 
                     id="content-guidelines" 
                     rows={6}
-                    defaultValue="All property listings must include accurate information. Photos must be recent and represent the actual property. Misleading information will result in listing removal."
+                    value={formData.content_guidelines}
+                    onChange={(e) => handleInputChange('content_guidelines', e.target.value)}
                   />
                 </div>
 
@@ -552,6 +560,8 @@ export default function AdminSettings() {
                   <Textarea 
                     id="prohibited-words" 
                     rows={3}
+                    value={formData.prohibited_words}
+                    onChange={(e) => handleInputChange('prohibited_words', e.target.value)}
                     placeholder="Enter prohibited words separated by commas"
                   />
                 </div>

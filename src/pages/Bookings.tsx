@@ -40,11 +40,16 @@ import { toast } from 'sonner';
 interface BookingWithProperty {
   id: string;
   property_id: string;
-  user_id: string;
-  start_date: string;
-  end_date: string;
-  total_price: number;
+  guest_id: string;
+  host_id: string;
+  check_in: string;
+  check_out: string;
+  total_amount: number | string; // Supabase returns NUMERIC as string
+  monthly_rent: number | string;
+  service_fee: number | string;
+  total_months: number;
   status: string;
+  special_requests?: string | null;
   created_at: string;
   properties?: {
     id: string;
@@ -76,7 +81,7 @@ export default function Bookings() {
     const today = startOfDay(new Date());
 
     const upcoming = (bookings as BookingWithProperty[]).filter((booking) => {
-      const checkInDate = new Date(booking.start_date);
+      const checkInDate = new Date(booking.check_in);
       return (
         (booking.status === 'confirmed' || booking.status === 'pending') &&
         !isBefore(checkInDate, today)

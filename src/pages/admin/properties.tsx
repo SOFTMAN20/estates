@@ -5,17 +5,26 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Search, Loader2, ArrowUpDown } from 'lucide-react';
 import { PropertyApprovalTable } from '@/components/admin/PropertyApprovalTable';
+import { usePropertyCounts } from '@/hooks/useAdminProperties';
+
+export type SortOption = 'date_desc' | 'date_asc' | 'price_desc' | 'price_asc' | 'status';
 
 export default function AdminProperties() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('pending');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
+  const [sortBy, setSortBy] = useState<SortOption>('date_desc');
   
-  // Mock counts for UI (PropertyApprovalTable has its own mock data)
-  const pendingCount = 3;
-  const approvedCount = 1;
-  const rejectedCount = 1;
+  // Fetch real property counts
+  const { data: counts, isLoading: countsLoading } = usePropertyCounts();
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -40,10 +49,19 @@ export default function AdminProperties() {
                   className="pl-10"
                 />
               </div>
-              <Button variant="outline">
-                <Filter className="h-4 w-4 mr-2" />
-                Filters
-              </Button>
+              <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
+                <SelectTrigger className="w-[200px]">
+                  <ArrowUpDown className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="date_desc">Date Added (Newest)</SelectItem>
+                  <SelectItem value="date_asc">Date Added (Oldest)</SelectItem>
+                  <SelectItem value="price_desc">Price (High to Low)</SelectItem>
+                  <SelectItem value="price_asc">Price (Low to High)</SelectItem>
+                  <SelectItem value="status">Status</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Tabs */}
@@ -54,29 +72,52 @@ export default function AdminProperties() {
               <TabsList>
                 <TabsTrigger value="pending">
                   Pending
-                  {pendingCount > 0 && (
+                  {countsLoading ? (
+                    <Loader2 className="h-3 w-3 ml-2 animate-spin" />
+                  ) : counts && counts.pending > 0 ? (
                     <Badge variant="secondary" className="ml-2 bg-yellow-100 text-yellow-800">
-                      {pendingCount}
+                      {counts.pending}
                     </Badge>
-                  )}
+                  ) : null}
                 </TabsTrigger>
                 <TabsTrigger value="approved">
                   Approved
-                  <Badge variant="secondary" className="ml-2 bg-green-100 text-green-800">
-                    {approvedCount}
-                  </Badge>
+                  {countsLoading ? (
+                    <Loader2 className="h-3 w-3 ml-2 animate-spin" />
+                  ) : counts ? (
+                    <Badge variant="secondary" className="ml-2 bg-green-100 text-green-800">
+                      {counts.approved}
+                    </Badge>
+                  ) : null}
                 </TabsTrigger>
                 <TabsTrigger value="rejected">
                   Rejected
-                  <Badge variant="secondary" className="ml-2 bg-red-100 text-red-800">
-                    {rejectedCount}
-                  </Badge>
+                  {countsLoading ? (
+                    <Loader2 className="h-3 w-3 ml-2 animate-spin" />
+                  ) : counts ? (
+                    <Badge variant="secondary" className="ml-2 bg-red-100 text-red-800">
+                      {counts.rejected}
+                    </Badge>
+                  ) : null}
                 </TabsTrigger>
-                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="all">
+                  All
+                  {countsLoading ? (
+                    <Loader2 className="h-3 w-3 ml-2 animate-spin" />
+                  ) : counts ? (
+                    <Badge variant="secondary" className="ml-2">
+                      {counts.all}
+                    </Badge>
+                  ) : null}
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value={statusFilter} className="mt-6">
-                <PropertyApprovalTable />
+                <PropertyApprovalTable 
+                  statusFilter={statusFilter}
+                  searchQuery={searchQuery}
+                  sortBy={sortBy}
+                />
               </TabsContent>
             </Tabs>
           </CardContent>

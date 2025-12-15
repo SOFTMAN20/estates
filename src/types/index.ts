@@ -23,3 +23,6 @@ export * from './analytics';
 
 // Search & Filter types
 export * from './search';
+
+// Payment types
+export * from './payment';

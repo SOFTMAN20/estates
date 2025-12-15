@@ -124,7 +124,7 @@ interface Booking {
   id: string;
   property_id: string;
   status: string;
-  total_price: number;
+  total_amount: number;
   check_in: string;
   check_out: string;
   created_at: string;
@@ -159,7 +159,7 @@ function calculateAnalytics(
   // Calculate total revenue
   const totalRevenue = bookings
     .filter(b => b.status === 'confirmed' || b.status === 'completed')
-    .reduce((sum, b) => sum + (b.total_price || 0), 0);
+    .reduce((sum, b) => sum + (b.total_amount || 0), 0);
 
   // Calculate total bookings
   const totalBookings = bookings.filter(b => b.status !== 'cancelled').length;
@@ -236,7 +236,7 @@ function generateRevenueData(bookings: Booking[]) {
       return date.toLocaleString('en', { month: 'short' }) === month;
     });
     
-    const revenue = monthBookings.reduce((sum, b) => sum + (b.total_price || 0), 0);
+    const revenue = monthBookings.reduce((sum, b) => sum + (b.total_amount || 0), 0);
     const expenses = Math.round(revenue * 0.25); // Estimate 25% expenses
     
     return {
@@ -322,7 +322,7 @@ function generatePropertyComparison(bookings: Booking[], reviews: Review[], prop
     const propertyBookings = bookings.filter(b => b.property_id === property.id);
     const propertyReviews = reviews.filter(r => r.property_id === property.id);
     
-    const revenue = propertyBookings.reduce((sum, b) => sum + (b.total_price || 0), 0);
+    const revenue = propertyBookings.reduce((sum, b) => sum + (b.total_amount || 0), 0);
     const rating = propertyReviews.length > 0
       ? propertyReviews.reduce((sum, r) => sum + (r.rating || 0), 0) / propertyReviews.length
       : 0;
@@ -337,7 +337,7 @@ function generatePropertyComparison(bookings: Booking[], reviews: Review[], prop
 }
 
 function generateEarningsBreakdown(bookings: Booking[]) {
-  const totalRevenue = bookings.reduce((sum, b) => sum + (b.total_price || 0), 0);
+  const totalRevenue = bookings.reduce((sum, b) => sum + (b.total_amount || 0), 0);
   
   const rentalIncome = Math.round(totalRevenue * 0.85);
   const cleaningFees = Math.round(totalRevenue * 0.10);

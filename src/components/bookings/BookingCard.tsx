@@ -34,10 +34,16 @@ interface BookingCardProps {
   booking: {
     id: string;
     property_id: string;
-    start_date: string;
-    end_date: string;
-    total_price: number;
+    guest_id?: string;
+    host_id?: string;
+    check_in: string;
+    check_out: string;
+    total_amount: number | string; // Supabase returns NUMERIC as string
+    monthly_rent?: number | string;
+    service_fee?: number | string;
+    total_months?: number;
     status: string;
+    special_requests?: string | null;
     created_at: string;
     properties?: {
       id: string;
@@ -46,6 +52,7 @@ interface BookingCardProps {
       images: string[];
       property_type: string;
     };
+    [key: string]: any; // Allow additional fields from database
   };
   hostName?: string;
   onCancel?: (bookingId: string) => void;
@@ -64,8 +71,16 @@ export function BookingCard({
   const navigate = useNavigate();
 
   // Format currency
-  const formatCurrency = (amount: number) => {
-    return `TZS ${amount.toLocaleString('en-US')}`;
+  const formatCurrency = (amount: number | string) => {
+    if (amount === undefined || amount === null) {
+      return 'TZS 0';
+    }
+    // Convert string to number if needed (Supabase returns NUMERIC as string)
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    if (isNaN(numAmount)) {
+      return 'TZS 0';
+    }
+    return `TZS ${numAmount.toLocaleString('en-US')}`;
   };
 
   // Get status color and label
@@ -104,7 +119,7 @@ export function BookingCard({
     if (booking.status !== 'confirmed' && booking.status !== 'pending') {
       return false;
     }
-    const checkInDate = new Date(booking.start_date);
+    const checkInDate = new Date(booking.check_in);
     const today = startOfDay(new Date());
     const daysUntilCheckIn = differenceInDays(checkInDate, today);
     return daysUntilCheckIn > 7;
@@ -173,7 +188,7 @@ export function BookingCard({
                   </div>
                   <div className="flex items-center gap-2 text-sm font-medium">
                     <Calendar className="h-4 w-4 text-primary" />
-                    <span>{format(new Date(booking.start_date), 'PP')}</span>
+                    <span>{format(new Date(booking.check_in), 'PP')}</span>
                   </div>
                 </div>
                 <div>
@@ -182,7 +197,7 @@ export function BookingCard({
                   </div>
                   <div className="flex items-center gap-2 text-sm font-medium">
                     <Calendar className="h-4 w-4 text-primary" />
-                    <span>{format(new Date(booking.end_date), 'PP')}</span>
+                    <span>{format(new Date(booking.check_out), 'PP')}</span>
                   </div>
                 </div>
               </div>
@@ -193,7 +208,7 @@ export function BookingCard({
                   {i18n.language === 'en' ? 'Total Amount' : 'Jumla ya Malipo'}
                 </div>
                 <div className="text-xl font-bold text-primary">
-                  {formatCurrency(booking.total_price)}
+                  {formatCurrency(booking.total_amount)}
                 </div>
               </div>
 

@@ -166,7 +166,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
           </DropdownMenuItem>
         ) : (
           <DropdownMenuItem asChild>
-            <Link to="/dashboard" className="flex items-center cursor-pointer">
+            <Link to="/host/properties" className="flex items-center cursor-pointer">
               <HomeIcon className="mr-2 h-4 w-4" />
               <span>{t('userMenu.myListings', 'My Listings')}</span>
             </Link>

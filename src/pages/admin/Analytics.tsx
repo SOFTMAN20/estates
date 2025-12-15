@@ -15,58 +15,33 @@ import {
 } from 'recharts';
 import { 
   TrendingUp, TrendingDown, Users, Home, Calendar, 
-  DollarSign, MapPin, Clock, Star 
+  DollarSign, MapPin, Clock, Star, Loader2
 } from 'lucide-react';
-
-// Mock data
-const revenueByMonth = [
-  { month: 'Jan', revenue: 2800000, bookings: 95, properties: 280 },
-  { month: 'Feb', revenue: 3100000, bookings: 105, properties: 295 },
-  { month: 'Mar', revenue: 3400000, bookings: 115, properties: 310 },
-  { month: 'Apr', revenue: 3200000, bookings: 108, properties: 320 },
-  { month: 'May', revenue: 3600000, bookings: 122, properties: 330 },
-  { month: 'Jun', revenue: 3900000, bookings: 132, properties: 335 },
-  { month: 'Jul', revenue: 4200000, bookings: 142, properties: 340 },
-  { month: 'Aug', revenue: 4500000, bookings: 152, properties: 342 },
-];
-
-const propertyTypePerformance = [
-  { type: 'Apartment', bookings: 245, revenue: 18500000, avgRating: 4.5 },
-  { type: 'House', bookings: 189, revenue: 24300000, avgRating: 4.7 },
-  { type: 'Studio', bookings: 156, revenue: 9800000, avgRating: 4.3 },
-  { type: 'Room', bookings: 98, revenue: 4200000, avgRating: 4.1 },
-];
-
-const locationAnalytics = [
-  { location: 'Masaki', properties: 45, bookings: 156, revenue: 12400000 },
-  { location: 'Mikocheni', properties: 38, bookings: 132, revenue: 8900000 },
-  { location: 'Oysterbay', properties: 32, bookings: 98, revenue: 15600000 },
-  { location: 'Mbezi Beach', properties: 28, bookings: 87, revenue: 11200000 },
-  { location: 'Kinondoni', properties: 52, bookings: 178, revenue: 7800000 },
-];
-
-const userGrowthData = [
-  { month: 'Jan', guests: 680, hosts: 125 },
-  { month: 'Feb', guests: 745, hosts: 138 },
-  { month: 'Mar', guests: 820, hosts: 152 },
-  { month: 'Apr', guests: 890, hosts: 168 },
-  { month: 'May', guests: 965, hosts: 185 },
-  { month: 'Jun', guests: 1045, hosts: 203 },
-  { month: 'Jul', guests: 1125, hosts: 221 },
-  { month: 'Aug', guests: 1205, hosts: 245 },
-];
-
-const bookingDurationData = [
-  { duration: '1 month', count: 245, percentage: 35 },
-  { duration: '2-3 months', count: 312, percentage: 45 },
-  { duration: '4-6 months', count: 98, percentage: 14 },
-  { duration: '6+ months', count: 42, percentage: 6 },
-];
+import {
+  useKeyMetrics,
+  useRevenueByMonth,
+  usePropertyTypePerformance,
+  useLocationAnalytics,
+  useUserGrowthData,
+  useBookingDurationData,
+  useUserStatistics,
+} from '@/hooks/useAdminAnalytics';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 export default function AdminAnalytics() {
   const [timeRange, setTimeRange] = useState('6months');
+
+  // Fetch all analytics data
+  const { data: keyMetrics, isLoading: metricsLoading } = useKeyMetrics();
+  const { data: revenueByMonth = [], isLoading: revenueLoading } = useRevenueByMonth();
+  const { data: propertyTypePerformance = [], isLoading: propertyLoading } = usePropertyTypePerformance();
+  const { data: locationAnalytics = [], isLoading: locationLoading } = useLocationAnalytics();
+  const { data: userGrowthData = [], isLoading: userLoading } = useUserGrowthData();
+  const { data: bookingDurationData = [], isLoading: durationLoading } = useBookingDurationData();
+  const { data: userStatistics, isLoading: userStatsLoading } = useUserStatistics();
+
+  const isLoading = metricsLoading || revenueLoading || propertyLoading || locationLoading || userLoading || durationLoading || userStatsLoading;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-TZ', {
@@ -76,6 +51,17 @@ export default function AdminAnalytics() {
       notation: 'compact',
     }).format(price);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen bg-gray-50">
+        <AdminSidebar />
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -111,10 +97,10 @@ export default function AdminAnalytics() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatPrice(28700000)}</div>
+              <div className="text-2xl font-bold">{formatPrice(keyMetrics?.totalRevenue || 0)}</div>
               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                 <TrendingUp className="h-3 w-3 text-green-600" />
-                <span className="text-green-600">+12.5%</span> from last period
+                <span className="text-green-600">+{keyMetrics?.revenueGrowth || 0}%</span> from last period
               </p>
             </CardContent>
           </Card>
@@ -125,10 +111,10 @@ export default function AdminAnalytics() {
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatPrice(1245000)}</div>
+              <div className="text-2xl font-bold">{formatPrice(keyMetrics?.avgBookingValue || 0)}</div>
               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                 <TrendingUp className="h-3 w-3 text-green-600" />
-                <span className="text-green-600">+8.2%</span> from last period
+                <span className="text-green-600">+{keyMetrics?.bookingValueGrowth || 0}%</span> from last period
               </p>
             </CardContent>
           </Card>
@@ -139,10 +125,10 @@ export default function AdminAnalytics() {
               <Home className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">78.5%</div>
+              <div className="text-2xl font-bold">{keyMetrics?.occupancyRate.toFixed(1) || 0}%</div>
               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                 <TrendingUp className="h-3 w-3 text-green-600" />
-                <span className="text-green-600">+5.3%</span> from last period
+                <span className="text-green-600">+{keyMetrics?.occupancyGrowth || 0}%</span> from last period
               </p>
             </CardContent>
           </Card>
@@ -153,10 +139,10 @@ export default function AdminAnalytics() {
               <Star className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">4.6</div>
+              <div className="text-2xl font-bold">{keyMetrics?.avgRating.toFixed(1) || 0}</div>
               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                 <TrendingUp className="h-3 w-3 text-green-600" />
-                <span className="text-green-600">+0.2</span> from last period
+                <span className="text-green-600">+{keyMetrics?.ratingGrowth || 0}</span> from last period
               </p>
             </CardContent>
           </Card>
@@ -335,8 +321,8 @@ export default function AdminAnalytics() {
                   <CardTitle className="text-sm font-medium">Total Users</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">1,450</div>
-                  <p className="text-xs text-muted-foreground mt-1">+156 this month</p>
+                  <div className="text-3xl font-bold">{userStatistics?.totalUsers.toLocaleString() || 0}</div>
+                  <p className="text-xs text-muted-foreground mt-1">+{userStatistics?.newUsersThisMonth || 0} this month</p>
                 </CardContent>
               </Card>
 
@@ -345,8 +331,8 @@ export default function AdminAnalytics() {
                   <CardTitle className="text-sm font-medium">Active Hosts</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">245</div>
-                  <p className="text-xs text-muted-foreground mt-1">+24 this month</p>
+                  <div className="text-3xl font-bold">{userStatistics?.activeHosts || 0}</div>
+                  <p className="text-xs text-muted-foreground mt-1">+{userStatistics?.newHostsThisMonth || 0} this month</p>
                 </CardContent>
               </Card>
 
@@ -355,7 +341,7 @@ export default function AdminAnalytics() {
                   <CardTitle className="text-sm font-medium">Guest Retention</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">68%</div>
+                  <div className="text-3xl font-bold">{userStatistics?.guestRetention.toFixed(0) || 0}%</div>
                   <p className="text-xs text-muted-foreground mt-1">Repeat bookings</p>
                 </CardContent>
               </Card>

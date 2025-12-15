@@ -14,55 +14,18 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
   FileText, Download, Calendar as CalendarIcon, 
-  TrendingUp, Users, Home, DollarSign, Clock, CheckCircle 
+  TrendingUp, Users, Home, DollarSign, Clock, CheckCircle, Loader2
 } from 'lucide-react';
 import { format as formatDate } from 'date-fns';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-
-// Mock generated reports
-const generatedReports = [
-  {
-    id: '1',
-    name: 'Financial Report - November 2024',
-    type: 'financial',
-    dateRange: 'Nov 1 - Nov 30, 2024',
-    format: 'PDF',
-    size: '2.4 MB',
-    generatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
-    status: 'completed',
-  },
-  {
-    id: '2',
-    name: 'User Activity Report - Q4 2024',
-    type: 'user_activity',
-    dateRange: 'Oct 1 - Dec 31, 2024',
-    format: 'XLSX',
-    size: '1.8 MB',
-    generatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
-    status: 'completed',
-  },
-  {
-    id: '3',
-    name: 'Property Performance - 2024',
-    type: 'property_performance',
-    dateRange: 'Jan 1 - Dec 31, 2024',
-    format: 'PDF',
-    size: '3.2 MB',
-    generatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
-    status: 'completed',
-  },
-  {
-    id: '4',
-    name: 'Booking Summary - December 2024',
-    type: 'booking_summary',
-    dateRange: 'Dec 1 - Dec 31, 2024',
-    format: 'CSV',
-    size: '856 KB',
-    generatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 1).toISOString(),
-    status: 'completed',
-  },
-];
+import {
+  useGeneratedReports,
+  useReportStatistics,
+  usePopularReports,
+  useGenerateReport,
+  useDownloadReport,
+} from '@/hooks/useAdminReports';
 
 const reportTemplates = [
   {
@@ -113,20 +76,48 @@ export default function AdminReports() {
   const [format, setFormat] = useState('pdf');
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
+  const [downloadingReportId, setDownloadingReportId] = useState<string | null>(null);
 
-  const handleGenerateReport = () => {
+  // Fetch data
+  const { data: generatedReports = [], isLoading: reportsLoading } = useGeneratedReports();
+  const { data: statistics } = useReportStatistics();
+  const { data: popularReports = [] } = usePopularReports();
+  
+  // Mutations
+  const generateReport = useGenerateReport();
+  const downloadReport = useDownloadReport();
+
+  const handleGenerateReport = async () => {
     if (!selectedReport) {
       toast.error('Please select a report type');
       return;
     }
 
-    toast.success('Report generation started (Mock action)', {
-      description: 'You will be notified when the report is ready',
-    });
+    try {
+      await generateReport.mutateAsync({
+        reportType: selectedReport,
+        dateRange,
+        format,
+        startDate,
+        endDate,
+      });
+
+      toast.success('Report generated successfully');
+    } catch (error) {
+      toast.error('Failed to generate report');
+    }
   };
 
-  const handleDownload = (reportName: string) => {
-    toast.success(`Downloading ${reportName} (Mock action)`);
+  const handleDownload = async (reportId: string, reportName: string) => {
+    try {
+      setDownloadingReportId(reportId);
+      await downloadReport.mutateAsync(reportId);
+      toast.success(`Downloaded ${reportName}`);
+    } catch (error) {
+      toast.error('Failed to download report');
+    } finally {
+      setDownloadingReportId(null);
+    }
   };
 
   return (
@@ -271,9 +262,23 @@ export default function AdminReports() {
                       </div>
                     )}
 
-                    <Button onClick={handleGenerateReport} className="w-full" size="lg">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Generate Report
+                    <Button 
+                      onClick={handleGenerateReport} 
+                      className="w-full" 
+                      size="lg"
+                      disabled={generateReport.isPending}
+                    >
+                      {generateReport.isPending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <FileText className="h-4 w-4 mr-2" />
+                          Generate Report
+                        </>
+                      )}
                     </Button>
                   </div>
                 )}
@@ -287,39 +292,56 @@ export default function AdminReports() {
                 <CardDescription>Previously generated reports</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {generatedReports.map((report) => (
-                    <div
-                      key={report.id}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="p-2 bg-white rounded-lg">
-                          <FileText className="h-5 w-5 text-primary" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium truncate">{report.name}</div>
-                          <div className="text-sm text-gray-500 flex items-center gap-2 mt-1">
-                            <span>{report.dateRange}</span>
-                            <span>•</span>
-                            <span>{report.size}</span>
-                            <span>•</span>
-                            <Badge variant="outline" className="text-xs">
-                              {report.format}
-                            </Badge>
+                {reportsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : generatedReports.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p>No reports generated yet</p>
+                    <p className="text-sm mt-1">Generate your first report above</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {generatedReports.map((report) => (
+                      <div
+                        key={report.id}
+                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="p-2 bg-white rounded-lg">
+                            <FileText className="h-5 w-5 text-primary" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium truncate">{report.name}</div>
+                            <div className="text-sm text-gray-500 flex items-center gap-2 mt-1">
+                              <span>{report.dateRange}</span>
+                              <span>•</span>
+                              <span>{report.size}</span>
+                              <span>•</span>
+                              <Badge variant="outline" className="text-xs">
+                                {report.format}
+                              </Badge>
+                            </div>
                           </div>
                         </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownload(report.id, report.name)}
+                          disabled={downloadingReportId === report.id}
+                        >
+                          {downloadingReportId === report.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Download className="h-4 w-4" />
+                          )}
+                        </Button>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDownload(report.name)}
-                      >
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -336,7 +358,7 @@ export default function AdminReports() {
                     <FileText className="h-4 w-4 text-gray-500" />
                     <span className="text-sm">Total Reports</span>
                   </div>
-                  <span className="font-bold">24</span>
+                  <span className="font-bold">{statistics?.totalReports || 0}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -344,7 +366,7 @@ export default function AdminReports() {
                     <Clock className="h-4 w-4 text-gray-500" />
                     <span className="text-sm">This Month</span>
                   </div>
-                  <span className="font-bold">8</span>
+                  <span className="font-bold">{statistics?.reportsThisMonth || 0}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -352,7 +374,7 @@ export default function AdminReports() {
                     <Download className="h-4 w-4 text-gray-500" />
                     <span className="text-sm">Downloads</span>
                   </div>
-                  <span className="font-bold">156</span>
+                  <span className="font-bold">{statistics?.totalDownloads || 0}</span>
                 </div>
               </CardContent>
             </Card>
@@ -362,22 +384,18 @@ export default function AdminReports() {
                 <CardTitle>Popular Reports</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span>Financial Report</span>
-                  <Badge variant="secondary">45</Badge>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span>User Activity</span>
-                  <Badge variant="secondary">38</Badge>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span>Property Performance</span>
-                  <Badge variant="secondary">32</Badge>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span>Booking Summary</span>
-                  <Badge variant="secondary">28</Badge>
-                </div>
+                {popularReports.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-4">
+                    No data available yet
+                  </p>
+                ) : (
+                  popularReports.map((report, index) => (
+                    <div key={index} className="flex items-center justify-between text-sm">
+                      <span>{report.name}</span>
+                      <Badge variant="secondary">{report.count}</Badge>
+                    </div>
+                  ))
+                )}
               </CardContent>
             </Card>
 

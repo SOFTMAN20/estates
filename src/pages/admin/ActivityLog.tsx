@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import {
   Table,
   TableBody,
@@ -21,13 +23,17 @@ import {
 } from '@/components/ui/table';
 import { 
   Search, Filter, CheckCircle, XCircle, AlertCircle, 
-  User, Home, Calendar, Settings, Shield, Ban, Eye, Loader2 
+  User, Home, Calendar, Settings, Shield, Ban, Eye, Loader2, Download,
+  Calendar as CalendarIcon, ExternalLink
 } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format as formatDate } from 'date-fns';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 import {
   useAdminActivityLogs,
   useActivityLogStatistics,
   useAdminsList,
+  type ActivityLog,
 } from '@/hooks/useAdminActivityLog';
 
 
@@ -60,15 +66,78 @@ export default function AdminActivityLog() {
   const [searchQuery, setSearchQuery] = useState('');
   const [actionFilter, setActionFilter] = useState('all');
   const [adminFilter, setAdminFilter] = useState('all');
+  const [targetTypeFilter, setTargetTypeFilter] = useState('all');
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
 
   // Fetch data
   const { data: activityLogs = [], isLoading: logsLoading } = useAdminActivityLogs({
     searchQuery,
     actionFilter,
     adminFilter,
+    targetTypeFilter,
+    startDate,
+    endDate,
   });
   const { data: statistics } = useActivityLogStatistics();
   const { data: adminsList = [] } = useAdminsList();
+
+  // Export to CSV
+  const handleExportCSV = () => {
+    if (activityLogs.length === 0) {
+      toast.error('No data to export');
+      return;
+    }
+
+    try {
+      // Create CSV content
+      const headers = ['Date/Time', 'Admin Name', 'Admin Email', 'Action', 'Target Type', 'Description', 'IP Address'];
+      const csvRows = [
+        headers.join(','),
+        ...activityLogs.map(log => [
+          new Date(log.created_at).toLocaleString(),
+          `"${log.admin_name}"`,
+          `"${log.admin_email || 'N/A'}"`,
+          `"${log.action_type.replace(/_/g, ' ')}"`,
+          log.target_type,
+          `"${log.description.replace(/"/g, '""')}"`,
+          log.ip_address || 'N/A',
+        ].join(','))
+      ];
+
+      const csvContent = csvRows.join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `activity-log-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success('Activity log exported successfully');
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Failed to export activity log');
+    }
+  };
+
+  // Get target link
+  const getTargetLink = (log: ActivityLog): string | null => {
+    if (!log.target_id) return null;
+
+    switch (log.target_type) {
+      case 'property':
+        return `/admin/properties`;
+      case 'user':
+        return `/admin/users`;
+      case 'booking':
+        return `/admin/bookings`;
+      default:
+        return null;
+    }
+  };
 
   const getActionIcon = (actionType: string) => {
     const Icon = actionTypeIcons[actionType] || AlertCircle;
@@ -134,48 +203,141 @@ export default function AdminActivityLog() {
         {/* Filters */}
         <Card className="mb-6">
           <CardContent className="pt-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <Input
-                  placeholder="Search by action, admin, or description..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
+            <div className="space-y-4">
+              {/* Search and Export */}
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <Input
+                    placeholder="Search by action, admin, or description..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <Button onClick={handleExportCSV} variant="outline" className="md:w-auto">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export CSV
+                </Button>
               </div>
 
-              <Select value={actionFilter} onValueChange={setActionFilter}>
-                <SelectTrigger className="w-full md:w-[200px]">
-                  <SelectValue placeholder="Filter by action" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Actions</SelectItem>
-                  <SelectItem value="approve_property">Approve Property</SelectItem>
-                  <SelectItem value="reject_property">Reject Property</SelectItem>
-                  <SelectItem value="suspend_user">Suspend User</SelectItem>
-                  <SelectItem value="activate_user">Activate User</SelectItem>
-                  <SelectItem value="change_user_role">Change User Role</SelectItem>
-                  <SelectItem value="delete_property">Delete Property</SelectItem>
-                  <SelectItem value="update_settings">Update Settings</SelectItem>
-                  <SelectItem value="cancel_booking">Cancel Booking</SelectItem>
-                  <SelectItem value="process_refund">Process Refund</SelectItem>
-                </SelectContent>
-              </Select>
+              {/* Filters Row 1 */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <Select value={actionFilter} onValueChange={setActionFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter by action" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Actions</SelectItem>
+                    <SelectItem value="approve_property">Approve Property</SelectItem>
+                    <SelectItem value="reject_property">Reject Property</SelectItem>
+                    <SelectItem value="suspend_user">Suspend User</SelectItem>
+                    <SelectItem value="activate_user">Activate User</SelectItem>
+                    <SelectItem value="change_user_role">Change User Role</SelectItem>
+                    <SelectItem value="delete_property">Delete Property</SelectItem>
+                    <SelectItem value="update_settings">Update Settings</SelectItem>
+                    <SelectItem value="cancel_booking">Cancel Booking</SelectItem>
+                    <SelectItem value="process_refund">Process Refund</SelectItem>
+                  </SelectContent>
+                </Select>
 
-              <Select value={adminFilter} onValueChange={setAdminFilter}>
-                <SelectTrigger className="w-full md:w-[200px]">
-                  <SelectValue placeholder="Filter by admin" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Admins</SelectItem>
-                  {adminsList.map((admin) => (
-                    <SelectItem key={admin.id} value={admin.id}>
-                      {admin.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <Select value={adminFilter} onValueChange={setAdminFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter by admin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Admins</SelectItem>
+                    {adminsList.map((admin) => (
+                      <SelectItem key={admin.id} value={admin.id}>
+                        {admin.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={targetTypeFilter} onValueChange={setTargetTypeFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter by target" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Targets</SelectItem>
+                    <SelectItem value="property">Property</SelectItem>
+                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="booking">Booking</SelectItem>
+                    <SelectItem value="review">Review</SelectItem>
+                    <SelectItem value="settings">Settings</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setActionFilter('all');
+                    setAdminFilter('all');
+                    setTargetTypeFilter('all');
+                    setStartDate(undefined);
+                    setEndDate(undefined);
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              </div>
+
+              {/* Date Range Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Start Date</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !startDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {startDate ? formatDate(startDate, "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <CalendarComponent
+                        mode="single"
+                        selected={startDate}
+                        onSelect={setStartDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">End Date</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !endDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {endDate ? formatDate(endDate, "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <CalendarComponent
+                        mode="single"
+                        selected={endDate}
+                        onSelect={setEndDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -195,12 +357,12 @@ export default function AdminActivityLog() {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Date/Time</TableHead>
                       <TableHead>Admin</TableHead>
                       <TableHead>Action</TableHead>
-                      <TableHead>Description</TableHead>
                       <TableHead>Target</TableHead>
-                      <TableHead>Time</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>IP Address</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -215,8 +377,16 @@ export default function AdminActivityLog() {
                     ) : (
                       activityLogs.map((log) => {
                         const Icon = getActionIcon(log.action_type);
+                        const targetLink = getTargetLink(log);
+                        
                         return (
                           <TableRow key={log.id}>
+                            <TableCell className="text-sm text-gray-500">
+                              <div>{formatDate(new Date(log.created_at), 'MMM dd, yyyy')}</div>
+                              <div className="text-xs text-gray-400">
+                                {formatDate(new Date(log.created_at), 'HH:mm:ss')}
+                              </div>
+                            </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 <Avatar className="h-8 w-8">
@@ -240,22 +410,28 @@ export default function AdminActivityLog() {
                                 {getActionBadge(log.action_type)}
                               </div>
                             </TableCell>
+                            <TableCell>
+                              {targetLink ? (
+                                <a
+                                  href={targetLink}
+                                  className="flex items-center gap-1 text-primary hover:underline"
+                                >
+                                  <Badge variant="secondary" className="text-xs">
+                                    {log.target_type}
+                                  </Badge>
+                                  <ExternalLink className="h-3 w-3" />
+                                </a>
+                              ) : (
+                                <Badge variant="secondary" className="text-xs">
+                                  {log.target_type}
+                                </Badge>
+                              )}
+                            </TableCell>
                             <TableCell className="max-w-md">
                               <p className="text-sm">{log.description}</p>
                             </TableCell>
-                            <TableCell className="text-sm text-gray-500">
-                              <Badge variant="secondary" className="text-xs">
-                                {log.target_type}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-sm text-gray-500">
-                              {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className="text-green-600 border-green-600">
-                                <CheckCircle className="h-3 w-3 mr-1" />
-                                {log.status}
-                              </Badge>
+                            <TableCell className="text-sm text-gray-500 font-mono">
+                              {log.ip_address || 'N/A'}
                             </TableCell>
                           </TableRow>
                         );

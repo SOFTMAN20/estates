@@ -13,9 +13,10 @@ export interface ActivityLog {
   admin_email?: string;
   action_type: string;
   target_type: string;
-  target_id: string;
+  target_id: string | null;
   description: string;
   details?: Record<string, unknown>;
+  ip_address?: string;
   created_at: string;
   status: 'success' | 'failed';
 }
@@ -24,6 +25,9 @@ interface ActivityLogFilters {
   searchQuery?: string;
   actionFilter?: string;
   adminFilter?: string;
+  targetTypeFilter?: string;
+  startDate?: Date;
+  endDate?: Date;
 }
 
 /**
@@ -42,6 +46,7 @@ export function useAdminActivityLogs(filters?: ActivityLogFilters) {
           target_type,
           target_id,
           details,
+          ip_address,
           created_at
         `)
         .order('created_at', { ascending: false })
@@ -54,6 +59,20 @@ export function useAdminActivityLogs(filters?: ActivityLogFilters) {
 
       if (filters?.adminFilter && filters.adminFilter !== 'all') {
         query = query.eq('admin_id', filters.adminFilter);
+      }
+
+      if (filters?.targetTypeFilter && filters.targetTypeFilter !== 'all') {
+        query = query.eq('target_type', filters.targetTypeFilter);
+      }
+
+      if (filters?.startDate) {
+        query = query.gte('created_at', filters.startDate.toISOString());
+      }
+
+      if (filters?.endDate) {
+        const endOfDay = new Date(filters.endDate);
+        endOfDay.setHours(23, 59, 59, 999);
+        query = query.lte('created_at', endOfDay.toISOString());
       }
 
       const { data: actions, error } = await query;
@@ -109,6 +128,7 @@ export function useAdminActivityLogs(filters?: ActivityLogFilters) {
           target_id: action.target_id,
           description,
           details: action.details as Record<string, unknown>,
+          ip_address: action.ip_address || undefined,
           created_at: action.created_at,
           status: 'success',
         };

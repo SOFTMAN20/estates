@@ -5,14 +5,14 @@
  * A comprehensive booking form for property rentals with:
  * - Check-in and check-out date pickers
  * - Automatic price calculation (monthly rent × months)
- * - Service fee calculation (10% platform commission)
+ * - Service fee calculation (dynamic platform commission from settings)
  * - Total amount display
  * - Prominent "Book Now" button
  * 
  * Fomu ya kuhifadhi nyumba na:
  * - Chaguo la tarehe ya kuingia na kutoka
  * - Hesabu ya bei otomatiki
- * - Ada ya huduma (10%)
+ * - Ada ya huduma (kutoka mipangilio ya jukwaa)
  * - Jumla ya kiasi
  */
 
@@ -28,6 +28,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { BookingModal } from './BookingModal';
+import { useCommissionRate } from '@/hooks/usePlatformSettings';
 
 interface BookingFormProps {
   propertyId: string;
@@ -61,8 +62,6 @@ export interface BookingData {
   totalAmount: number;
 }
 
-const PLATFORM_COMMISSION = 0.1; // 10% service fee
-
 export function BookingForm({
   propertyId,
   pricePerMonth,
@@ -76,6 +75,10 @@ export function BookingForm({
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Get dynamic commission rate from platform settings
+  const commissionRate = useCommissionRate();
+  const platformCommission = commissionRate / 100; // Convert percentage to decimal
 
   // Calculate booking details
   const bookingDetails = useMemo(() => {
@@ -86,18 +89,19 @@ export function BookingForm({
     // Calculate number of months (minimum 1 month)
     const months = Math.max(1, differenceInMonths(checkOut, checkIn));
     
-    // Calculate amounts
+    // Calculate amounts using dynamic commission rate
     const subtotal = pricePerMonth * months;
-    const serviceFee = subtotal * PLATFORM_COMMISSION;
+    const serviceFee = subtotal * platformCommission;
     const totalAmount = subtotal + serviceFee;
 
     return {
       months,
       subtotal,
       serviceFee,
-      totalAmount
+      totalAmount,
+      commissionRate, // Include commission rate in details
     };
-  }, [checkIn, checkOut, pricePerMonth]);
+  }, [checkIn, checkOut, pricePerMonth, platformCommission, commissionRate]);
 
   // Handle check-in date selection
   const handleCheckInSelect = (date: Date | undefined) => {
@@ -290,7 +294,7 @@ export function BookingForm({
               <div className="flex items-center space-x-2">
                 <TrendingUp className="h-4 w-4 text-primary" />
                 <span className="text-sm font-medium text-gray-700">
-                  {i18n.language === 'en' ? 'Service Fee (10%)' : 'Ada ya Huduma (10%)'}
+                  {i18n.language === 'en' ? `Service Fee (${commissionRate}%)` : `Ada ya Huduma (${commissionRate}%)`}
                   <span className="block text-xs text-gray-500">
                     {i18n.language === 'en' ? 'Platform Fee' : 'Ada ya Jukwaa'}
                   </span>

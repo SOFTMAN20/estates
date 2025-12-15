@@ -11,7 +11,7 @@
  * - Action buttons
  */
 
-import { format, isBefore, differenceInDays, startOfDay } from 'date-fns';
+import { format, differenceInDays, startOfDay } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -25,8 +25,7 @@ import {
   Eye,
   X,
   MessageCircle,
-  Star,
-  Home
+  Star
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -45,6 +44,9 @@ interface BookingCardProps {
     status: string;
     special_requests?: string | null;
     created_at: string;
+    updated_at?: string;
+    cancellation_reason?: string | null;
+    cancellation_date?: string | null;
     properties?: {
       id: string;
       title: string;
@@ -52,7 +54,6 @@ interface BookingCardProps {
       images: string[];
       property_type: string;
     };
-    [key: string]: any; // Allow additional fields from database
   };
   hostName?: string;
   onCancel?: (bookingId: string) => void;

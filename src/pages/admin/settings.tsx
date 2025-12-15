@@ -21,18 +21,22 @@ export default function AdminSettings() {
   
   // Local state for form
   const [formData, setFormData] = useState<SettingsFormData>(settingsValues);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Update form when settings load
+  // Update form only when settings are initially loaded
   useEffect(() => {
-    if (!settingsLoading) {
+    if (!settingsLoading && !isInitialized) {
       setFormData(settingsValues);
+      setIsInitialized(true);
     }
-  }, [settingsValues, settingsLoading]);
+  }, [settingsValues, settingsLoading, isInitialized]);
 
   const handleSave = async () => {
     try {
       await updateSettings.mutateAsync(formData);
       toast.success('Settings saved successfully');
+      // Reset initialization flag so form can reload with new data
+      setIsInitialized(false);
     } catch (error) {
       console.error('Error saving settings:', error);
       toast.error('Failed to save settings');
@@ -148,7 +152,8 @@ export default function AdminSettings() {
                   <Input 
                     id="min-booking" 
                     type="number" 
-                    defaultValue="1"
+                    value={formData.min_booking_months}
+                    onChange={(e) => handleInputChange('min_booking_months', Number(e.target.value))}
                     min="1" 
                     max="12" 
                   />
@@ -160,7 +165,8 @@ export default function AdminSettings() {
                   <Input 
                     id="max-advance" 
                     type="number" 
-                    defaultValue="12"
+                    value={formData.max_advance_booking_months}
+                    onChange={(e) => handleInputChange('max_advance_booking_months', Number(e.target.value))}
                     min="1" 
                     max="24" 
                   />
@@ -171,8 +177,8 @@ export default function AdminSettings() {
                   <Label htmlFor="currency">Currency</Label>
                   <Input 
                     id="currency" 
-                    value="TZS"
-                    disabled
+                    value={formData.currency}
+                    onChange={(e) => handleInputChange('currency', e.target.value)}
                   />
                   <p className="text-sm text-muted-foreground">Tanzanian Shilling (TZS)</p>
                 </div>

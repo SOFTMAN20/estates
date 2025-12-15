@@ -18,6 +18,9 @@ export interface PlatformSettings {
   bank_transfer_enabled: boolean;
   maintenance_mode_enabled: boolean;
   maintenance_message: string;
+  auto_approve_properties: boolean;
+  require_property_verification: boolean;
+  max_images_per_property: number;
 }
 
 /**
@@ -56,6 +59,9 @@ export function usePlatformSettings() {
         bank_transfer_enabled: settingsMap.bank_transfer_enabled === 'true',
         maintenance_mode_enabled: settingsMap.maintenance_mode_enabled === 'true',
         maintenance_message: settingsMap.maintenance_message || "We're currently performing maintenance. Please check back soon.",
+        auto_approve_properties: settingsMap.auto_approve_properties === 'true',
+        require_property_verification: settingsMap.require_property_verification === 'true',
+        max_images_per_property: Number(settingsMap.max_images_per_property || 10),
       };
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
@@ -79,6 +85,9 @@ function getDefaultSettings(): PlatformSettings {
     bank_transfer_enabled: false,
     maintenance_mode_enabled: false,
     maintenance_message: "We're currently performing maintenance. Please check back soon.",
+    auto_approve_properties: false,
+    require_property_verification: true,
+    max_images_per_property: 10,
   };
 }
 

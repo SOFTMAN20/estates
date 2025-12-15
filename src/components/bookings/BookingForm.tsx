@@ -28,7 +28,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { BookingModal } from './BookingModal';
-import { useCommissionRate } from '@/hooks/usePlatformSettings';
+import { useCommissionRate, usePlatformSettings } from '@/hooks/usePlatformSettings';
 
 interface BookingFormProps {
   propertyId: string;
@@ -76,9 +76,11 @@ export function BookingForm({
   const [checkOut, setCheckOut] = useState<Date>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  // Get dynamic commission rate from platform settings
+  // Get dynamic settings from platform settings
   const commissionRate = useCommissionRate();
+  const { data: platformSettings } = usePlatformSettings();
   const platformCommission = commissionRate / 100; // Convert percentage to decimal
+  const minBookingMonths = platformSettings?.min_booking_months || 1;
 
   // Calculate booking details
   const bookingDetails = useMemo(() => {
@@ -86,8 +88,8 @@ export function BookingForm({
       return null;
     }
 
-    // Calculate number of months (minimum 1 month)
-    const months = Math.max(1, differenceInMonths(checkOut, checkIn));
+    // Calculate number of months (use dynamic minimum from settings)
+    const months = Math.max(minBookingMonths, differenceInMonths(checkOut, checkIn));
     
     // Calculate amounts using dynamic commission rate
     const subtotal = pricePerMonth * months;
@@ -101,7 +103,7 @@ export function BookingForm({
       totalAmount,
       commissionRate, // Include commission rate in details
     };
-  }, [checkIn, checkOut, pricePerMonth, platformCommission, commissionRate]);
+  }, [checkIn, checkOut, pricePerMonth, platformCommission, commissionRate, minBookingMonths]);
 
   // Handle check-in date selection
   const handleCheckInSelect = (date: Date | undefined) => {

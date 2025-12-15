@@ -21,6 +21,9 @@ export interface SettingsFormData {
   platform_name: string;
   support_email: string;
   commission_rate: number;
+  min_booking_months: number;
+  max_advance_booking_months: number;
+  currency: string;
   
   // Payment Settings
   mpesa_enabled: boolean;
@@ -80,6 +83,9 @@ export function useSettingsValues() {
     platform_name: settings.platform_name?.value || 'NyumbaLink',
     support_email: settings.support_email?.value || 'support@nyumbalink.com',
     commission_rate: Number(settings.commission_rate?.value || settings.service_fee_percentage?.value || 10),
+    min_booking_months: Number(settings.min_booking_months?.value || 1),
+    max_advance_booking_months: Number(settings.max_advance_booking_months?.value || 12),
+    currency: settings.currency?.value || 'TZS',
     
     // Payment Settings
     mpesa_enabled: settings.mpesa_enabled?.value === 'true',
@@ -132,6 +138,15 @@ export function useUpdateSettings() {
       if (settings.commission_rate !== undefined) {
         updates.push({ key: 'commission_rate', value: String(settings.commission_rate), data_type: 'number' });
         updates.push({ key: 'service_fee_percentage', value: String(settings.commission_rate), data_type: 'number' });
+      }
+      if (settings.min_booking_months !== undefined) {
+        updates.push({ key: 'min_booking_months', value: String(settings.min_booking_months), data_type: 'number' });
+      }
+      if (settings.max_advance_booking_months !== undefined) {
+        updates.push({ key: 'max_advance_booking_months', value: String(settings.max_advance_booking_months), data_type: 'number' });
+      }
+      if (settings.currency !== undefined) {
+        updates.push({ key: 'currency', value: settings.currency, data_type: 'string' });
       }
 
       // Payment Settings

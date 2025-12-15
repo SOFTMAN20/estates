@@ -62,6 +62,7 @@ import ErrorBoundary from "@/components/ui/error-boundary";
 import { lazy, Suspense } from "react";
 import MobileBottomNav from "./components/layout/navbarLayout/MobileBottomNav";
 import PerformanceDashboard from "./components/common/PerformanceDashboard";
+import { ProtectedAdminRoute } from "@/components/auth/ProtectedAdminRoute";
 
 // Lazy load pages for code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -94,6 +95,7 @@ const AdminSettings = lazy(() => import("./pages/admin/settings"));
 const AdminAnalytics = lazy(() => import("./pages/admin/Analytics"));
 const AdminReports = lazy(() => import("./pages/admin/Reports"));
 const AdminActivityLog = lazy(() => import("./pages/admin/ActivityLog"));
+const AdminNotifications = lazy(() => import("./pages/admin/Notifications"));
 
 /**
  * REACT QUERY CLIENT CONFIGURATION
@@ -182,16 +184,17 @@ const App = () => (
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<SignUp />} />
 
-                {/* Admin routes - Njia za msimamizi */}
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/admin/properties" element={<AdminProperties />} />
-                <Route path="/admin/users" element={<AdminUsers />} />
-                <Route path="/admin/bookings" element={<AdminBookings />} />
-                <Route path="/admin/payments" element={<AdminPayments />} />
-                <Route path="/admin/analytics" element={<AdminAnalytics />} />
-                <Route path="/admin/reports" element={<AdminReports />} />
-                <Route path="/admin/activity-log" element={<AdminActivityLog />} />
-                <Route path="/admin/settings" element={<AdminSettings />} />
+                {/* Admin routes - Njia za msimamizi (Protected) */}
+                <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
+                <Route path="/admin/properties" element={<ProtectedAdminRoute><AdminProperties /></ProtectedAdminRoute>} />
+                <Route path="/admin/users" element={<ProtectedAdminRoute><AdminUsers /></ProtectedAdminRoute>} />
+                <Route path="/admin/bookings" element={<ProtectedAdminRoute><AdminBookings /></ProtectedAdminRoute>} />
+                <Route path="/admin/payments" element={<ProtectedAdminRoute><AdminPayments /></ProtectedAdminRoute>} />
+                <Route path="/admin/analytics" element={<ProtectedAdminRoute><AdminAnalytics /></ProtectedAdminRoute>} />
+                <Route path="/admin/reports" element={<ProtectedAdminRoute><AdminReports /></ProtectedAdminRoute>} />
+                <Route path="/admin/activity-log" element={<ProtectedAdminRoute><AdminActivityLog /></ProtectedAdminRoute>} />
+                <Route path="/admin/notifications" element={<ProtectedAdminRoute><AdminNotifications /></ProtectedAdminRoute>} />
+                <Route path="/admin/settings" element={<ProtectedAdminRoute><AdminSettings /></ProtectedAdminRoute>} />
 
                 {/* Catch-all route for 404 errors */}
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

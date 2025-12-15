@@ -1,10 +1,13 @@
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { AdminHeader } from '@/components/admin/AdminHeader';
 import { StatisticsCards } from '@/components/admin/StatisticsCards';
 import { RevenueChart } from '@/components/admin/RevenueChart';
 import { UserGrowthChart } from '@/components/admin/UserGrowthChart';
 import { BookingTrendsChart } from '@/components/admin/BookingTrendsChart';
 import { PropertyTypesChart } from '@/components/admin/PropertyTypesChart';
 import { RecentActivity } from '@/components/admin/RecentActivity';
+import { PendingApprovalsWidget } from '@/components/admin/PendingApprovalsWidget';
+import { SystemHealthWidget } from '@/components/admin/SystemHealthWidget';
 import { useAdminStats, useRevenueData, useUserGrowthData, useBookingTrends, usePropertyTypeDistribution } from '@/hooks/useAdminStats';
 import { Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -52,7 +55,10 @@ export default function AdminDashboard() {
     <div className="flex min-h-screen bg-gray-50">
       <AdminSidebar />
       
-      <div className="flex-1 p-4 md:p-8 overflow-auto">
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <AdminHeader />
+        
+        <div className="flex-1 p-4 md:p-8 overflow-auto">
         {/* Header */}
         <div className="mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
@@ -65,6 +71,12 @@ export default function AdminDashboard() {
             <StatisticsCards stats={stats} />
           </div>
         )}
+
+        {/* Quick Action Widgets */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+          <PendingApprovalsWidget />
+          <SystemHealthWidget />
+        </div>
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
@@ -119,6 +131,7 @@ export default function AdminDashboard() {
 
         {/* Recent Activity */}
         <RecentActivity />
+        </div>
       </div>
     </div>
   );

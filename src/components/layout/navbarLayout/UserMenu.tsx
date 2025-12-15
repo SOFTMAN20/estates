@@ -209,8 +209,8 @@ const UserMenu: React.FC<UserMenuProps> = ({
           <span>Mipangilio</span>
         </DropdownMenuItem>
 
-        {/* Admin link - only visible if role='admin' */}
-        {profile?.role === 'admin' && (
+        {/* Admin link - only visible if role='admin' or 'super_admin' */}
+        {(profile?.role === 'admin' || profile?.role === 'super_admin') && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>

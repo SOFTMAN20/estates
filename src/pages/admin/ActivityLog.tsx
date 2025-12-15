@@ -21,133 +21,16 @@ import {
 } from '@/components/ui/table';
 import { 
   Search, Filter, CheckCircle, XCircle, AlertCircle, 
-  User, Home, Calendar, Settings, Shield, Ban, Eye 
+  User, Home, Calendar, Settings, Shield, Ban, Eye, Loader2 
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import {
+  useAdminActivityLogs,
+  useActivityLogStatistics,
+  useAdminsList,
+} from '@/hooks/useAdminActivityLog';
 
-// Mock activity log data
-const activityLogs = [
-  {
-    id: '1',
-    admin_id: 'admin-1',
-    admin_name: 'Admin User',
-    action_type: 'approve_property',
-    target_type: 'property',
-    target_id: 'prop-123',
-    description: 'Approved property "Modern 3BR Apartment in Masaki"',
-    ip_address: '192.168.1.100',
-    created_at: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-    status: 'success',
-  },
-  {
-    id: '2',
-    admin_id: 'admin-1',
-    admin_name: 'Admin User',
-    action_type: 'reject_property',
-    target_type: 'property',
-    target_id: 'prop-124',
-    description: 'Rejected property "Single Room in Kinondoni" - Incomplete information',
-    ip_address: '192.168.1.100',
-    created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-    status: 'success',
-  },
-  {
-    id: '3',
-    admin_id: 'admin-2',
-    admin_name: 'Super Admin',
-    action_type: 'suspend_user',
-    target_type: 'user',
-    target_id: 'user-456',
-    description: 'Suspended user account "grace.wanjiru@example.com" - Policy violation',
-    ip_address: '192.168.1.105',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-    status: 'success',
-  },
-  {
-    id: '4',
-    admin_id: 'admin-1',
-    admin_name: 'Admin User',
-    action_type: 'update_settings',
-    target_type: 'settings',
-    target_id: 'settings-1',
-    description: 'Updated platform commission rate from 10% to 12%',
-    ip_address: '192.168.1.100',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
-    status: 'success',
-  },
-  {
-    id: '5',
-    admin_id: 'admin-2',
-    admin_name: 'Super Admin',
-    action_type: 'activate_user',
-    target_type: 'user',
-    target_id: 'user-789',
-    description: 'Activated user account "peter.kamau@example.com"',
-    ip_address: '192.168.1.105',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-    status: 'success',
-  },
-  {
-    id: '6',
-    admin_id: 'admin-1',
-    admin_name: 'Admin User',
-    action_type: 'cancel_booking',
-    target_type: 'booking',
-    target_id: 'booking-321',
-    description: 'Cancelled booking #321 - Customer request',
-    ip_address: '192.168.1.100',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString(),
-    status: 'success',
-  },
-  {
-    id: '7',
-    admin_id: 'admin-2',
-    admin_name: 'Super Admin',
-    action_type: 'process_refund',
-    target_type: 'payment',
-    target_id: 'payment-654',
-    description: 'Processed refund of TZS 1,500,000 for booking #321',
-    ip_address: '192.168.1.105',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString(),
-    status: 'success',
-  },
-  {
-    id: '8',
-    admin_id: 'admin-1',
-    admin_name: 'Admin User',
-    action_type: 'approve_property',
-    target_type: 'property',
-    target_id: 'prop-125',
-    description: 'Approved property "Luxury Villa in Mbezi Beach"',
-    ip_address: '192.168.1.100',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
-    status: 'success',
-  },
-  {
-    id: '9',
-    admin_id: 'admin-1',
-    admin_name: 'Admin User',
-    action_type: 'update_settings',
-    target_type: 'settings',
-    target_id: 'settings-2',
-    description: 'Enabled M-Pesa payment method',
-    ip_address: '192.168.1.100',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-    status: 'success',
-  },
-  {
-    id: '10',
-    admin_id: 'admin-2',
-    admin_name: 'Super Admin',
-    action_type: 'approve_property',
-    target_type: 'property',
-    target_id: 'prop-126',
-    description: 'Approved property "Cozy Studio in Mikocheni"',
-    ip_address: '192.168.1.105',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
-    status: 'success',
-  },
-];
+
 
 const actionTypeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   approve_property: CheckCircle,
@@ -157,6 +40,8 @@ const actionTypeIcons: Record<string, React.ComponentType<{ className?: string }
   update_settings: Settings,
   cancel_booking: XCircle,
   process_refund: AlertCircle,
+  change_user_role: User,
+  delete_property: XCircle,
 };
 
 const actionTypeColors: Record<string, string> = {
@@ -167,6 +52,8 @@ const actionTypeColors: Record<string, string> = {
   update_settings: 'text-blue-600 bg-blue-100',
   cancel_booking: 'text-red-600 bg-red-100',
   process_refund: 'text-yellow-600 bg-yellow-100',
+  change_user_role: 'text-purple-600 bg-purple-100',
+  delete_property: 'text-red-600 bg-red-100',
 };
 
 export default function AdminActivityLog() {
@@ -174,14 +61,14 @@ export default function AdminActivityLog() {
   const [actionFilter, setActionFilter] = useState('all');
   const [adminFilter, setAdminFilter] = useState('all');
 
-  const filteredLogs = activityLogs.filter((log) => {
-    const matchesSearch = log.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         log.admin_name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesAction = actionFilter === 'all' || log.action_type === actionFilter;
-    const matchesAdmin = adminFilter === 'all' || log.admin_id === adminFilter;
-    
-    return matchesSearch && matchesAction && matchesAdmin;
+  // Fetch data
+  const { data: activityLogs = [], isLoading: logsLoading } = useAdminActivityLogs({
+    searchQuery,
+    actionFilter,
+    adminFilter,
   });
+  const { data: statistics } = useActivityLogStatistics();
+  const { data: adminsList = [] } = useAdminsList();
 
   const getActionIcon = (actionType: string) => {
     const Icon = actionTypeIcons[actionType] || AlertCircle;
@@ -196,13 +83,6 @@ export default function AdminActivityLog() {
       </Badge>
     );
   };
-
-  // Statistics
-  const totalActions = activityLogs.length;
-  const todayActions = activityLogs.filter(log => 
-    new Date(log.created_at).toDateString() === new Date().toDateString()
-  ).length;
-  const uniqueAdmins = new Set(activityLogs.map(log => log.admin_id)).size;
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -223,7 +103,7 @@ export default function AdminActivityLog() {
               <Shield className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalActions}</div>
+              <div className="text-2xl font-bold">{statistics?.totalActions || 0}</div>
               <p className="text-xs text-muted-foreground">All time</p>
             </CardContent>
           </Card>
@@ -234,7 +114,7 @@ export default function AdminActivityLog() {
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{todayActions}</div>
+              <div className="text-2xl font-bold">{statistics?.todayActions || 0}</div>
               <p className="text-xs text-muted-foreground">Last 24 hours</p>
             </CardContent>
           </Card>
@@ -245,7 +125,7 @@ export default function AdminActivityLog() {
               <User className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{uniqueAdmins}</div>
+              <div className="text-2xl font-bold">{statistics?.uniqueAdmins || 0}</div>
               <p className="text-xs text-muted-foreground">Unique administrators</p>
             </CardContent>
           </Card>
@@ -275,6 +155,8 @@ export default function AdminActivityLog() {
                   <SelectItem value="reject_property">Reject Property</SelectItem>
                   <SelectItem value="suspend_user">Suspend User</SelectItem>
                   <SelectItem value="activate_user">Activate User</SelectItem>
+                  <SelectItem value="change_user_role">Change User Role</SelectItem>
+                  <SelectItem value="delete_property">Delete Property</SelectItem>
                   <SelectItem value="update_settings">Update Settings</SelectItem>
                   <SelectItem value="cancel_booking">Cancel Booking</SelectItem>
                   <SelectItem value="process_refund">Process Refund</SelectItem>
@@ -287,8 +169,11 @@ export default function AdminActivityLog() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Admins</SelectItem>
-                  <SelectItem value="admin-1">Admin User</SelectItem>
-                  <SelectItem value="admin-2">Super Admin</SelectItem>
+                  {adminsList.map((admin) => (
+                    <SelectItem key={admin.id} value={admin.id}>
+                      {admin.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -301,75 +186,89 @@ export default function AdminActivityLog() {
             <CardTitle>Activity History</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Admin</TableHead>
-                    <TableHead>Action</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>IP Address</TableHead>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredLogs.length === 0 ? (
+            {logsLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-gray-500">
-                        <Eye className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                        <p>No activity logs found</p>
-                      </TableCell>
+                      <TableHead>Admin</TableHead>
+                      <TableHead>Action</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Target</TableHead>
+                      <TableHead>Time</TableHead>
+                      <TableHead>Status</TableHead>
                     </TableRow>
-                  ) : (
-                    filteredLogs.map((log) => {
-                      const Icon = getActionIcon(log.action_type);
-                      return (
-                        <TableRow key={log.id}>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Avatar className="h-8 w-8">
-                                <AvatarFallback className="text-xs">
-                                  {log.admin_name.split(' ').map(n => n[0]).join('')}
-                                </AvatarFallback>
-                              </Avatar>
-                              <span className="font-medium text-sm">{log.admin_name}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <div className={`p-1.5 rounded ${actionTypeColors[log.action_type] || 'text-gray-600 bg-gray-100'}`}>
-                                <Icon className="h-4 w-4" />
+                  </TableHeader>
+                  <TableBody>
+                    {activityLogs.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                          <Eye className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                          <p>No activity logs found</p>
+                          <p className="text-sm mt-1">Admin actions will appear here</p>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      activityLogs.map((log) => {
+                        const Icon = getActionIcon(log.action_type);
+                        return (
+                          <TableRow key={log.id}>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Avatar className="h-8 w-8">
+                                  <AvatarFallback className="text-xs">
+                                    {log.admin_name.split(' ').map(n => n[0]).join('')}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <div className="font-medium text-sm">{log.admin_name}</div>
+                                  {log.admin_email && (
+                                    <div className="text-xs text-gray-500">{log.admin_email}</div>
+                                  )}
+                                </div>
                               </div>
-                              {getActionBadge(log.action_type)}
-                            </div>
-                          </TableCell>
-                          <TableCell className="max-w-md">
-                            <p className="text-sm">{log.description}</p>
-                          </TableCell>
-                          <TableCell className="text-sm text-gray-500 font-mono">
-                            {log.ip_address}
-                          </TableCell>
-                          <TableCell className="text-sm text-gray-500">
-                            {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="text-green-600 border-green-600">
-                              <CheckCircle className="h-3 w-3 mr-1" />
-                              Success
-                            </Badge>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <div className={`p-1.5 rounded ${actionTypeColors[log.action_type] || 'text-gray-600 bg-gray-100'}`}>
+                                  <Icon className="h-4 w-4" />
+                                </div>
+                                {getActionBadge(log.action_type)}
+                              </div>
+                            </TableCell>
+                            <TableCell className="max-w-md">
+                              <p className="text-sm">{log.description}</p>
+                            </TableCell>
+                            <TableCell className="text-sm text-gray-500">
+                              <Badge variant="secondary" className="text-xs">
+                                {log.target_type}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-sm text-gray-500">
+                              {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="text-green-600 border-green-600">
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                {log.status}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
 
-            {filteredLogs.length > 0 && (
+            {activityLogs.length > 0 && (
               <div className="mt-4 text-sm text-gray-500 text-center">
-                Showing {filteredLogs.length} of {totalActions} activities
+                Showing {activityLogs.length} activities
               </div>
             )}
           </CardContent>

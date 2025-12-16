@@ -43,9 +43,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import {
   ArrowLeft,
   Heart,
-  School,
-  Building2,
-  ShoppingCart,
   ChevronLeft,
   ChevronRight,
   Home,
@@ -80,6 +77,8 @@ const PropertyDetail = () => {
   // UI state management - Usimamizi wa hali ya UI
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
 
   // Favorites functionality - Utendakazi wa vipendwa
   const { isFavorited, toggleFavorite } = useFavorites();
@@ -523,7 +522,7 @@ const PropertyDetail = () => {
 
                 {/* Full gallery dialog */}
                 <Dialog open={isGalleryOpen} onOpenChange={setIsGalleryOpen}>
-                  <DialogContent className="max-w-6xl w-full">
+                  <DialogContent className="max-w-6xl w-full max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle>{property.title} — Photos</DialogTitle>
                     </DialogHeader>
@@ -532,8 +531,130 @@ const PropertyDetail = () => {
                         ? property.images
                         : ['https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=1200&h=900&fit=crop']
                       ).map((src, idx) => (
-                        <img key={idx} src={src} alt={`Photo ${idx + 1}`} className="w-full h-64 object-cover rounded-md" />
+                        <div 
+                          key={idx} 
+                          className="relative group cursor-pointer"
+                          onClick={() => {
+                            setZoomedImage(src);
+                            setZoomLevel(1);
+                          }}
+                        >
+                          <img 
+                            src={src} 
+                            alt={`Photo ${idx + 1}`} 
+                            className="w-full h-64 object-cover rounded-md transition-transform duration-300 group-hover:scale-105" 
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-md flex items-center justify-center">
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                <line x1="11" y1="8" x2="11" y2="14"></line>
+                                <line x1="8" y1="11" x2="14" y2="11"></line>
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
                       ))}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+
+                {/* Zoom Image Modal */}
+                <Dialog open={!!zoomedImage} onOpenChange={() => {
+                  setZoomedImage(null);
+                  setZoomLevel(1);
+                }}>
+                  <DialogContent className="max-w-7xl w-full h-[90vh] p-0">
+                    <div className="relative w-full h-full bg-black flex flex-col">
+                      {/* Header with zoom controls */}
+                      <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/80 to-transparent p-4">
+                        <div className="flex items-center justify-between">
+                          <DialogTitle className="text-white">
+                            {property.title}
+                          </DialogTitle>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setZoomLevel(prev => Math.max(prev - 0.25, 1))}
+                              disabled={zoomLevel <= 1}
+                              className="text-white hover:bg-white/20"
+                              title="Zoom Out"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                <line x1="8" y1="11" x2="14" y2="11"></line>
+                              </svg>
+                            </Button>
+                            <span className="text-white text-sm min-w-[60px] text-center">
+                              {Math.round(zoomLevel * 100)}%
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setZoomLevel(prev => Math.min(prev + 0.25, 3))}
+                              disabled={zoomLevel >= 3}
+                              className="text-white hover:bg-white/20"
+                              title="Zoom In"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                <line x1="11" y1="8" x2="11" y2="14"></line>
+                                <line x1="8" y1="11" x2="14" y2="11"></line>
+                              </svg>
+                            </Button>
+                            {zoomLevel > 1 && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setZoomLevel(1)}
+                                className="text-white hover:bg-white/20 text-xs"
+                                title="Reset Zoom"
+                              >
+                                Reset
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Image container with zoom */}
+                      <div 
+                        className="flex-1 overflow-auto flex items-center justify-center p-4"
+                        onWheel={(e) => {
+                          e.preventDefault();
+                          const delta = e.deltaY;
+                          if (delta < 0) {
+                            // Scroll up - zoom in
+                            setZoomLevel(prev => Math.min(prev + 0.1, 3));
+                          } else {
+                            // Scroll down - zoom out
+                            setZoomLevel(prev => Math.max(prev - 0.1, 1));
+                          }
+                        }}
+                      >
+                        {zoomedImage && (
+                          <img
+                            src={zoomedImage}
+                            alt="Zoomed view"
+                            className="transition-transform duration-200 cursor-move select-none"
+                            style={{
+                              transform: `scale(${zoomLevel})`,
+                              maxWidth: zoomLevel === 1 ? '100%' : 'none',
+                              maxHeight: zoomLevel === 1 ? '100%' : 'none',
+                            }}
+                            draggable={false}
+                          />
+                        )}
+                      </div>
+
+                      {/* Help text */}
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-3 py-1 rounded-full">
+                        Use zoom buttons or mouse wheel to zoom • Scroll to pan when zoomed
+                      </div>
                     </div>
                   </DialogContent>
                 </Dialog>

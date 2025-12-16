@@ -122,6 +122,12 @@ const PropertyDetail = () => {
     ? typedProperties.filter(p => p.host_id === property.host_id).length 
     : 1;
 
+  // Debug: Log property data to check profiles
+  console.log('Property data:', property);
+  console.log('Property profiles:', property?.profiles);
+  console.log('Host name:', property?.profiles?.name);
+  console.log('Host avatar:', property?.profiles?.avatar_url);
+
   /**
    * IMAGE NAVIGATION FUNCTIONS
    * =========================
@@ -541,7 +547,7 @@ const PropertyDetail = () => {
                   <PropertyHeader
                     title={property.title}
                     location={property.location}
-                    fullAddress={property.full_address}
+                    fullAddress={property.location}
                     price={Number(property.price)}
                     amenities={property.amenities}
                     nearbyServices={property.nearby_services}
@@ -608,9 +614,9 @@ const PropertyDetail = () => {
 
             {/* Host Information Card */}
             <HostInformationCard
-              hostName={property.profiles?.name}
-              hostAvatar={property.profiles?.avatar_url}
-              memberSince={property.profiles?.created_at}
+              hostName={property.profiles?.name ?? undefined}
+              hostAvatar={property.profiles?.avatar_url ?? undefined}
+              memberSince={property.profiles?.created_at ?? undefined}
               totalProperties={hostPropertyCount}
               contactPhone={property.contact_phone}
               whatsappPhone={property.contact_whatsapp_phone}
@@ -621,7 +627,7 @@ const PropertyDetail = () => {
             {/* Location Map */}
             <PropertyLocation
               location={property.location}
-              fullAddress={property.full_address}
+              fullAddress={property.location}
               title={property.title}
             />
 

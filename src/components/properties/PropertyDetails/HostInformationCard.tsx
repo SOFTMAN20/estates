@@ -46,6 +46,18 @@ const HostInformationCard: React.FC<HostInformationCardProps> = ({
   const { t } = useTranslation();
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
+  // Debug: Log all props received
+  console.log('HostInformationCard Props:', {
+    hostName,
+    hostAvatar,
+    memberSince,
+    totalProperties,
+    contactPhone,
+    whatsappPhone,
+    propertyTitle,
+    isVerified
+  });
+
   const displayName = hostName || t('propertyDetail.hostCard.propertyHost');
 
   /**
@@ -103,8 +115,17 @@ const HostInformationCard: React.FC<HostInformationCardProps> = ({
         <CardContent className="p-4 sm:p-6">
           {/* Host Header */}
           <div className="flex items-start space-x-4 mb-4">
-            <Avatar className="h-16 w-16 sm:h-20 sm:w-20 border-2 border-primary/20">
-              <AvatarImage src={hostAvatar || undefined} alt={hostName} />
+            <Avatar className="h-16 w-16 sm:h-20 sm:w-20 border-2 border-primary/20 ring-2 ring-primary/10">
+              <AvatarImage 
+                src={hostAvatar || undefined} 
+                alt={displayName}
+                className="object-cover"
+                onError={(e) => {
+                  // Fallback to initials if image fails to load
+                  console.log('Avatar failed to load:', hostAvatar);
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
               <AvatarFallback className="bg-gradient-to-br from-primary to-serengeti-500 text-white text-lg sm:text-xl font-bold">
                 {getHostInitials()}
               </AvatarFallback>
@@ -113,7 +134,7 @@ const HostInformationCard: React.FC<HostInformationCardProps> = ({
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <h3 className="text-lg sm:text-xl font-bold text-gray-900 truncate">
-                  {hostName}
+                  {displayName}
                 </h3>
                 {isVerified && (
                   <Badge className="bg-blue-100 text-blue-800 border-blue-200 flex-shrink-0">
@@ -175,14 +196,21 @@ const HostInformationCard: React.FC<HostInformationCardProps> = ({
           <div className="space-y-3 py-4">
             {/* Host Info in Modal */}
             <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <Avatar className="h-12 w-12 border-2 border-primary/20">
-                <AvatarImage src={hostAvatar || undefined} alt={hostName} />
+              <Avatar className="h-12 w-12 border-2 border-primary/20 ring-2 ring-primary/10">
+                <AvatarImage 
+                  src={hostAvatar || undefined} 
+                  alt={displayName}
+                  className="object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
                 <AvatarFallback className="bg-gradient-to-br from-primary to-serengeti-500 text-white font-bold">
                   {getHostInitials()}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-semibold text-gray-900">{hostName}</p>
+                <p className="font-semibold text-gray-900">{displayName}</p>
                 <p className="text-sm text-gray-600">{formatMemberSince()}</p>
               </div>
             </div>

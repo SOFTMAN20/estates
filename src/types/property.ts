@@ -29,6 +29,7 @@ export interface Property {
  */
 export type ExtendedProperty = Tables<'properties'> & {
   profiles?: {
+    id?: string;
     name: string | null;
     phone: string | null;
     avatar_url: string | null;

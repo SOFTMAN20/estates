@@ -144,7 +144,8 @@ export const useProperties = () => {
         .from('properties')
         .select(`
           *,
-          profiles:host_id (
+          profiles!host_id (
+            id,
             name,
             phone,
             avatar_url,
@@ -169,6 +170,12 @@ export const useProperties = () => {
         throw error;
       }
 
+      // Debug: Log raw data from Supabase
+      console.log('Raw properties data from Supabase:', data);
+      if (data && data.length > 0) {
+        console.log('First property profiles:', data[0].profiles);
+      }
+
       /**
        * DATA TRANSFORMATION LOGIC
        * ========================
@@ -176,12 +183,12 @@ export const useProperties = () => {
        * Transforms Supabase response to match our Property type:
        * 
        * ISSUE / TATIZO:
-       * Supabase returns profiles as an array due to join syntax,
-       * but we need a single profile object for each property.
+       * Supabase may return profiles as an array, object, or null depending on join syntax.
+       * We need a consistent single profile object for each property.
        * 
        * SOLUTION / SULUHISHO:
-       * - Check if profiles array exists and has items
-       * - Extract first profile object from array
+       * - Check if profiles is an array and extract first item
+       * - If profiles is already an object, use it directly
        * - Set to undefined if no profile found
        * 
        * TYPE SAFETY / USALAMA WA AINA:
@@ -189,12 +196,31 @@ export const useProperties = () => {
        * - Handles edge cases where profile might not exist
        * - Maintains consistency with Property type definition
        */
-      const transformedData = (data?.map((property: Record<string, unknown>) => ({
-        ...property,
-        profiles: Array.isArray(property.profiles) && property.profiles.length > 0 
-          ? property.profiles[0] 
-          : undefined
-      })) || []) as Property[];
+      const transformedData = (data?.map((property: Record<string, unknown>) => {
+        let profileData = property.profiles;
+        
+        // Handle array response (old join syntax)
+        if (Array.isArray(profileData) && profileData.length > 0) {
+          profileData = profileData[0];
+        }
+        
+        // Handle null or empty array
+        if (!profileData || (Array.isArray(profileData) && profileData.length === 0)) {
+          profileData = undefined;
+        }
+        
+        return {
+          ...property,
+          profiles: profileData
+        };
+      }) || []) as Property[];
+
+      // Debug: Log transformed data
+      console.log('Transformed properties data:', transformedData);
+      if (transformedData.length > 0) {
+        console.log('First property after transformation:', transformedData[0]);
+        console.log('First property profiles after transformation:', transformedData[0].profiles);
+      }
 
       /**
        * SUCCESS LOGGING AND RETURN

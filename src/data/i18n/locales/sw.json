@@ -227,6 +227,12 @@
       "safetyReminder": "Kikumbusho cha Usalama",
       "neverSendMoney": "Usitume fedha kabla ya kuona nyumba mwenyewe"
     },
+    "similarProperties": {
+      "title": "Nyumba Zinazofanana",
+      "subtitle": "Unaweza pia kupendezwa na nyumba hizi",
+      "perMonth": "kwa mwezi",
+      "viewAll": "Tazama Nyumba Zote"
+    },
     "bookingSuccess": "Ombi la kuhifadhi limewasilishwa kwa mafanikio!"
   },
   "auth": {

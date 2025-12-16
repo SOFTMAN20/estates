@@ -35,6 +35,7 @@ import PropertyDescription from '@/components/properties/PropertyDetails/Propert
 import HostInformationCard from '@/components/properties/PropertyDetails/HostInformationCard';
 import PropertyLocation from '@/components/properties/PropertyDetails/PropertyLocation';
 import SafetyTips from '@/components/properties/PropertyDetails/SafetyTips';
+import SimilarProperties from '@/components/properties/PropertyDetails/SimilarProperties';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -635,6 +636,15 @@ const PropertyDetail = () => {
             <SafetyTips />
           </div>
         </div>
+
+        {/* Similar Properties Section */}
+        <SimilarProperties
+          currentPropertyId={property.id}
+          location={property.location}
+          propertyType={property.property_type}
+          price={Number(property.price)}
+          allProperties={typedProperties}
+        />
       </div>
 
       <Footer />

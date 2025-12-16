@@ -227,6 +227,12 @@
       "safetyReminder": "Safety Reminder",
       "neverSendMoney": "Never send money before viewing the property in person"
     },
+    "similarProperties": {
+      "title": "Similar Properties",
+      "subtitle": "You might also be interested in these properties",
+      "perMonth": "per month",
+      "viewAll": "View All Properties"
+    },
     "bookingSuccess": "Booking request submitted successfully!"
   },
   "auth": {

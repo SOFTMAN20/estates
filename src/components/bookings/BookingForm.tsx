@@ -75,6 +75,8 @@ export function BookingForm({
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCheckInOpen, setIsCheckInOpen] = useState(false);
+  const [isCheckOutOpen, setIsCheckOutOpen] = useState(false);
   
   // Get dynamic settings from platform settings
   const commissionRate = useCommissionRate();
@@ -112,6 +114,21 @@ export function BookingForm({
     // If check-out is before new check-in, reset check-out
     if (date && checkOut && isBefore(checkOut, date)) {
       setCheckOut(undefined);
+    }
+    
+    // Close the popover after selection
+    if (date) {
+      setIsCheckInOpen(false);
+    }
+  };
+
+  // Handle check-out date selection
+  const handleCheckOutSelect = (date: Date | undefined) => {
+    setCheckOut(date);
+    
+    // Close the popover after selection
+    if (date) {
+      setIsCheckOutOpen(false);
     }
   };
 
@@ -188,7 +205,7 @@ export function BookingForm({
             <label className="text-xs font-medium text-gray-600 mb-2 block">
               {i18n.language === 'en' ? 'Check-in Date' : 'Tarehe ya Kuingia'}
             </label>
-            <Popover>
+            <Popover open={isCheckInOpen} onOpenChange={setIsCheckInOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="ghost"
@@ -222,7 +239,7 @@ export function BookingForm({
             <label className="text-xs font-medium text-gray-600 mb-2 block">
               {i18n.language === 'en' ? 'Check-out Date' : 'Tarehe ya Kutoka'}
             </label>
-            <Popover>
+            <Popover open={isCheckOutOpen} onOpenChange={setIsCheckOutOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="ghost"
@@ -244,7 +261,7 @@ export function BookingForm({
                 <Calendar
                   mode="single"
                   selected={checkOut}
-                  onSelect={setCheckOut}
+                  onSelect={handleCheckOutSelect}
                   disabled={(date) => isBefore(date, minCheckOutDate)}
                   initialFocus
                 />

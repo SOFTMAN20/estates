@@ -44,6 +44,7 @@ import MobileMenu from '@/components/layout/navbarLayout/MobileMenu';
 import ModeToggle from '@/components/layout/navbarLayout/ModeToggle';
 import LanguageToggle from '@/components/layout/navbarLayout/LanguageToggle';
 import NavbarSearchBar from '@/components/layout/navbarLayout/NavbarSearchBar';
+import { NotificationBell } from '@/components/Notifications/NotificationBell';
 
 import { supabase } from '@/lib/integrations/supabase/client';
 import type { Tables } from '@/lib/integrations/supabase/types';
@@ -143,6 +144,13 @@ const Navigation = () => {
 
         {/* RIGHT: Actions */}
         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+
+          {/* Notification Bell - Only for logged in users */}
+          {user && (
+            <div className="hidden sm:block">
+              <NotificationBell />
+            </div>
+          )}
 
           {/* Mode Toggle - Hidden on small mobile */}
           {user && (

@@ -58,6 +58,7 @@ import { createOptimizedQueryClient } from "@/utils/cache";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ModeProvider } from "@/contexts/ModeContext";
+import { ToastProvider } from "@/contexts/ToastContext";
 import ErrorBoundary from "@/components/ui/error-boundary";
 import { lazy, Suspense } from "react";
 import MobileBottomNav from "./components/layout/navbarLayout/MobileBottomNav";
@@ -84,6 +85,14 @@ const ColorPalette = lazy(() => import("./components/common/ColorPalette"));
 const Typography = lazy(() => import("./components/common/Typography"));
 const LoadingStates = lazy(() => import("./components/common/LoadingStates"));
 const ComponentLibrary = lazy(() => import("./components/ui/ComponentLibrary"));
+
+// Notification pages
+const Notifications = lazy(() => import("./pages/Notifications"));
+const NotificationSettings = lazy(() => import("./pages/NotificationSettings"));
+
+// Review pages
+const MyReviews = lazy(() => import("./pages/MyReviews"));
+const HostReviews = lazy(() => import("./pages/host/Reviews"));
 
 // Admin pages
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
@@ -139,10 +148,11 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ModeProvider>
-          <TooltipProvider>
-            {/* Notification systems - Mifumo ya arifa */}
-            <Toaster />
-            <Sonner />
+          <ToastProvider>
+            <TooltipProvider>
+              {/* Notification systems - Mifumo ya arifa */}
+              <Toaster />
+              <Sonner />
 
           {/* Main routing configuration - Mipangilio ya uongozaji */}
           <BrowserRouter
@@ -179,6 +189,10 @@ const App = () => (
                 <Route path="/bookings/:id" element={<BookingDetail />} />
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/property-example" element={<PropertyExample />} />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/settings/notifications" element={<NotificationSettings />} />
+                <Route path="/reviews" element={<MyReviews />} />
+                <Route path="/host/reviews" element={<HostReviews />} />
 
                 {/* Authentication routes - Njia za uthibitisho */}
                 <Route path="/signin" element={<SignIn />} />
@@ -208,7 +222,8 @@ const App = () => (
 
           {/* Performance Dashboard - Development only */}
           <PerformanceDashboard />
-          </TooltipProvider>
+            </TooltipProvider>
+          </ToastProvider>
         </ModeProvider>
       </AuthProvider>
     </QueryClientProvider>

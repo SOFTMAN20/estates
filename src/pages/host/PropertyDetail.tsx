@@ -57,6 +57,9 @@ import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { useCreateBooking } from '@/hooks/useBookings';
 import { format } from 'date-fns';
+import { useReviews } from '@/hooks/useReviews';
+import { RatingSummary } from '@/components/reviews/RatingSummary';
+import { ReviewList } from '@/components/reviews/ReviewList';
 
 /**
  * PROPERTY DETAIL COMPONENT
@@ -88,6 +91,9 @@ const PropertyDetail = () => {
 
   // Booking mutation
   const createBookingMutation = useCreateBooking();
+
+  // Reviews data
+  const { reviews, statistics, isLoading: reviewsLoading } = useReviews(id);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -708,6 +714,27 @@ const PropertyDetail = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Reviews Section */}
+            {!reviewsLoading && statistics && statistics.total_reviews > 0 && (
+              <Card>
+                <CardContent className="p-4 sm:p-6">
+                  <div className="space-y-6">
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      Guest Reviews
+                    </h2>
+                    
+                    {/* Rating Summary */}
+                    <RatingSummary statistics={statistics} />
+                    
+                    <Separator />
+                    
+                    {/* Review List */}
+                    <ReviewList reviews={reviews} />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar Section - Sehemu ya upande */}

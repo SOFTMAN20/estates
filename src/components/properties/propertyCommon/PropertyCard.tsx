@@ -40,7 +40,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Heart, MapPin, Zap, Droplets, Bed, Eye } from 'lucide-react';
+import { Heart, MapPin, Zap, Droplets, Bed, Eye, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ReliableImage from '@/components/common/ReliableImage';
@@ -82,6 +82,8 @@ interface PropertyCardProps {
   electricity?: boolean;
   water?: boolean;
   bedrooms?: number;
+  averageRating?: number;
+  totalReviews?: number;
   isFavorited?: boolean;
   onToggleFavorite?: (id: string) => void;
   viewMode?: 'grid' | 'list';
@@ -121,6 +123,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   electricity,
   water,
   bedrooms,
+  averageRating,
+  totalReviews,
   isFavorited = false,
   onToggleFavorite,
   viewMode = 'grid'
@@ -246,8 +250,15 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                   </div>
                 </div>
 
-                {/* RATING AND CONTACT SECTION */}
+                {/* RATING AND AMENITIES SECTION */}
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                  {averageRating && totalReviews && totalReviews > 0 && (
+                    <div className="flex items-center text-yellow-600 group-hover:text-yellow-700 transition-colors duration-300">
+                      <Star className="h-3 w-3 sm:h-4 sm:w-4 mr-1 fill-current" />
+                      <span className="text-xs sm:text-sm font-semibold">{averageRating.toFixed(1)}</span>
+                      <span className="text-xs sm:text-sm text-gray-500 ml-1">({totalReviews})</span>
+                    </div>
+                  )}
                   {electricity && (
                     <div className="flex items-center text-green-600 group-hover:text-green-700 transition-colors duration-300" title="Umeme">
                       <Zap className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
@@ -379,8 +390,16 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               </div>
             </div>
 
-            {/* AMENITIES DISPLAY */}
+            {/* RATING AND AMENITIES DISPLAY */}
             <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+              {averageRating && totalReviews && totalReviews > 0 && (
+                <Badge variant="secondary" className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-yellow-50 text-yellow-800 
+                                                     border border-yellow-200 group-hover:bg-yellow-100 transition-colors duration-300">
+                  <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1 fill-current" />
+                  <span className="font-semibold">{averageRating.toFixed(1)}</span>
+                  <span className="ml-0.5 text-gray-600">({totalReviews})</span>
+                </Badge>
+              )}
               {electricity && (
                 <Badge variant="secondary" className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-green-100 text-green-800 
                                                      border border-green-200 group-hover:bg-green-200 transition-colors duration-300">

@@ -251,6 +251,18 @@ export function BookingCard({
 
                 {canReview && onLeaveReview && (
                   <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => onLeaveReview(booking.id)}
+                    className="flex-1 sm:flex-none bg-primary hover:bg-primary/90"
+                  >
+                    <Star className="h-4 w-4 mr-2" />
+                    {i18n.language === 'en' ? 'Leave Review' : 'Acha Maoni'}
+                  </Button>
+                )}
+
+                {canReview && onLeaveReview && (
+                  <Button
                     variant="outline"
                     size="sm"
                     onClick={() => onLeaveReview(booking.id)}

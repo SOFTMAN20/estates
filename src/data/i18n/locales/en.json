@@ -1,9 +1,9 @@
 {
   "navigation": {
     "home": "Home",
-    "browse": "Browse Properties",
-    "about": "About Us",
-    "dashboard": "Host Dashboard",
+    "browse": "Properties",
+    "about": "About",
+    "dashboard": "Host",
     "signIn": "Sign In",
     "signUp": "Sign Up",
     "signOut": "Sign Out",

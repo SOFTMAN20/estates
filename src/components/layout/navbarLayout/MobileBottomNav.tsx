@@ -17,7 +17,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Search, Heart, User, Building2 } from 'lucide-react';
+import { Home, Search, Heart, User, PlusCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 interface NavItem {
@@ -99,8 +99,8 @@ const MobileBottomNav = () => {
     },
     {
       id: 'dashboard',
-      icon: <Building2 className="h-5 w-5" />,
-      label: user ? 'Dashboard' : 'Dashboard',
+      icon: <PlusCircle className="h-5 w-5" />,
+      label: user ? 'Host' : 'Host',
       path: user ? '/dashboard' : '/signin'
     },
     {

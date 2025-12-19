@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, MapPin, Wifi, Car, Utensils, Zap, Eye } from 'lucide-react';
+import { Star, MapPin, Bed, Bath, Maximize2, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProperties, type Property } from '@/hooks/useProperties';
 import LoadingSpinner from '@/components/ui/loading-spinner';
@@ -45,11 +45,11 @@ const FeaturedPropertyCard = ({ property, index, t }: FeaturedPropertyCardProps)
 
   return (
     <Card key={property.id} className="group overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 
-                       bg-white hover:border-primary/30 relative before:absolute before:inset-0 before:bg-gradient-to-r before:from-primary/5 before:to-serengeti-500/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300">
+                       bg-white hover:border-primary/30 relative before:absolute before:inset-0 before:bg-gradient-to-r before:from-primary/5 before:to-serengeti-500/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 rounded-xl">
       <Link to={`/property/${property.id}`} className="block">
         <div className="relative">
           <div
-            className="relative overflow-hidden"
+            className="relative overflow-hidden rounded-t-xl"
             onTouchStart={handleMobileTouch}
             onClick={handleMobileTouch}
           >
@@ -86,62 +86,51 @@ const FeaturedPropertyCard = ({ property, index, t }: FeaturedPropertyCardProps)
         </div>
 
         <CardContent className="p-2 sm:p-4">
-          <div className="mb-1 sm:mb-2">
-            <h3 className="font-semibold text-sm sm:text-base text-gray-900 mb-0.5 sm:mb-1 line-clamp-1">
+          <div className="space-y-1.5 sm:space-y-2">
+            {/* TITLE */}
+            <h3 className="font-semibold text-sm sm:text-base text-gray-900 line-clamp-1">
               {property.title}
             </h3>
-            <div className="flex items-center text-muted-foreground text-xs sm:text-sm mb-1 sm:mb-2">
-              <MapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
+            
+            {/* LOCATION */}
+            <div className="flex items-center text-muted-foreground text-xs sm:text-sm">
+              <MapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1 flex-shrink-0" />
               <span className="line-clamp-1">{property.location}</span>
             </div>
-          </div>
 
-          <div className="flex items-center gap-1 mb-2 sm:mb-3">
-            {property.amenities?.includes('electricity') && (
-              <Badge variant="secondary" className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-green-100 text-green-800 
-                                                   border border-green-200 hover:bg-green-200 transition-colors duration-300">
-                <Zap className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
-                <span className="hidden sm:inline">Umeme</span>
-                <span className="sm:hidden">⚡</span>
-              </Badge>
+            {/* AMENITIES */}
+            {(property.bedrooms || property.bathrooms || property.square_meters) && (
+              <div className="flex items-center gap-2 sm:gap-3 text-gray-600">
+                {property.bedrooms && (
+                  <div className="flex items-center gap-0.5 sm:gap-1">
+                    <Bed className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                    <span className="text-xs sm:text-sm font-medium">{property.bedrooms}</span>
+                  </div>
+                )}
+                {property.bathrooms && (
+                  <div className="flex items-center gap-0.5 sm:gap-1">
+                    <Bath className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                    <span className="text-xs sm:text-sm font-medium">{property.bathrooms}</span>
+                  </div>
+                )}
+                {property.square_meters && (
+                  <div className="flex items-center gap-0.5 sm:gap-1">
+                    <Maximize2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                    <span className="text-xs sm:text-sm font-medium">{property.square_meters}m²</span>
+                  </div>
+                )}
+              </div>
             )}
-            {property.amenities?.includes('water') && (
-              <Badge variant="secondary" className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-blue-100 text-blue-800 
-                                                   border border-blue-200 hover:bg-blue-200 transition-colors duration-300">
-                <span className="mr-0.5 sm:mr-1">💧</span>
-                <span className="hidden sm:inline">Maji</span>
-              </Badge>
-            )}
-            {property.amenities?.includes('parking') && (
-              <Badge variant="secondary" className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-100 text-gray-800 
-                                                   border border-gray-200 hover:bg-gray-200 transition-colors duration-300">
-                <Car className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
-                <span className="hidden sm:inline">Parking</span>
-                <span className="sm:hidden">🚗</span>
-              </Badge>
-            )}
-          </div>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="text-sm sm:text-base font-bold text-gray-900">
-                TZS {Number(property.price).toLocaleString()}
-              </span>
-              <span className="text-gray-500 text-xs sm:text-sm ml-1">/month</span>
+            {/* PRICE */}
+            <div className="pt-0.5 sm:pt-1">
+              <div className="flex items-baseline flex-nowrap whitespace-nowrap">
+                <span className="text-sm sm:text-base font-bold text-gray-900">
+                  TZS {Number(property.price).toLocaleString()}
+                </span>
+                <span className="text-gray-500 text-xs sm:text-sm ml-1">/month</span>
+              </div>
             </div>
-
-            {property.profiles?.phone && (
-              <a
-                href={`https://wa.me/${(property.contact_whatsapp_phone || property.contact_phone || property.profiles.phone)!.replace(/[^0-9]/g, '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="flex items-center bg-green-500 hover:bg-green-600 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs transition-colors"
-              >
-                <span className="mr-0.5 sm:mr-1">📱</span>
-                <span className="hidden sm:inline">{t('featuredProperties.call')}</span>
-              </a>
-            )}
           </div>
         </CardContent>
       </Link>
@@ -158,15 +147,6 @@ const FeaturedProperties = () => {
   const propertyLimit = isMobile ? 8 : 16;
   const typedProperties = allProperties as Property[];
   const properties = typedProperties.slice(0, propertyLimit);
-
-  const getAmenityIcon = (amenity: string) => {
-    switch (amenity) {
-      case 'Zap': return <Zap className="h-3 w-3" />;
-      case 'Parking': return <Car className="h-3 w-3" />;
-      case 'Kitchen': return <Utensils className="h-3 w-3" />;
-      default: return null;
-    }
-  };
 
   if (isLoading) {
     return (

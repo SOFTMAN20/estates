@@ -235,7 +235,7 @@ const Browse = () => {
       {/* Results Section */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Results Header */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-2 sm:gap-4">
+        <div className="flex justify-between items-center mb-4 sm:mb-6 gap-2">
           <div>
             <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900">
               Available Properties
@@ -253,12 +253,14 @@ const Browse = () => {
           <Button
             variant="outline"
             onClick={() => updateUIState('showFilters', !uiState.showFilters)}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 flex-shrink-0"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
-            {uiState.showFilters ? 'Hide Filters' : 'Show Filters'}
+            <span className="hidden sm:inline">
+              {uiState.showFilters ? 'Hide Filters' : 'Show Filters'}
+            </span>
           </Button>
         </div>
 
@@ -386,6 +388,10 @@ const Browse = () => {
                   electricity={property.amenities?.includes('electricity') || false}
                   water={property.amenities?.includes('water') || false}
                   bedrooms={property.bedrooms || undefined}
+                  bathrooms={property.bathrooms || undefined}
+                  squareMeters={property.square_meters || undefined}
+                  averageRating={property.average_rating || 0}
+                  totalReviews={property.total_reviews || 0}
                   isFavorited={isFavorited(property.id)}
                   onToggleFavorite={toggleFavorite}
                   viewMode={uiState.viewMode}

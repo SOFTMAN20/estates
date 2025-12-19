@@ -27,7 +27,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, Search, User, X, Globe, Building2, LogOut, Bell } from 'lucide-react';
+import { Home, Search, User, X, Globe, Building2, LogOut, Bell, PlusCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ModeToggle from '@/components/layout/navbarLayout/ModeToggle';
 import type { Tables } from '@/lib/integrations/supabase/types';
@@ -178,7 +178,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                   onClick={handleLinkClick}
                 >
                   <div className="flex items-center">
-                    <User className="h-5 w-5 mr-3 text-gray-400" />
+                    <PlusCircle className="h-5 w-5 mr-3 text-gray-400" />
                     {t('navigation.dashboard')}
                   </div>
                 </Link>
@@ -205,9 +205,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
               {user && (
                 <div className="border-t border-gray-200 pt-4 mt-4">
                   <p className="text-sm font-medium text-gray-600 mb-2 px-4">Switch Mode</p>
-                  <div className="px-4">
-                    <ModeToggle />
-                  </div>
+                  <ModeToggle />
                 </div>
               )}
 

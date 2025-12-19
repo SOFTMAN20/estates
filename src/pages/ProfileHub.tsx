@@ -52,7 +52,7 @@ export default function ProfileHub() {
   
   const { profile, fetchProfile } = useProfileData();
   const { notifications, unreadCount } = useNotifications();
-  const { getFavoritesCount, favorites, loading: favoritesLoading } = useFavorites();
+  const { getFavoritesCount, favorites, loading: favoritesLoading, toggleFavorite } = useFavorites();
   const { data: bookings = [], isLoading: bookingsLoading } = useBookings({ guest_id: user?.id });
   const { data: properties = [], isLoading: propertiesLoading } = useProperties();
   const { currentMode } = useModeToggle();
@@ -62,7 +62,8 @@ export default function ProfileHub() {
     if (user) {
       fetchProfile(user);
     }
-  }, [fetchProfile, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   // Get recent items (limit to 3 for preview)
   const recentNotifications = notifications.slice(0, 3);
@@ -501,10 +502,10 @@ export default function ProfileHub() {
                     location={property.location}
                     images={property.images || []}
                     bedrooms={property.bedrooms}
-                    electricity={property.amenities?.includes('electricity')}
-                    water={property.amenities?.includes('water')}
-                    averageRating={property.average_rating || 0}
-                    totalReviews={property.total_reviews || 0}
+                    bathrooms={property.bathrooms}
+                    squareMeters={property.square_meters}
+                    isFavorited={true}
+                    onToggleFavorite={toggleFavorite}
                   />
                 ))}
               </div>

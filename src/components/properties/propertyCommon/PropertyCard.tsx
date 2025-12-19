@@ -40,7 +40,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Heart, MapPin, Zap, Droplets, Bed, Eye, Star } from 'lucide-react';
+import { Heart, MapPin, Bed, Bath, Maximize2, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ReliableImage from '@/components/common/ReliableImage';
@@ -76,14 +76,9 @@ interface PropertyCardProps {
   price: number;
   location: string;
   images: string[];
-  phone?: string;
-  contactPhone?: string;
-  contactWhatsappPhone?: string;
-  electricity?: boolean;
-  water?: boolean;
   bedrooms?: number;
-  averageRating?: number;
-  totalReviews?: number;
+  bathrooms?: number;
+  squareMeters?: number;
   isFavorited?: boolean;
   onToggleFavorite?: (id: string) => void;
   viewMode?: 'grid' | 'list';
@@ -117,14 +112,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   price,
   location,
   images,
-  phone,
-  contactPhone,
-  contactWhatsappPhone,
-  electricity,
-  water,
   bedrooms,
-  averageRating,
-  totalReviews,
+  bathrooms,
+  squareMeters,
   isFavorited = false,
   onToggleFavorite,
   viewMode = 'grid'
@@ -192,12 +182,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
    */
   if (viewMode === 'list') {
     return (
-      <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border-0 shadow-lg bg-white">
+      <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border-0 shadow-lg bg-white rounded-xl">
         <Link to={`/property/${id}`} className="block touch-manipulation">
           <div className="flex flex-col sm:flex-row">
             {/* LIST VIEW IMAGE SECTION */}
             <div 
-              className="w-full sm:w-80 h-48 sm:h-60 flex-shrink-0 relative overflow-hidden"
+              className="w-full sm:w-80 h-48 sm:h-60 flex-shrink-0 relative overflow-hidden sm:rounded-l-xl"
             >
               <ReliableImage
                 src={images[0] || `https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop`}
@@ -250,36 +240,29 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                   </div>
                 </div>
 
-                {/* RATING AND AMENITIES SECTION */}
-                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                  {averageRating && totalReviews && totalReviews > 0 && (
-                    <div className="flex items-center text-yellow-600 group-hover:text-yellow-700 transition-colors duration-300">
-                      <Star className="h-3 w-3 sm:h-4 sm:w-4 mr-1 fill-current" />
-                      <span className="text-xs sm:text-sm font-semibold">{averageRating.toFixed(1)}</span>
-                      <span className="text-xs sm:text-sm text-gray-500 ml-1">({totalReviews})</span>
-                    </div>
-                  )}
-                  {electricity && (
-                    <div className="flex items-center text-green-600 group-hover:text-green-700 transition-colors duration-300" title="Umeme">
-                      <Zap className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                      <span className="text-xs sm:text-sm font-medium">{t('propertyCard.electricity')}</span>
-                    </div>
-                  )}
-                  {water && (
-                    <div className="flex items-center text-blue-600 group-hover:text-blue-700 transition-colors duration-300" title="Maji">
-                      <Droplets className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                      <span className="text-xs sm:text-sm font-medium">{t('propertyCard.water')}</span>
-                    </div>
-                  )}
-                  {bedrooms && bedrooms > 0 && (
-                    <div className="flex items-center text-gray-600 group-hover:text-gray-700 transition-colors duration-300" title="Vyumba vya kulala">
-                      <Bed className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                      <span className="text-xs sm:text-sm">{bedrooms} {t('propertyCard.bedrooms')}</span>
-                    </div>
-                  )}
-                </div>
-
-
+                {/* AMENITIES SECTION - LIST VIEW */}
+                {(bedrooms || bathrooms || squareMeters) && (
+                  <div className="flex items-center gap-3 sm:gap-4 text-gray-600">
+                    {bedrooms && (
+                      <div className="flex items-center gap-1.5">
+                        <Bed className="h-4 w-4 sm:h-5 sm:w-5" />
+                        <span className="text-sm sm:text-base font-medium">{bedrooms}</span>
+                      </div>
+                    )}
+                    {bathrooms && (
+                      <div className="flex items-center gap-1.5">
+                        <Bath className="h-4 w-4 sm:h-5 sm:w-5" />
+                        <span className="text-sm sm:text-base font-medium">{bathrooms}</span>
+                      </div>
+                    )}
+                    {squareMeters && (
+                      <div className="flex items-center gap-1.5">
+                        <Maximize2 className="h-4 w-4 sm:h-5 sm:w-5" />
+                        <span className="text-sm sm:text-base font-medium">{squareMeters}m²</span>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                
               </div>
@@ -311,12 +294,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
    */
   return (
     <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 
-                     border-0 shadow-lg bg-white hover:border-primary/20">
+                     border-0 shadow-lg bg-white hover:border-primary/20 rounded-xl">
       <Link to={`/property/${id}`} className="block touch-manipulation">
         <div className="relative">
           {/* GRID VIEW IMAGE SECTION */}
           <div 
-            className="aspect-[4/3] overflow-hidden relative"
+            className="aspect-[4/3] overflow-hidden relative rounded-t-xl"
           >
             <ReliableImage
               src={images[currentImageIndex] || `https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop`}
@@ -390,48 +373,37 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               </div>
             </div>
 
-            {/* RATING AND AMENITIES DISPLAY */}
-            <div className="flex flex-wrap items-center gap-1 sm:gap-2">
-              {averageRating && totalReviews && totalReviews > 0 && (
-                <Badge variant="secondary" className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-yellow-50 text-yellow-800 
-                                                     border border-yellow-200 group-hover:bg-yellow-100 transition-colors duration-300">
-                  <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1 fill-current" />
-                  <span className="font-semibold">{averageRating.toFixed(1)}</span>
-                  <span className="ml-0.5 text-gray-600">({totalReviews})</span>
-                </Badge>
-              )}
-              {electricity && (
-                <Badge variant="secondary" className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-green-100 text-green-800 
-                                                     border border-green-200 group-hover:bg-green-200 transition-colors duration-300">
-                  <Zap className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
-                  <span className="hidden sm:inline">{t('browse.electricity')}</span>
-                  <span className="sm:hidden">⚡</span>
-                </Badge>
-              )}
-              {water && (
-                <Badge variant="secondary" className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-blue-100 text-blue-800 
-                                                     border border-blue-200 group-hover:bg-blue-200 transition-colors duration-300">
-                  <Droplets className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
-                  <span className="hidden sm:inline">{t('browse.water')}</span>
-                  <span className="sm:hidden">💧</span>
-                </Badge>
-              )}
-              {bedrooms && bedrooms > 0 && (
-                <Badge variant="secondary" className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-100 text-gray-800 
-                                                     border border-gray-200 group-hover:bg-gray-200 transition-colors duration-300">
-                  <Bed className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
-                  <span>{bedrooms}</span>
-                </Badge>
-              )}
-            </div>
+            {/* AMENITIES SECTION - GRID VIEW */}
+            {(bedrooms || bathrooms || squareMeters) && (
+              <div className="flex items-center gap-2 sm:gap-3 text-gray-600">
+                {bedrooms && (
+                  <div className="flex items-center gap-1">
+                    <Bed className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span className="text-xs sm:text-sm font-medium">{bedrooms}</span>
+                  </div>
+                )}
+                {bathrooms && (
+                  <div className="flex items-center gap-1">
+                    <Bath className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span className="text-xs sm:text-sm font-medium">{bathrooms}</span>
+                  </div>
+                )}
+                {squareMeters && (
+                  <div className="flex items-center gap-1">
+                    <Maximize2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span className="text-xs sm:text-sm font-medium">{squareMeters}m²</span>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* PRICE SECTION */}
             <div className="pt-1">
-              <div className="flex items-baseline">
-                <span className="text-base font-bold text-gray-900 group-hover:text-primary transition-colors duration-300">
+              <div className="flex items-baseline flex-nowrap whitespace-nowrap">
+                <span className="text-sm sm:text-base font-bold text-gray-900 group-hover:text-primary transition-colors duration-300">
                   TZS {price.toLocaleString()}
                 </span>
-                <span className="text-gray-500 ml-1 text-sm group-hover:text-gray-600 transition-colors duration-300">
+                <span className="text-gray-500 ml-1 text-xs sm:text-sm group-hover:text-gray-600 transition-colors duration-300">
                   {t('propertyCard.perMonth')}
                 </span>
               </div>

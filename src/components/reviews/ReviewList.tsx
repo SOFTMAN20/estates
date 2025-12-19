@@ -56,43 +56,53 @@ export function ReviewList({ reviews, isHostView = false, showPropertyInfo = fal
   return (
     <div className="space-y-6">
       {/* Filters and Sort */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-gray-500" />
-          <Select value={filterRating} onValueChange={setFilterRating}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by rating" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Ratings</SelectItem>
-              <SelectItem value="5">5 Stars Only</SelectItem>
-              <SelectItem value="4">4 Stars Only</SelectItem>
-              <SelectItem value="3">3 Stars Only</SelectItem>
-              <SelectItem value="2">2 Stars Only</SelectItem>
-              <SelectItem value="1">1 Star Only</SelectItem>
-            </SelectContent>
-          </Select>
+      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="flex items-center gap-2 text-gray-700">
+              <Filter className="w-4 h-4" />
+              <span className="text-sm font-medium">Filter:</span>
+            </div>
+            <Select value={filterRating} onValueChange={setFilterRating}>
+              <SelectTrigger className="w-full sm:w-[180px] bg-white">
+                <SelectValue placeholder="Filter by rating" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">⭐ All Ratings</SelectItem>
+                <SelectItem value="5">⭐⭐⭐⭐⭐ 5 Stars</SelectItem>
+                <SelectItem value="4">⭐⭐⭐⭐ 4 Stars</SelectItem>
+                <SelectItem value="3">⭐⭐⭐ 3 Stars</SelectItem>
+                <SelectItem value="2">⭐⭐ 2 Stars</SelectItem>
+                <SelectItem value="1">⭐ 1 Star</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="flex items-center gap-2 text-gray-700">
+              <SortAsc className="w-4 h-4" />
+              <span className="text-sm font-medium">Sort:</span>
+            </div>
+            <Select value={sortBy} onValueChange={(value) => setSortBy(value as ReviewSortOption)}>
+              <SelectTrigger className="w-full sm:w-[180px] bg-white">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="recent">🕒 Most Recent</SelectItem>
+                <SelectItem value="highest">📈 Highest Rating</SelectItem>
+                <SelectItem value="lowest">📉 Lowest Rating</SelectItem>
+                <SelectItem value="helpful">👍 Most Helpful</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <SortAsc className="w-4 h-4 text-gray-500" />
-          <Select value={sortBy} onValueChange={(value) => setSortBy(value as ReviewSortOption)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="recent">Most Recent</SelectItem>
-              <SelectItem value="highest">Highest Rating</SelectItem>
-              <SelectItem value="lowest">Lowest Rating</SelectItem>
-              <SelectItem value="helpful">Most Helpful</SelectItem>
-            </SelectContent>
-          </Select>
+        {/* Review Count */}
+        <div className="mt-3 pt-3 border-t border-gray-200">
+          <p className="text-sm font-medium text-gray-700">
+            Showing <span className="text-primary font-bold">{displayedReviews.length}</span> of <span className="font-bold">{filteredReviews.length}</span> review{filteredReviews.length !== 1 ? 's' : ''}
+          </p>
         </div>
-      </div>
-
-      {/* Review Count */}
-      <div className="text-sm text-gray-600">
-        Showing {displayedReviews.length} of {filteredReviews.length} review{filteredReviews.length !== 1 ? 's' : ''}
       </div>
 
       {/* Reviews */}

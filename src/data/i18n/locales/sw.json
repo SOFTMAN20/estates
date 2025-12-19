@@ -233,6 +233,11 @@
       "perMonth": "kwa mwezi",
       "viewAll": "Tazama Nyumba Zote"
     },
+    "reviews": {
+      "title": "Maoni ya Wageni",
+      "noReviews": "Hakuna maoni bado",
+      "beFirst": "Kuwa wa kwanza kutoa maoni baada ya kuhifadhi!"
+    },
     "bookingSuccess": "Ombi la kuhifadhi limewasilishwa kwa mafanikio!"
   },
   "auth": {

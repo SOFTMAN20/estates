@@ -39,7 +39,7 @@ export function ReviewCard({ review, showPropertyInfo = false, isHostView = fals
   const hasCategories = review.cleanliness || review.communication || review.value || review.location_rating;
 
   return (
-    <div className="border-b border-gray-200 py-6 last:border-0">
+    <div className="border-b border-gray-200 py-6 last:border-0 hover:bg-gray-50/50 transition-colors rounded-lg px-2">
       <div className="flex items-start gap-4">
         {/* User Avatar */}
         <div className="flex-shrink-0">
@@ -47,11 +47,11 @@ export function ReviewCard({ review, showPropertyInfo = false, isHostView = fals
             <img
               src={review.user.avatar_url}
               alt={review.user?.name || 'User'}
-              className="w-12 h-12 rounded-full object-cover"
+              className="w-14 h-14 rounded-full object-cover border-2 border-gray-100 shadow-sm"
             />
           ) : (
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <User className="w-6 h-6 text-primary" />
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center border-2 border-primary/20 shadow-sm">
+              <User className="w-7 h-7 text-primary" />
             </div>
           )}
         </div>
@@ -59,24 +59,28 @@ export function ReviewCard({ review, showPropertyInfo = false, isHostView = fals
         {/* Review Content */}
         <div className="flex-1 min-w-0">
           {/* Header */}
-          <div className="flex items-start justify-between gap-4 mb-2">
+          <div className="flex items-start justify-between gap-4 mb-3">
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <h4 className="font-semibold text-gray-900">{review.user?.name || 'Anonymous'}</h4>
-                <Badge variant="secondary" className="text-xs">
-                  Verified Guest
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <h4 className="font-bold text-gray-900 text-lg">{review.user?.name || 'Anonymous'}</h4>
+                <Badge variant="secondary" className="text-xs bg-green-100 text-green-800 border-green-200">
+                  ✓ Verified Guest
                 </Badge>
               </div>
               {review.booking && (
-                <p className="text-sm text-gray-500">
-                  Stayed {new Date(review.booking.check_in).toLocaleDateString()} - {new Date(review.booking.check_out).toLocaleDateString()}
+                <p className="text-sm text-gray-600 flex items-center gap-1">
+                  <span className="font-medium">Stayed:</span>
+                  {new Date(review.booking.check_in).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} - {new Date(review.booking.check_out).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
               )}
-              <p className="text-sm text-gray-500">
+              <p className="text-xs text-gray-500 mt-1">
                 {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
               </p>
             </div>
-            <RatingStars value={review.rating} size="md" showValue />
+            <div className="flex flex-col items-end gap-1">
+              <RatingStars value={review.rating} size="md" showValue />
+              <span className="text-xs text-gray-500 font-medium">Overall Rating</span>
+            </div>
           </div>
 
           {/* Property Info (for My Reviews page) */}
@@ -97,38 +101,74 @@ export function ReviewCard({ review, showPropertyInfo = false, isHostView = fals
 
           {/* Category Ratings */}
           {hasCategories && (
-            <div className="mb-3">
+            <div className="mb-4">
               <button
                 onClick={() => setShowCategories(!showCategories)}
-                className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors mb-3"
               >
                 {showCategories ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                Category Ratings
+                Detailed Ratings
               </button>
               {showCategories && (
-                <div className="grid grid-cols-2 gap-3 mt-2 pl-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-gray-50 rounded-lg border border-gray-100">
                   {review.cleanliness && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Cleanliness</span>
-                      <RatingStars value={review.cleanliness} size="sm" />
+                    <div className="flex items-center justify-between p-2 bg-white rounded-md">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">✨</span>
+                        <span className="text-sm font-medium text-gray-700">Cleanliness</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <RatingStars value={review.cleanliness} size="sm" />
+                        <span className="text-sm font-bold text-gray-900 ml-1">{review.cleanliness.toFixed(1)}</span>
+                      </div>
+                    </div>
+                  )}
+                  {review.accuracy && (
+                    <div className="flex items-center justify-between p-2 bg-white rounded-md">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">✓</span>
+                        <span className="text-sm font-medium text-gray-700">Accuracy</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <RatingStars value={review.accuracy} size="sm" />
+                        <span className="text-sm font-bold text-gray-900 ml-1">{review.accuracy.toFixed(1)}</span>
+                      </div>
                     </div>
                   )}
                   {review.communication && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Communication</span>
-                      <RatingStars value={review.communication} size="sm" />
-                    </div>
-                  )}
-                  {review.value && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Value</span>
-                      <RatingStars value={review.value} size="sm" />
+                    <div className="flex items-center justify-between p-2 bg-white rounded-md">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">💬</span>
+                        <span className="text-sm font-medium text-gray-700">Communication</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <RatingStars value={review.communication} size="sm" />
+                        <span className="text-sm font-bold text-gray-900 ml-1">{review.communication.toFixed(1)}</span>
+                      </div>
                     </div>
                   )}
                   {review.location_rating && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Location</span>
-                      <RatingStars value={review.location_rating} size="sm" />
+                    <div className="flex items-center justify-between p-2 bg-white rounded-md">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">📍</span>
+                        <span className="text-sm font-medium text-gray-700">Location</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <RatingStars value={review.location_rating} size="sm" />
+                        <span className="text-sm font-bold text-gray-900 ml-1">{review.location_rating.toFixed(1)}</span>
+                      </div>
+                    </div>
+                  )}
+                  {review.value && (
+                    <div className="flex items-center justify-between p-2 bg-white rounded-md">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">💰</span>
+                        <span className="text-sm font-medium text-gray-700">Value</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <RatingStars value={review.value} size="sm" />
+                        <span className="text-sm font-bold text-gray-900 ml-1">{review.value.toFixed(1)}</span>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -137,7 +177,9 @@ export function ReviewCard({ review, showPropertyInfo = false, isHostView = fals
           )}
 
           {/* Review Text */}
-          <p className="text-gray-700 leading-relaxed mb-3">{review.comment}</p>
+          <div className="bg-white p-4 rounded-lg border border-gray-100 mb-3">
+            <p className="text-gray-800 leading-relaxed text-base">{review.comment}</p>
+          </div>
 
           {/* Review Images */}
           {review.images && review.images.length > 0 && (

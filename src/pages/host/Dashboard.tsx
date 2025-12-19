@@ -29,7 +29,7 @@
  * - Clearer separation of concerns (Mgawanyiko wazi wa majukumu)
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Navigation from '@/components/layout/navbarLayout/Navigation';
 import QuickActions from '@/components/host/dashboard/dashboardCommon/QuickActions';
 import StatsSection from '@/components/host/dashboard/dashboardCommon/StatsSection';
@@ -41,7 +41,7 @@ import GetHelpSection from '@/components/host/dashboard/dashboardCommon/GetHelpS
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 // Import custom dashboard hooks
 import {
@@ -66,6 +66,8 @@ const Dashboard = () => {
   const { toast } = useToast();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
+  const hasOpenedFormRef = useRef(false);
   
   // UI State Management Hook
   const {
@@ -163,6 +165,16 @@ const Dashboard = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  // Check if we should open the add property form from navigation state
+  useEffect(() => {
+    if (location.state?.openAddForm && !hasOpenedFormRef.current) {
+      hasOpenedFormRef.current = true;
+      openAddForm();
+      // Clear the state to prevent reopening on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, openAddForm]);
 
   /**
    * HANDLER FUNCTIONS

@@ -145,12 +145,8 @@ const Navigation = () => {
         {/* RIGHT: Actions */}
         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
 
-          {/* Notification Bell - Only for logged in users */}
-          {user && (
-            <div className="hidden sm:block">
-              <NotificationBell />
-            </div>
-          )}
+          {/* Notification Bell - Only for logged in users - Now visible on mobile too */}
+          {user && <NotificationBell />}
 
           {/* Mode Toggle - Hidden on small mobile */}
           {user && (
@@ -188,7 +184,7 @@ const Navigation = () => {
               </div>
               
               {/* User Avatar */}
-              <Link to="/profile" className="hover:opacity-80">
+              <Link to="/account" className="hover:opacity-80">
                 {profile?.avatar_url ? (
                   <img
                     src={profile.avatar_url}

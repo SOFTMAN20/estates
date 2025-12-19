@@ -72,6 +72,7 @@ const PropertyDetail = lazy(() => import("./pages/host/PropertyDetail"));
 const Dashboard = lazy(() => import("./pages/host/Dashboard"));
 const Properties = lazy(() => import("./pages/host/Properties"));
 const Profile = lazy(() => import("./pages/Profile"));
+const ProfileHub = lazy(() => import("./pages/ProfileHub"));
 const Favorites = lazy(() => import("./pages/Favorites"));
 const Bookings = lazy(() => import("./pages/Bookings"));
 const BookingDetail = lazy(() => import("./pages/BookingDetail"));
@@ -184,6 +185,7 @@ const App = () => (
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/host/properties" element={<Properties />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/account" element={<ProfileHub />} />
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/bookings" element={<Bookings />} />
                 <Route path="/bookings/:id" element={<BookingDetail />} />

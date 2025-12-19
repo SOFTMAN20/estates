@@ -19,9 +19,9 @@ export function useReviews(propertyId?: string, filters?: ReviewFilters) {
         .from('reviews')
         .select(`
           *,
-          user:profiles!reviews_user_id_fkey(id, name, avatar_url),
-          property:properties(id, title, images),
-          booking:bookings(check_in, check_out)
+          profiles!reviews_user_id_fkey(id, name, avatar_url),
+          properties!reviews_property_id_fkey(id, title, images),
+          bookings!reviews_booking_id_fkey(check_in, check_out)
         `)
         .eq('property_id', propertyId);
 
@@ -56,8 +56,20 @@ export function useReviews(propertyId?: string, filters?: ReviewFilters) {
 
       const { data, error } = await query;
 
-      if (error) throw error;
-      return data as Review[];
+      if (error) {
+        console.error('Error fetching reviews:', error);
+        throw error;
+      }
+
+      // Transform the data to match expected structure
+      const transformedData = data?.map((review: any) => ({
+        ...review,
+        user: review.profiles,
+        property: review.properties,
+        booking: review.bookings,
+      })) || [];
+
+      return transformedData as Review[];
     },
     enabled: !!propertyId,
   });
@@ -87,14 +99,22 @@ export function useReviews(propertyId?: string, filters?: ReviewFilters) {
         .from('reviews')
         .select(`
           *,
-          property:properties(id, title, images),
-          booking:bookings(check_in, check_out)
+          properties!reviews_property_id_fkey(id, title, images),
+          bookings!reviews_booking_id_fkey(check_in, check_out)
         `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as Review[];
+
+      // Transform the data
+      const transformedData = data?.map((review: any) => ({
+        ...review,
+        property: review.properties,
+        booking: review.bookings,
+      })) || [];
+
+      return transformedData as Review[];
     },
     enabled: !!user?.id,
   });
@@ -105,15 +125,26 @@ export function useReviews(propertyId?: string, filters?: ReviewFilters) {
     queryFn: async () => {
       if (!user?.id) return [];
 
+      // First get all properties for this host
+      const { data: hostProperties, error: propError } = await supabase
+        .from('properties')
+        .select('id')
+        .eq('host_id', user.id);
+
+      if (propError) throw propError;
+      if (!hostProperties || hostProperties.length === 0) return [];
+
+      const propertyIds = hostProperties.map(p => p.id);
+
       let query = supabase
         .from('reviews')
         .select(`
           *,
-          user:profiles!reviews_user_id_fkey(id, name, avatar_url),
-          property:properties!reviews_property_id_fkey(id, title, images, host_id),
-          booking:bookings(check_in, check_out)
+          profiles!reviews_user_id_fkey(id, name, avatar_url),
+          properties!reviews_property_id_fkey(id, title, images, host_id),
+          bookings!reviews_booking_id_fkey(check_in, check_out)
         `)
-        .eq('property.host_id', user.id);
+        .in('property_id', propertyIds);
 
       // Apply filters
       if (filters?.rating) {
@@ -131,7 +162,16 @@ export function useReviews(propertyId?: string, filters?: ReviewFilters) {
       const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as Review[];
+
+      // Transform the data
+      const transformedData = data?.map((review: any) => ({
+        ...review,
+        user: review.profiles,
+        property: review.properties,
+        booking: review.bookings,
+      })) || [];
+
+      return transformedData as Review[];
     },
     enabled: !!user?.id,
   });

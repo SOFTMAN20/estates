@@ -25,7 +25,7 @@ export interface Property {
 
 /**
  * Extended Property Type
- * Property with profile/host information
+ * Property with profile/host information and review statistics
  */
 export type ExtendedProperty = Tables<'properties'> & {
   profiles?: {
@@ -35,6 +35,8 @@ export type ExtendedProperty = Tables<'properties'> & {
     avatar_url: string | null;
     created_at: string | null;
   };
+  average_rating?: number;
+  total_reviews?: number;
 };
 
 /**

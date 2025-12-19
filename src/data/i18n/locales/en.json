@@ -233,6 +233,11 @@
       "perMonth": "per month",
       "viewAll": "View All Properties"
     },
+    "reviews": {
+      "title": "Guest Reviews",
+      "noReviews": "No reviews yet",
+      "beFirst": "Be the first to leave a review after booking!"
+    },
     "bookingSuccess": "Booking request submitted successfully!"
   },
   "auth": {

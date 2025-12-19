@@ -47,7 +47,8 @@ import {
   ChevronRight,
   Home,
   AlertCircle,
-  Images
+  Images,
+  MessageCircle
 } from 'lucide-react';
 import { useProperties, type Property } from '@/hooks/useProperties';
 import { useFavorites } from '@/hooks/useFavorites';
@@ -716,25 +717,47 @@ const PropertyDetail = () => {
             </Card>
 
             {/* Reviews Section */}
-            {!reviewsLoading && statistics && statistics.total_reviews > 0 && (
-              <Card>
-                <CardContent className="p-4 sm:p-6">
-                  <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-gray-900">
-                      Guest Reviews
-                    </h2>
-                    
-                    {/* Rating Summary */}
-                    <RatingSummary statistics={statistics} />
-                    
-                    <Separator />
-                    
-                    {/* Review List */}
-                    <ReviewList reviews={reviews} />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            <Card>
+              <CardContent className="p-4 sm:p-6">
+                <div className="space-y-6">
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    {t('propertyDetail.reviews.title', 'Guest Reviews')}
+                  </h2>
+                  
+                  {reviewsLoading ? (
+                    <div className="flex justify-center py-8">
+                      <LoadingSpinner size="md" />
+                    </div>
+                  ) : statistics && statistics.total_reviews > 0 ? (
+                    <>
+                      {/* Rating Summary */}
+                      <RatingSummary statistics={statistics} />
+                      
+                      <Separator />
+                      
+                      {/* Review List */}
+                      <ReviewList reviews={reviews} />
+                    </>
+                  ) : (
+                    <div className="text-center py-12 bg-gray-50 rounded-lg">
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
+                          <MessageCircle className="w-8 h-8 text-gray-400" />
+                        </div>
+                        <div>
+                          <p className="text-lg font-medium text-gray-900">
+                            {t('propertyDetail.reviews.noReviews', 'No reviews yet')}
+                          </p>
+                          <p className="text-sm text-gray-500 mt-1">
+                            {t('propertyDetail.reviews.beFirst', 'Be the first to leave a review after booking!')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sidebar Section - Sehemu ya upande */}

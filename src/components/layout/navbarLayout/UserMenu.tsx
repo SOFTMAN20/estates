@@ -41,6 +41,7 @@ import {
 import { Menu, User, Building2, LogOut, Heart, Bell, Settings, Calendar, Home as HomeIcon, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useModeToggle } from '@/hooks/useModeToggle';
+import { useNotifications } from '@/hooks/useNotifications';
 import type { Tables } from '@/lib/integrations/supabase/types';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
@@ -78,6 +79,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { currentMode } = useModeToggle();
+  const { unreadCount } = useNotifications();
 
   /**
    * Get user initials from name or email
@@ -194,19 +196,25 @@ const UserMenu: React.FC<UserMenuProps> = ({
           </Link>
         </DropdownMenuItem>
 
-        {/* Notifications (Disabled) */}
-        <DropdownMenuItem disabled>
-          <Bell className="mr-2 h-4 w-4" />
-          <span>Arifa</span>
-          <Badge className="ml-auto bg-gray-100 text-gray-600 text-xs px-1.5 py-0.5">
-            Haribu
-          </Badge>
+        {/* Notifications */}
+        <DropdownMenuItem asChild>
+          <Link to="/notifications" className="flex items-center cursor-pointer">
+            <Bell className="mr-2 h-4 w-4" />
+            <span>Arifa</span>
+            {unreadCount > 0 && (
+              <Badge className="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5">
+                {unreadCount}
+              </Badge>
+            )}
+          </Link>
         </DropdownMenuItem>
 
-        {/* Settings (Disabled) */}
-        <DropdownMenuItem disabled>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Mipangilio</span>
+        {/* Settings */}
+        <DropdownMenuItem asChild>
+          <Link to="/settings" className="flex items-center cursor-pointer">
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Mipangilio</span>
+          </Link>
         </DropdownMenuItem>
 
         {/* Admin link - only visible if role='admin' or 'super_admin' */}

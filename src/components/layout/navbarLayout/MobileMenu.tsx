@@ -27,7 +27,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, Search, User, X, Globe, Building2, LogOut } from 'lucide-react';
+import { Home, Search, User, X, Globe, Building2, LogOut, Bell } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ModeToggle from '@/components/layout/navbarLayout/ModeToggle';
 import type { Tables } from '@/lib/integrations/supabase/types';
@@ -180,6 +180,23 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                   <div className="flex items-center">
                     <User className="h-5 w-5 mr-3 text-gray-400" />
                     {t('navigation.dashboard')}
+                  </div>
+                </Link>
+              )}
+
+              {/* Notifications Link - Only for authenticated users */}
+              {user && (
+                <Link
+                  to="/notifications"
+                  className={`block px-4 py-3 text-gray-700 hover:bg-primary/10 hover:text-primary 
+                             rounded-lg text-sm transition-all duration-300 ${
+                    location.pathname === '/notifications' ? 'bg-primary/15 text-primary border border-primary/20' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  <div className="flex items-center">
+                    <Bell className="h-5 w-5 mr-3 text-gray-400" />
+                    {t('navigation.notifications', 'Notifications')}
                   </div>
                 </Link>
               )}

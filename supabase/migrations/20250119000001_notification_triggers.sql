@@ -5,21 +5,21 @@ DECLARE
   v_property RECORD;
   v_guest RECORD;
 BEGIN
-  SELECT p.*, u.full_name as host_name
+  SELECT p.*, u.name as host_name
   INTO v_property
   FROM properties p
-  JOIN users u ON u.id = p.host_id
+  JOIN profiles u ON u.id = p.host_id
   WHERE p.id = NEW.property_id;
   
-  SELECT full_name INTO v_guest
-  FROM users
+  SELECT name INTO v_guest
+  FROM profiles
   WHERE id = NEW.guest_id;
   
   PERFORM create_notification(
     v_property.host_id,
     'booking',
     'New Booking Received',
-    v_guest.full_name || ' booked ' || v_property.title,
+    v_guest.name || ' booked ' || v_property.title,
     '/host/bookings/' || NEW.id,
     NEW.id,
     'booking',

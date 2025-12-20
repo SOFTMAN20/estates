@@ -283,7 +283,7 @@ const Navigation = () => {
       </div>
 
       {/* MOBILE SEARCH BAR - Sticky on mobile, scrolls away on desktop */}
-      <div className="md:hidden sticky top-0 z-50 bg-white px-2 py-2 border-b border-gray-200 shadow-sm">
+      <div className="md:hidden sticky top-0 z-50 bg-white px-2 py-2 border-b border-gray-200 shadow-sm flex justify-center">
         <NavbarSearchBar />
       </div>
 

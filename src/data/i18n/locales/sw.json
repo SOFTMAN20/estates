@@ -433,6 +433,8 @@
     "propertyCount_other": "Nyumba {{count}}",
     "viewAll": "Tazama Zote",
     "add": "Ongeza",
+    "properties": "nyumba",
+    "manageAllProperties": "Simamia Nyumba Zote",
     "viewAllProperties": "Tazama Nyumba Zote",
     "viewAllPropertiesDesc": "Angalia orodha kamili ya nyumba zako"
   },

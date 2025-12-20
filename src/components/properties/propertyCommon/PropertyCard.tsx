@@ -40,7 +40,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Heart, MapPin, Bed, Bath, Maximize2, Eye } from 'lucide-react';
+import { Heart, MapPin, Bed, Bath, Maximize, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ReliableImage from '@/components/common/ReliableImage';
@@ -257,7 +257,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                     )}
                     {squareMeters && (
                       <div className="flex items-center gap-1.5">
-                        <Maximize2 className="h-4 w-4 sm:h-5 sm:w-5" />
+                        <Maximize className="h-4 w-4 sm:h-5 sm:w-5" />
                         <span className="text-sm sm:text-base font-medium">{squareMeters}m²</span>
                       </div>
                     )}
@@ -390,7 +390,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 )}
                 {squareMeters && (
                   <div className="flex items-center gap-1">
-                    <Maximize2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <Maximize className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     <span className="text-xs sm:text-sm font-medium">{squareMeters}m²</span>
                   </div>
                 )}

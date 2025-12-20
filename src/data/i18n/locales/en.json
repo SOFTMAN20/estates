@@ -433,6 +433,8 @@
     "propertyCount_other": "{{count}} houses",
     "viewAll": "View All",
     "add": "Add",
+    "properties": "properties",
+    "manageAllProperties": "Manage All Properties",
     "viewAllProperties": "View All Properties",
     "viewAllPropertiesDesc": "View complete list of your properties"
   },

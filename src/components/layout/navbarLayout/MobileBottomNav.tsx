@@ -16,7 +16,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Search, Heart, User, PlusCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -31,6 +31,7 @@ interface NavItem {
 
 const MobileBottomNav = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [isVisible, setIsVisible] = useState(true);
 
@@ -76,6 +77,16 @@ const MobileBottomNav = () => {
       clearTimeout(scrollTimeout);
     };
   }, []);
+
+  // Handle host button click to open add property form
+  const handleHostClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (user) {
+      navigate('/dashboard', { state: { openAddForm: true } });
+    } else {
+      navigate('/signin');
+    }
+  };
 
   // Define navigation items similar to Airbnb
   const navItems: NavItem[] = [
@@ -155,6 +166,67 @@ const MobileBottomNav = () => {
         >
           {navItems.map((item) => {
             const active = isActive(item.path);
+            
+            // Special handling for Host button
+            if (item.id === 'dashboard') {
+              return (
+                <Link
+                  key={item.id}
+                  to={item.path}
+                  onClick={handleHostClick}
+                  className="flex flex-col items-center justify-center flex-1 min-w-0"
+                  style={{ 
+                    color: active ? '#D97706' : '#6B7280',
+                    flex: '1 1 0%',
+                    minWidth: '0',
+                    padding: '8px 2px',
+                    textDecoration: 'none'
+                  }}
+                >
+                  <div style={{ 
+                    transform: active ? 'scale(1.05)' : 'scale(1)',
+                    transition: 'transform 0.2s'
+                  }}>
+                    <div style={{ 
+                      height: '20px', 
+                      width: '20px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center' 
+                    }}>
+                      {item.icon}
+                    </div>
+                  </div>
+                  <span 
+                    style={{ 
+                      fontSize: '9px',
+                      marginTop: '2px',
+                      fontWeight: '500',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      width: '100%',
+                      textAlign: 'center',
+                      lineHeight: '1.2'
+                    }}
+                  >
+                    {item.label}
+                  </span>
+                  
+                  {/* Active indicator dot */}
+                  {active && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '4px',
+                      width: '4px',
+                      height: '4px',
+                      backgroundColor: '#D97706',
+                      borderRadius: '50%'
+                    }} />
+                  )}
+                </Link>
+              );
+            }
             
             return (
               <Link

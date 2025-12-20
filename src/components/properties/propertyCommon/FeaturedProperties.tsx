@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, MapPin, Bed, Bath, Maximize2, Eye } from 'lucide-react';
+import { Star, MapPin, Bed, Bath, Maximize, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProperties, type Property } from '@/hooks/useProperties';
 import LoadingSpinner from '@/components/ui/loading-spinner';
@@ -115,7 +115,7 @@ const FeaturedPropertyCard = ({ property, index, t }: FeaturedPropertyCardProps)
                 )}
                 {property.square_meters && (
                   <div className="flex items-center gap-0.5 sm:gap-1">
-                    <Maximize2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                    <Maximize className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                     <span className="text-xs sm:text-sm font-medium">{property.square_meters}m²</span>
                   </div>
                 )}

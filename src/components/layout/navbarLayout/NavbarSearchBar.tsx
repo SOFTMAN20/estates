@@ -76,6 +76,7 @@ const parseSearchQuery = (query: string): { location?: string; minPrice?: string
 const NavbarSearchBar: React.FC<NavbarSearchBarProps> = ({ className = '' }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -137,6 +138,7 @@ const NavbarSearchBar: React.FC<NavbarSearchBarProps> = ({ className = '' }) => 
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setShowSuggestions(false);
+        setIsFocused(false);
       }
     };
 
@@ -177,24 +179,44 @@ const NavbarSearchBar: React.FC<NavbarSearchBarProps> = ({ className = '' }) => 
   };
 
   return (
-    <div ref={containerRef} className={`relative flex items-center max-w-2xl w-full ${className}`}>
+    <div 
+      ref={containerRef} 
+      className={`relative flex items-center w-full transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        isFocused 
+          ? 'max-w-[280px] sm:max-w-md md:max-w-2xl lg:max-w-3xl xl:max-w-4xl' 
+          : 'max-w-[280px] sm:max-w-md md:max-w-xl lg:max-w-2xl'
+      } ${className}`}
+    >
       {/* Search Input Container */}
-      <div className="flex items-center flex-1 border border-gray-300 rounded-l-full overflow-hidden bg-white hover:border-gray-400 focus-within:border-orange-400 focus-within:ring-1 focus-within:ring-orange-300/50 transition-colors">
+      <div className={`flex items-center flex-1 border border-gray-300 rounded-l-full overflow-hidden bg-white hover:border-gray-400 focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-300/50 transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        isFocused ? 'shadow-xl scale-[1.02]' : 'shadow-sm'
+      }`}>
         <Input
           type="text"
           placeholder={t('browse.cityPlaceholder') || 'Search by area, town, or price...'}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          onFocus={() => setShowSuggestions(true)}
-          className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 py-2 text-sm"
+          onFocus={() => {
+            setShowSuggestions(true);
+            setIsFocused(true);
+          }}
+          onBlur={() => {
+            // Small delay to allow suggestion clicks
+            setTimeout(() => setIsFocused(false), 150);
+          }}
+          className={`flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 py-2 transition-all duration-150 ${
+            isFocused ? 'text-sm md:text-base' : 'text-sm'
+          }`}
         />
       </div>
 
       {/* Search Button */}
       <Button
         onClick={() => handleSearch()}
-        className="rounded-l-none rounded-r-full px-6 py-2 bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white border-0 h-[42px] shadow-sm"
+        className={`rounded-l-none rounded-r-full px-6 py-2 bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white border-0 h-[42px] transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+          isFocused ? 'shadow-xl' : 'shadow-sm'
+        }`}
         variant="ghost"
       >
         <Search className="h-5 w-5" />

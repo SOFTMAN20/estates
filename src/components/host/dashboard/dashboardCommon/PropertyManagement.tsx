@@ -119,9 +119,9 @@ const PropertyManagement: React.FC<PropertyManagementProps> = ({
     return matchesSearch && matchesStatus;
   });
 
-  // Apply limit if specified
-  const displayedProperties = limit ? filteredProperties.slice(0, limit) : filteredProperties;
-  const hasMoreProperties = limit && filteredProperties.length > limit;
+  // Apply limit if specified - when showViewAll is true, always limit to show button
+  const displayedProperties = limit ? properties.slice(0, limit) : properties;
+  const hasMoreProperties = showViewAll && properties.length > 0;
 
   /**
    * SEARCH AND FILTER CONTROLS
@@ -232,7 +232,12 @@ const PropertyManagement: React.FC<PropertyManagementProps> = ({
               size="lg"
               className="w-full sm:w-auto sm:min-w-[200px] group hover:bg-primary hover:text-white transition-all"
             >
-              <span>{t('dashboard.viewAll')} ({filteredProperties.length})</span>
+              <span>
+                {properties.length > limit! 
+                  ? `${t('dashboard.viewAll')} (${properties.length} ${t('dashboard.properties')})`
+                  : t('dashboard.manageAllProperties')
+                }
+              </span>
               <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
             </Button>
           </div>

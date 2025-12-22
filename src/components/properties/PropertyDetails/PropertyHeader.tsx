@@ -8,6 +8,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Zap, Droplets, Shield, Wifi, Car, Wind, Tv, Sofa, Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface PropertyHeaderProps {
   title: string;
@@ -26,6 +27,8 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
   amenities,
   nearbyServices,
 }) => {
+  const { t } = useTranslation();
+  
   const getAmenityIcon = (amenity: string) => {
     const lower = amenity.toLowerCase();
     if (lower === 'electricity' || lower === 'umeme') return { Icon: Zap, label: 'Umeme', color: 'bg-yellow-50 text-yellow-700 border-yellow-200' };
@@ -49,7 +52,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
           <div className="text-2xl sm:text-3xl font-bold text-primary">
             TZS {price.toLocaleString()}
           </div>
-          <div className="text-sm sm:text-base text-gray-600">per month</div>
+          <div className="text-sm sm:text-base text-gray-600">{t('propertyDetail.perMonth')}</div>
         </div>
       </div>
 

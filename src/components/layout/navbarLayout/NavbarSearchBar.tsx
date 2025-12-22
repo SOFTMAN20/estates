@@ -187,13 +187,13 @@ const NavbarSearchBar: React.FC<NavbarSearchBarProps> = ({ className = '' }) => 
           : 'max-w-[280px] sm:max-w-md md:max-w-xl lg:max-w-2xl'
       } ${className}`}
     >
-      {/* Search Input Container */}
-      <div className={`flex items-center flex-1 border border-gray-300 rounded-l-full overflow-hidden bg-white hover:border-gray-400 focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-300/50 transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+      {/* Search Input Container with Button Inside */}
+      <div className={`flex items-center flex-1 border border-gray-300 rounded-full overflow-hidden bg-white hover:border-gray-400 focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-300/50 transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
         isFocused ? 'shadow-xl scale-[1.02]' : 'shadow-sm'
       }`}>
         <Input
           type="text"
-          placeholder={t('browse.cityPlaceholder') || 'Search by area, town, or price...'}
+          placeholder={t('browse.cityPlaceholder') || 'Search by location, price, property...'}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -209,18 +209,16 @@ const NavbarSearchBar: React.FC<NavbarSearchBarProps> = ({ className = '' }) => 
             isFocused ? 'text-sm md:text-base' : 'text-sm'
           }`}
         />
+        
+        {/* Search Button - Circular Icon Inside */}
+        <Button
+          onClick={() => handleSearch()}
+          className="rounded-full w-9 h-9 p-0 bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white border-0 mr-1.5 flex items-center justify-center transition-all duration-200"
+          variant="ghost"
+        >
+          <Search className="h-4 w-4" />
+        </Button>
       </div>
-
-      {/* Search Button */}
-      <Button
-        onClick={() => handleSearch()}
-        className={`rounded-l-none rounded-r-full px-6 py-2 bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white border-0 h-[42px] transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-          isFocused ? 'shadow-xl' : 'shadow-sm'
-        }`}
-        variant="ghost"
-      >
-        <Search className="h-5 w-5" />
-      </Button>
 
       {/* Search Suggestions Dropdown */}
       {showSuggestions && (

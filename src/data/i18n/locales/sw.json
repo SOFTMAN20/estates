@@ -85,7 +85,7 @@
   "browse": {
     "title": "Pata Nyumba Yako ya Kupenda",
     "propertiesAvailable": "Nyumba {{count}} zinapatikana kwa ajili yako",
-    "cityPlaceholder": "Mji au eneo la kupenda...",
+    "cityPlaceholder": "Tafuta kwa eneo, bei, nyumba...",
     "priceLabel": "Bei (TZS)",
     "anyPrice": "Bei yoyote",
     "under100k": "Chini ya 100K",

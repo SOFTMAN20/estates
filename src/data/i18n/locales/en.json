@@ -85,7 +85,7 @@
   "browse": {
     "title": "Find Your Perfect Home",
     "propertiesAvailable": "{{count}} properties available for you",
-    "cityPlaceholder": "Preferred city or area...",
+    "cityPlaceholder": "Search by location, price, property...",
     "priceLabel": "Price (TZS)",
     "anyPrice": "Any price",
     "under100k": "Under 100K",

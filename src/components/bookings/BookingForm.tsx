@@ -18,7 +18,7 @@
 
 import { useState, useMemo } from 'react';
 import { Calendar as CalendarIcon, Receipt, TrendingUp, CheckCircle2, Sparkles, Clock } from 'lucide-react';
-import { format, differenceInMonths, addDays, isBefore, startOfDay } from 'date-fns';
+import { format, differenceInMonths, addDays, addMonths, isBefore, startOfDay } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -111,8 +111,11 @@ export function BookingForm({
   const handleCheckInSelect = (date: Date | undefined) => {
     setCheckIn(date);
     
-    // If check-out is before new check-in, reset check-out
-    if (date && checkOut && isBefore(checkOut, date)) {
+    // Auto-calculate check-out date based on minimum booking months
+    if (date) {
+      const autoCheckOut = addMonths(date, minBookingMonths);
+      setCheckOut(autoCheckOut);
+    } else {
       setCheckOut(undefined);
     }
     
@@ -194,7 +197,7 @@ export function BookingForm({
             </div>
           </div>
           <Badge className="bg-gradient-to-r from-primary to-primary/80 text-white border-0 shadow-md">
-            10% Fee
+            {commissionRate}% Fee
           </Badge>
         </div>
 

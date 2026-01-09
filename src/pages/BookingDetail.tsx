@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import Navigation from '@/components/layout/navbarLayout/Navigation';
 import Footer from '@/components/layout/Footer';
 import { useBooking, useCancelBooking } from '@/hooks/useBookings';
-import { useAuth } from '@/hooks/useAuth';
+import { useCommissionRate } from '@/hooks/usePlatformSettings';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -35,9 +35,6 @@ import {
   Calendar,
   MapPin,
   Home,
-  User,
-  Mail,
-  Phone,
   Clock,
   Receipt,
   CheckCircle2,
@@ -51,7 +48,9 @@ export default function BookingDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { i18n } = useTranslation();
-  const { user } = useAuth();
+
+  // Get dynamic commission rate from platform settings
+  const commissionRate = useCommissionRate();
 
   // Fetch booking details
   const { data: booking, isLoading, error } = useBooking(id || '');
@@ -356,7 +355,7 @@ export default function BookingDetail() {
                 {/* Service Fee */}
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">
-                    {i18n.language === 'en' ? 'Service Fee (10%)' : 'Ada ya Huduma (10%)'}
+                    {i18n.language === 'en' ? `Service Fee (${commissionRate}%)` : `Ada ya Huduma (${commissionRate}%)`}
                   </span>
                   <span className="font-medium">{formatCurrency(booking.service_fee)}</span>
                 </div>

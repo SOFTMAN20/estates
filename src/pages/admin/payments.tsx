@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/table';
 import { formatDistanceToNow } from 'date-fns';
 import { DollarSign } from 'lucide-react';
+import { useCommissionRate } from '@/hooks/usePlatformSettings';
 
 // Mock payment data
 const mockPayments = [
@@ -50,6 +51,9 @@ const mockPayments = [
 ];
 
 export default function AdminPayments() {
+  // Get dynamic commission rate from platform settings
+  const commissionRate = useCommissionRate();
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-TZ', {
       style: 'currency',
@@ -124,7 +128,7 @@ export default function AdminPayments() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{formatPrice(totalCommission)}</div>
-              <p className="text-xs text-muted-foreground">10% of total revenue</p>
+              <p className="text-xs text-muted-foreground">{commissionRate}% of total revenue</p>
             </CardContent>
           </Card>
 

@@ -20,7 +20,7 @@ interface ImageUploadProps {
 const ImageUpload: React.FC<ImageUploadProps> = ({ 
   images, 
   onImagesChange, 
-  maxImages = 6 
+  maxImages = 10 
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();

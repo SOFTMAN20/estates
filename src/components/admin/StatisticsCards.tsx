@@ -6,6 +6,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Users, Home, Calendar, DollarSign } from 'lucide-react';
+import { useCommissionRate } from '@/hooks/usePlatformSettings';
 import type { DashboardStats } from '@/types/admin';
 
 interface StatisticsCardsProps {
@@ -13,6 +14,9 @@ interface StatisticsCardsProps {
 }
 
 export function StatisticsCards({ stats }: StatisticsCardsProps) {
+  // Get dynamic commission rate from platform settings
+  const commissionRate = useCommissionRate();
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* Total Users Card */}
@@ -100,7 +104,7 @@ export function StatisticsCards({ stats }: StatisticsCardsProps) {
       >
         <div className="space-y-1 mt-2">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Commission (10%)</span>
+            <span className="text-gray-600">Commission ({commissionRate}%)</span>
             <span className="font-semibold text-emerald-600">
               TZS {(stats.platformCommission / 1000).toFixed(0)}K
             </span>

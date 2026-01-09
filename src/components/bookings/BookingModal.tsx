@@ -39,6 +39,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useCommissionRate } from '@/hooks/usePlatformSettings';
 
 interface BookingModalProps {
   open: boolean;
@@ -81,6 +82,9 @@ export function BookingModal({
   const { i18n } = useTranslation();
   const [specialRequests, setSpecialRequests] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  
+  // Get dynamic commission rate from platform settings
+  const commissionRate = useCommissionRate();
 
   // Safety check - don't render if property is undefined
   if (!property) {
@@ -225,7 +229,7 @@ export function BookingModal({
               {/* Service Fee */}
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">
-                  {i18n.language === 'en' ? 'Service Fee (10%)' : 'Ada ya Huduma (10%)'}
+                  {i18n.language === 'en' ? `Service Fee (${commissionRate}%)` : `Ada ya Huduma (${commissionRate}%)`}
                 </span>
                 <span className="font-medium">{formatCurrency(bookingData.serviceFee)}</span>
               </div>

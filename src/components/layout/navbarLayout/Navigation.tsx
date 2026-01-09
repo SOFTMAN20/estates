@@ -42,7 +42,6 @@ import { useTranslation } from 'react-i18next';
 import UserMenu from '@/components/layout/navbarLayout/UserMenu';
 import MobileMenu from '@/components/layout/navbarLayout/MobileMenu';
 import ModeToggle from '@/components/layout/navbarLayout/ModeToggle';
-import LanguageToggle from '@/components/layout/navbarLayout/LanguageToggle';
 import NavbarSearchBar from '@/components/layout/navbarLayout/NavbarSearchBar';
 import { NotificationBell } from '@/components/Notifications/NotificationBell';
 
@@ -66,6 +65,7 @@ const Navigation = () => {
   // Usimamizi wa hali ya kipengee
   const [isMenuOpen, setIsMenuOpen] = useState(false); // Mobile menu visibility
   const [profile, setProfile] = useState<Profile | null>(null); // User profile
+  const [isScrolled, setIsScrolled] = useState(false); // Track scroll for header height
   const location = useLocation(); // Current page location for active states
   const navigate = useNavigate(); // Navigation function
   const { user, signOut } = useAuth(); // Authentication state
@@ -103,8 +103,16 @@ const Navigation = () => {
     fetchProfile();
   }, [user]);
 
-  // Scroll tracking removed - second row now always visible
-  // The second row will remain visible at all times for better navigation access
+  // Track scroll to expand header when second row scrolls away
+  useEffect(() => {
+    const handleScroll = () => {
+      // Expand header after scrolling past 50px (roughly when second row disappears)
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   /**
    * Language Toggle Function
@@ -120,18 +128,18 @@ const Navigation = () => {
 
   return (
     <>
-      {/* TOP ROW: YouTube-style Layout: Logo | Search | Actions - Scrolls away on mobile */}
-      <div className="bg-white border-b border-gray-200 md:sticky md:top-0 md:z-50">
-        <div className="flex items-center justify-between px-2 sm:px-4 h-14 border-b border-gray-100">
+      {/* TOP ROW: YouTube-style Layout: Logo | Search | Actions - Sticky on desktop */}
+      <div className={`bg-white border-b border-gray-200 sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'shadow-md' : ''}`}>
+        <div className={`flex items-center justify-between px-2 sm:px-4 border-b border-gray-100 transition-all duration-300 ${isScrolled ? 'h-16 md:h-[72px]' : 'h-14'}`}>
         
         {/* LEFT: Logo */}
         <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group">
-            <div className="p-1 sm:p-1.5 bg-gradient-to-br from-primary to-serengeti-500 rounded-lg">
-              <Home className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+            <div className={`bg-gradient-to-br from-primary to-serengeti-500 rounded-lg transition-all duration-300 ${isScrolled ? 'p-1.5 sm:p-2' : 'p-1 sm:p-1.5'}`}>
+              <Home className={`text-white transition-all duration-300 ${isScrolled ? 'h-5 w-5 sm:h-6 sm:w-6' : 'h-4 w-4 sm:h-5 sm:w-5'}`} />
             </div>
-            <span className="hidden sm:inline text-base sm:text-lg font-bold bg-gradient-to-r from-primary to-serengeti-600 bg-clip-text text-transparent">
+            <span className={`hidden sm:inline font-bold bg-gradient-to-r from-primary to-serengeti-600 bg-clip-text text-transparent transition-all duration-300 ${isScrolled ? 'text-lg sm:text-xl' : 'text-base sm:text-lg'}`}>
               NyumbaLink
             </span>
           </Link>
@@ -154,11 +162,6 @@ const Navigation = () => {
               <ModeToggle />
             </div>
           )}
-
-          {/* Language Toggle - Hidden on small mobile */}
-          <div className="hidden sm:block">
-            <LanguageToggle />
-          </div>
 
           {/* Mobile Menu Toggle - On the right */}
           <Button
@@ -219,9 +222,10 @@ const Navigation = () => {
           )}
         </div>
         </div>
+      </div>
 
-        {/* SECOND ROW: Navigation Items (YouTube-style category tabs) - Desktop only, always visible */}
-        <div className="hidden md:flex items-center justify-center gap-1 px-4 py-2 overflow-x-auto">
+      {/* SECOND ROW: Navigation Items (YouTube-style category tabs) - Desktop only, scrolls with page */}
+      <div className="hidden md:flex items-center justify-center gap-1 px-4 py-2 overflow-x-auto bg-white border-b border-gray-200">
         <Link to="/">
           <Button
             variant="ghost"
@@ -279,7 +283,6 @@ const Navigation = () => {
             </Button>
           </Link>
         )}
-        </div>
       </div>
 
       {/* MOBILE SEARCH BAR - Sticky on mobile, scrolls away on desktop */}

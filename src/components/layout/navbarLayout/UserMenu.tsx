@@ -38,7 +38,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Menu, User, Building2, LogOut, Heart, Bell, Settings, Calendar, Home as HomeIcon, Shield } from 'lucide-react';
+import { Menu, User, Building2, LogOut, Heart, Bell, Settings, Calendar, Home as HomeIcon, Shield, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useModeToggle } from '@/hooks/useModeToggle';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -76,10 +76,18 @@ const UserMenu: React.FC<UserMenuProps> = ({
   favoritesCount,
   onSignOut
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { currentMode } = useModeToggle();
   const { unreadCount } = useNotifications();
+
+  /**
+   * Toggle language between English and Swahili
+   */
+  const toggleLanguage = () => {
+    const newLanguage = i18n.language === 'en' ? 'sw' : 'en';
+    i18n.changeLanguage(newLanguage);
+  };
 
   /**
    * Get user initials from name or email
@@ -231,6 +239,18 @@ const UserMenu: React.FC<UserMenuProps> = ({
         )}
 
         <DropdownMenuSeparator />
+
+        {/* Language Toggle */}
+        <DropdownMenuItem
+          onClick={toggleLanguage}
+          className="cursor-pointer"
+        >
+          <Globe className="mr-2 h-4 w-4" />
+          <span>{i18n.language === 'en' ? 'Swahili' : 'English'}</span>
+          <Badge variant="outline" className="ml-auto text-xs">
+            {i18n.language === 'en' ? 'EN' : 'SW'}
+          </Badge>
+        </DropdownMenuItem>
 
         {/* Sign Out */}
         <DropdownMenuItem

@@ -20,8 +20,7 @@
  * - Error handling for missing properties (Kushughulikia nyumba zisizopo)
  */
 
-import React, { useState } from 'react';
-import { useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navigation from '@/components/layout/navbarLayout/Navigation';
 import Footer from '@/components/layout/Footer';
@@ -40,6 +39,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import {
   ArrowLeft,
   Heart,
@@ -48,7 +48,8 @@ import {
   Home,
   AlertCircle,
   Images,
-  MessageCircle
+  MessageCircle,
+  Calendar
 } from 'lucide-react';
 import { useProperties, type Property } from '@/hooks/useProperties';
 import { useFavorites } from '@/hooks/useFavorites';
@@ -83,6 +84,16 @@ const PropertyDetail = () => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [panPosition, setPanPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  
+  // Mobile booking sheet state
+  const [isMobileBookingOpen, setIsMobileBookingOpen] = useState(false);
+  const [showStickyButton, setShowStickyButton] = useState(false);
+  const [isBookingFormVisible, setIsBookingFormVisible] = useState(true);
+  const bookingFormRef = useRef<HTMLDivElement>(null);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
 
   // Favorites functionality - Utendakazi wa vipendwa
   const { isFavorited, toggleFavorite } = useFavorites();
@@ -99,6 +110,45 @@ const PropertyDetail = () => {
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, []);
+
+  // Handle sticky button visibility on mobile
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const isDesktop = window.innerWidth >= 1024;
+      
+      if (isDesktop) {
+        // On desktop: show sticky button when booking form is not visible
+        if (bookingFormRef.current) {
+          const rect = bookingFormRef.current.getBoundingClientRect();
+          const isFormVisible = rect.top < window.innerHeight && rect.bottom > 0;
+          setIsBookingFormVisible(isFormVisible);
+          setShowStickyButton(!isFormVisible && scrollY > 300);
+        } else {
+          setShowStickyButton(scrollY > 300);
+        }
+      } else {
+        // On mobile: show sticky button after scrolling past 300px
+        setShowStickyButton(scrollY > 300);
+      }
+    };
+
+    // Handle resize
+    const handleResize = () => {
+      handleScroll(); // Re-evaluate on resize
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleResize);
+    
+    // Initial check
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   // Data fetching from database - Kupata data kutoka database
@@ -347,15 +397,15 @@ const PropertyDetail = () => {
       <Navigation />
 
       <div className="flex-1 max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 pt-1 pb-3 sm:pb-4 lg:pb-6 xl:pb-8">
-        {/* Back Navigation Button */}
-        <Button
+        {/* Back Navigation Button - Hidden for now */}
+        {/* <Button
           variant="ghost"
           onClick={() => navigate(-1)}
           className="mb-3 sm:mb-4 lg:mb-2 hover:bg-transparent"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           {t('propertyDetail.goBack')}
-        </Button>
+        </Button> */}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Main Content Section - Sehemu ya maudhui makuu */}
@@ -529,40 +579,42 @@ const PropertyDetail = () => {
 
                 {/* Full gallery dialog */}
                 <Dialog open={isGalleryOpen} onOpenChange={setIsGalleryOpen}>
-                  <DialogContent className="max-w-6xl w-full max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
+                  <DialogContent className="max-w-7xl w-[95vw] h-[92vh] flex flex-col">
+                    <DialogHeader className="flex-shrink-0">
                       <DialogTitle>{property.title} — Photos</DialogTitle>
                     </DialogHeader>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {(property.images && property.images.length > 0
-                        ? property.images
-                        : ['https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=1200&h=900&fit=crop']
-                      ).map((src, idx) => (
-                        <div 
-                          key={idx} 
-                          className="relative group cursor-pointer"
-                          onClick={() => {
-                            setZoomedImage(src);
-                            setZoomLevel(1);
-                          }}
-                        >
-                          <img 
-                            src={src} 
-                            alt={`Photo ${idx + 1}`} 
-                            className="w-full h-64 object-cover rounded-md transition-transform duration-300 group-hover:scale-105" 
-                          />
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-md flex items-center justify-center">
-                            <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-2">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                <line x1="11" y1="8" x2="11" y2="14"></line>
-                                <line x1="8" y1="11" x2="14" y2="11"></line>
-                              </svg>
+                    <div className="flex-1 overflow-hidden">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 h-full auto-rows-[calc(50%-6px)]">
+                        {(property.images && property.images.length > 0
+                          ? property.images
+                          : ['https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=1200&h=900&fit=crop']
+                        ).slice(0, 8).map((src, idx) => (
+                          <div 
+                            key={idx} 
+                            className="relative group cursor-pointer h-full"
+                            onClick={() => {
+                              setZoomedImage(src);
+                              setZoomLevel(1);
+                            }}
+                          >
+                            <img 
+                              src={src} 
+                              alt={`Photo ${idx + 1}`} 
+                              className="w-full h-full object-cover rounded-md transition-transform duration-300 group-hover:scale-[1.02]" 
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-md flex items-center justify-center">
+                              <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <circle cx="11" cy="11" r="8"></circle>
+                                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                  <line x1="11" y1="8" x2="11" y2="14"></line>
+                                  <line x1="8" y1="11" x2="14" y2="11"></line>
+                                </svg>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </DialogContent>
                 </Dialog>
@@ -571,6 +623,7 @@ const PropertyDetail = () => {
                 <Dialog open={!!zoomedImage} onOpenChange={() => {
                   setZoomedImage(null);
                   setZoomLevel(1);
+                  setPanPosition({ x: 0, y: 0 });
                 }}>
                   <DialogContent className="max-w-7xl w-full h-[90vh] p-0">
                     <div className="relative w-full h-full bg-black flex flex-col">
@@ -579,12 +632,20 @@ const PropertyDetail = () => {
                         <div className="flex items-center justify-between">
                           <DialogTitle className="text-white">
                             {property.title}
+                            {property.images && property.images.length > 1 && (
+                              <span className="ml-2 text-sm text-white/70">
+                                ({(property.images.indexOf(zoomedImage || '') + 1)} / {property.images.length})
+                              </span>
+                            )}
                           </DialogTitle>
                           <div className="flex items-center gap-2">
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => setZoomLevel(prev => Math.max(prev - 0.25, 1))}
+                              onClick={() => {
+                                setZoomLevel(prev => Math.max(prev - 0.5, 1));
+                                if (zoomLevel <= 1.5) setPanPosition({ x: 0, y: 0 });
+                              }}
                               disabled={zoomLevel <= 1}
                               className="text-white hover:bg-white/20"
                               title="Zoom Out"
@@ -601,8 +662,8 @@ const PropertyDetail = () => {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => setZoomLevel(prev => Math.min(prev + 0.25, 3))}
-                              disabled={zoomLevel >= 3}
+                              onClick={() => setZoomLevel(prev => Math.min(prev + 0.5, 4))}
+                              disabled={zoomLevel >= 4}
                               className="text-white hover:bg-white/20"
                               title="Zoom In"
                             >
@@ -617,7 +678,10 @@ const PropertyDetail = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => setZoomLevel(1)}
+                                onClick={() => {
+                                  setZoomLevel(1);
+                                  setPanPosition({ x: 0, y: 0 });
+                                }}
                                 className="text-white hover:bg-white/20 text-xs"
                                 title="Reset Zoom"
                               >
@@ -628,18 +692,92 @@ const PropertyDetail = () => {
                         </div>
                       </div>
 
-                      {/* Image container with zoom */}
+                      {/* Previous Image Button */}
+                      {property.images && property.images.length > 1 && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            const currentIndex = property.images?.indexOf(zoomedImage || '') || 0;
+                            const prevIndex = currentIndex === 0 ? (property.images?.length || 1) - 1 : currentIndex - 1;
+                            setZoomedImage(property.images?.[prevIndex] || null);
+                            setZoomLevel(1);
+                            setPanPosition({ x: 0, y: 0 });
+                          }}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-black/50 hover:bg-black/70 text-white"
+                        >
+                          <ChevronLeft className="h-8 w-8" />
+                        </Button>
+                      )}
+
+                      {/* Next Image Button */}
+                      {property.images && property.images.length > 1 && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            const currentIndex = property.images?.indexOf(zoomedImage || '') || 0;
+                            const nextIndex = currentIndex === (property.images?.length || 1) - 1 ? 0 : currentIndex + 1;
+                            setZoomedImage(property.images?.[nextIndex] || null);
+                            setZoomLevel(1);
+                            setPanPosition({ x: 0, y: 0 });
+                          }}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-black/50 hover:bg-black/70 text-white"
+                        >
+                          <ChevronRight className="h-8 w-8" />
+                        </Button>
+                      )}
+
+                      {/* Image container with zoom and pan */}
                       <div 
-                        className="flex-1 overflow-auto flex items-center justify-center p-4"
+                        ref={imageContainerRef}
+                        className={`flex-1 overflow-hidden flex items-center justify-center p-4 ${zoomLevel > 1 ? 'cursor-grab' : 'cursor-zoom-in'} ${isDragging ? 'cursor-grabbing' : ''}`}
                         onWheel={(e) => {
                           e.preventDefault();
+                          const rect = imageContainerRef.current?.getBoundingClientRect();
+                          if (!rect) return;
+                          
                           const delta = e.deltaY;
-                          if (delta < 0) {
-                            // Scroll up - zoom in
-                            setZoomLevel(prev => Math.min(prev + 0.1, 3));
+                          const newZoom = delta < 0 
+                            ? Math.min(zoomLevel + 0.2, 4) 
+                            : Math.max(zoomLevel - 0.2, 1);
+                          
+                          // Reset pan when zooming out to 1
+                          if (newZoom <= 1) {
+                            setPanPosition({ x: 0, y: 0 });
+                          }
+                          
+                          setZoomLevel(newZoom);
+                        }}
+                        onMouseDown={(e) => {
+                          if (zoomLevel > 1) {
+                            setIsDragging(true);
+                            setDragStart({ x: e.clientX - panPosition.x, y: e.clientY - panPosition.y });
+                          }
+                        }}
+                        onMouseMove={(e) => {
+                          if (isDragging && zoomLevel > 1) {
+                            const newX = e.clientX - dragStart.x;
+                            const newY = e.clientY - dragStart.y;
+                            setPanPosition({ x: newX, y: newY });
+                          }
+                        }}
+                        onMouseUp={() => setIsDragging(false)}
+                        onMouseLeave={() => setIsDragging(false)}
+                        onDoubleClick={(e) => {
+                          if (zoomLevel === 1) {
+                            // Zoom in to clicked position
+                            const rect = imageContainerRef.current?.getBoundingClientRect();
+                            if (rect) {
+                              const x = e.clientX - rect.left - rect.width / 2;
+                              const y = e.clientY - rect.top - rect.height / 2;
+                              setPanPosition({ x: -x, y: -y });
+                              setZoomLevel(2.5);
+                            }
                           } else {
-                            // Scroll down - zoom out
-                            setZoomLevel(prev => Math.max(prev - 0.1, 1));
+                            // Reset zoom
+                            setZoomLevel(1);
+                            setPanPosition({ x: 0, y: 0 });
                           }
                         }}
                       >
@@ -647,11 +785,13 @@ const PropertyDetail = () => {
                           <img
                             src={zoomedImage}
                             alt="Zoomed view"
-                            className="transition-transform duration-200 cursor-move select-none"
+                            className="select-none pointer-events-none"
                             style={{
-                              transform: `scale(${zoomLevel})`,
-                              maxWidth: zoomLevel === 1 ? '100%' : 'none',
-                              maxHeight: zoomLevel === 1 ? '100%' : 'none',
+                              transform: `scale(${zoomLevel}) translate(${panPosition.x / zoomLevel}px, ${panPosition.y / zoomLevel}px)`,
+                              maxWidth: '100%',
+                              maxHeight: '100%',
+                              objectFit: 'contain',
+                              transition: isDragging ? 'none' : 'transform 0.2s ease-out',
                             }}
                             draggable={false}
                           />
@@ -660,7 +800,7 @@ const PropertyDetail = () => {
 
                       {/* Help text */}
                       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-3 py-1 rounded-full">
-                        Use zoom buttons or mouse wheel to zoom • Scroll to pan when zoomed
+                        Double-click to zoom • Drag to pan • Mouse wheel to zoom • Arrows to navigate
                       </div>
                     </div>
                   </DialogContent>
@@ -763,26 +903,28 @@ const PropertyDetail = () => {
           {/* Sidebar Section - Sehemu ya upande */}
           <div className="space-y-3 sm:space-y-4 lg:space-y-6">
             {/* Booking Form */}
-            <BookingForm
-              propertyId={property.id}
-              pricePerMonth={Number(property.price)}
-              property={{
-                id: property.id,
-                title: property.title,
-                location: property.location,
-                images: property.images || [],
-                property_type: property.property_type,
-                price: Number(property.price)
-              }}
-              guestInfo={{
-                id: user?.id || '',
-                name: user?.user_metadata?.full_name || user?.email || null,
-                email: user?.email || null,
-                phone: user?.user_metadata?.phone || null
-              }}
-              onConfirmBooking={handleConfirmBooking}
-              isLoading={createBookingMutation.isPending}
-            />
+            <div ref={bookingFormRef}>
+              <BookingForm
+                propertyId={property.id}
+                pricePerMonth={Number(property.price)}
+                property={{
+                  id: property.id,
+                  title: property.title,
+                  location: property.location,
+                  images: property.images || [],
+                  property_type: property.property_type,
+                  price: Number(property.price)
+                }}
+                guestInfo={{
+                  id: user?.id || '',
+                  name: user?.user_metadata?.full_name || user?.email || null,
+                  email: user?.email || null,
+                  phone: user?.user_metadata?.phone || null
+                }}
+                onConfirmBooking={handleConfirmBooking}
+                isLoading={createBookingMutation.isPending}
+              />
+            </div>
 
             {/* Host Information Card */}
             <HostInformationCard
@@ -817,6 +959,90 @@ const PropertyDetail = () => {
           allProperties={typedProperties}
         />
       </div>
+
+      {/* Sticky Book Now Button - Mobile & Desktop */}
+      {showStickyButton && (
+        <>
+          {/* Mobile Sticky Button */}
+          <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white border-t border-gray-200 shadow-lg p-3 safe-area-inset-bottom">
+            <div className="flex items-center justify-between gap-3 max-w-lg mx-auto">
+              <div className="flex-1">
+                <p className="text-xs text-gray-500">{t('propertyDetail.priceFrom', 'From')}</p>
+                <p className="text-lg font-bold text-gray-900">
+                  TZS {Number(property.price).toLocaleString()}
+                  <span className="text-sm font-normal text-gray-500">/{t('propertyDetail.perMonth', 'month')}</span>
+                </p>
+              </div>
+              <Button
+                onClick={() => setIsMobileBookingOpen(true)}
+                className="flex-shrink-0 h-12 px-6 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md"
+                size="lg"
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                {t('propertyDetail.bookNow', 'Book Now')}
+              </Button>
+            </div>
+          </div>
+
+          {/* Desktop Sticky Button */}
+          <div className="hidden lg:block fixed bottom-6 right-6 z-50 animate-slide-up">
+            <Button
+              onClick={() => {
+                bookingFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }}
+              className="h-14 px-8 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-xl hover:shadow-2xl transition-all duration-300 rounded-full"
+              size="lg"
+            >
+              <Calendar className="h-5 w-5 mr-2" />
+              <span className="font-semibold">{t('propertyDetail.bookNow', 'Book Now')}</span>
+              <span className="ml-2 text-sm opacity-90">
+                TZS {Number(property.price).toLocaleString()}/{t('propertyDetail.perMonth', 'mo')}
+              </span>
+            </Button>
+          </div>
+        </>
+      )}
+
+      {/* Mobile Booking Sheet */}
+      <Sheet open={isMobileBookingOpen} onOpenChange={setIsMobileBookingOpen}>
+        <SheetContent side="bottom" className="h-[90vh] overflow-y-auto rounded-t-2xl">
+          <SheetHeader className="pb-4 border-b">
+            <SheetTitle className="text-xl font-bold flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-primary" />
+              {t('propertyDetail.bookProperty', 'Book This Property')}
+            </SheetTitle>
+          </SheetHeader>
+          <div className="py-4">
+            <BookingForm
+              propertyId={property.id}
+              pricePerMonth={Number(property.price)}
+              property={{
+                id: property.id,
+                title: property.title,
+                location: property.location,
+                images: property.images || [],
+                property_type: property.property_type,
+                price: Number(property.price)
+              }}
+              guestInfo={{
+                id: user?.id || '',
+                name: user?.user_metadata?.full_name || user?.email || null,
+                email: user?.email || null,
+                phone: user?.user_metadata?.phone || null
+              }}
+              onConfirmBooking={(bookingData, specialRequests) => {
+                setIsMobileBookingOpen(false);
+                handleConfirmBooking(bookingData, specialRequests);
+              }}
+              isLoading={createBookingMutation.isPending}
+              className="border-0 shadow-none"
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Add bottom padding when sticky button is visible */}
+      {showStickyButton && <div className="h-20 lg:h-0" />}
 
       <Footer />
     </div>

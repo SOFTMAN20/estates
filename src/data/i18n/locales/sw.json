@@ -293,8 +293,8 @@
     "completeAccountAction": "Kamilisha Akaunti",
     "accountProgress": "Maendeleo ya Akaunti",
     "completeInfo": "Kamilisha maelezo yako ili kupata huduma bora zaidi",
-    "addFirstProperty": "Ongeza Nyumba ya Kwanza!",
-    "addNewProperty": "Ongeza Nyumba Mpya",
+    "addFirstProperty": "Nyumba Mpya",
+    "addNewProperty": "Nyumba Mpya",
     "startJourney": "Anza safari yako ya kuongeza nyumba",
     "addToList": "Ongeza nyumba mpya kwenye orodha",
     "updateAccountInfo": "Sasisha Akaunti",
@@ -440,7 +440,7 @@
     "add": "Ongeza",
     "properties": "nyumba",
     "manageAllProperties": "Simamia Nyumba Zote",
-    "viewAllProperties": "Tazama Nyumba Zote",
+    "viewAllProperties": "Nyumba Zote",
     "viewAllPropertiesDesc": "Angalia orodha kamili ya nyumba zako"
   },
   "about": {
@@ -561,6 +561,8 @@
     "month": "mwezi",
     "months": "miezi",
     "totalAmount": "Jumla",
+    "yourEarnings": "Mapato Yako",
+    "guestPays": "Mgeni analipa",
     "specialRequests": "Maombi Maalum",
     "approve": "Kubali",
     "reject": "Kataa",

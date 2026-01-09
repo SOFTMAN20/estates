@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { PropertyGridSkeleton } from '@/components/properties/propertyCommon/PropertyCardSkeleton';
 import { DeletePropertyDialog } from './DeletePropertyDialog';
-import { Home, Plus, Eye, Edit, Trash2, MapPin, DollarSign } from 'lucide-react';
+import { Home, Plus, Eye, Edit, Trash2, MapPin, DollarSign, Bed, Bath } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Property } from '@/hooks/useProperties';
 import { formatCurrency } from '@/lib/utils';
@@ -21,6 +22,8 @@ interface PropertyGridProps {
   onDelete: (id: string) => Promise<void>;
   /** Function called when user wants to add a new property */
   onAddProperty: () => void;
+  /** Function called when user toggles property availability */
+  onToggleAvailability?: (propertyId: string, currentAvailability: boolean) => void;
   /** View mode for displaying properties */
   viewMode?: 'grid' | 'list';
 }
@@ -37,6 +40,7 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
   onEdit, 
   onDelete,
   onAddProperty,
+  onToggleAvailability,
   viewMode = 'grid'
 }) => {
   const { t, i18n } = useTranslation();
@@ -181,8 +185,37 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
             </span>
           </div>
 
+          {/* Bedrooms, Bathrooms & Availability Toggle */}
+          <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600 pb-2 border-b">
+            <div className="flex items-center">
+              <Bed className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+              <span>{property.bedrooms || 0}</span>
+            </div>
+            <div className="flex items-center">
+              <Bath className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+              <span>{property.bathrooms || 0}</span>
+            </div>
+            {onToggleAvailability && (
+              <div className="flex items-center gap-1.5 ml-auto">
+                <span className="text-xs text-gray-500">
+                  {property.is_available ? t('dashboard.available') : 'Hidden'}
+                </span>
+                <Switch
+                  checked={property.is_available ?? true}
+                  disabled={property.status !== 'approved'}
+                  className="scale-75 sm:scale-100"
+                  onCheckedChange={() => {
+                    if (property.status === 'approved') {
+                      onToggleAvailability(property.id, property.is_available ?? true);
+                    }
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
           {/* Action Buttons */}
-          <div className="flex gap-2 pt-2 border-t">
+          <div className="flex gap-2 pt-1">
             <Button
               variant="outline"
               size="sm"

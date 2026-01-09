@@ -342,6 +342,17 @@ const Dashboard = () => {
           }}
           onDeleteProperty={(id) => deleteProperty(id, onPropertyDeleteSuccess, onPropertyDeleteError)}
           onAddProperty={openAddForm}
+          onToggleAvailability={(propertyId, currentAvailability) => {
+            toggleAvailability(
+              propertyId,
+              currentAvailability,
+              () => {
+                showSuccessToast(currentAvailability ? 'Property hidden successfully' : 'Property made available');
+                if (user) getMyProperties(user);
+              },
+              () => showErrorToast('Failed to update property availability')
+            );
+          }}
           limit={4}
           showViewAll={true}
           onViewAll={() => navigate('/host/properties')}

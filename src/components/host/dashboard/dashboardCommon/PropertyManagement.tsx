@@ -40,6 +40,7 @@ interface PropertyManagementProps {
   onEditProperty: (property: Property) => void;
   onDeleteProperty: (id: string) => Promise<void>;
   onAddProperty: () => void;
+  onToggleAvailability?: (propertyId: string, currentAvailability: boolean) => void;
   limit?: number;
   showViewAll?: boolean;
   onViewAll?: () => void;
@@ -66,6 +67,7 @@ const PropertyManagement: React.FC<PropertyManagementProps> = ({
   onEditProperty,
   onDeleteProperty,
   onAddProperty,
+  onToggleAvailability,
   limit,
   showViewAll = false,
   onViewAll
@@ -222,6 +224,7 @@ const PropertyManagement: React.FC<PropertyManagementProps> = ({
           onEdit={onEditProperty}
           onDelete={onDeleteProperty}
           onAddProperty={onAddProperty}
+          onToggleAvailability={onToggleAvailability}
         />
         
         {showViewAll && hasMoreProperties && (

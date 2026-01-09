@@ -293,8 +293,8 @@
     "completeAccountAction": "Complete Account",
     "accountProgress": "Account Progress",
     "completeInfo": "Complete your information to get better services",
-    "addFirstProperty": "Add Your First Property!",
-    "addNewProperty": "Add New Property",
+    "addFirstProperty": "New Property",
+    "addNewProperty": "New Property",
     "startJourney": "Start your property listing journey",
     "addToList": "Add new property to your listings",
     "updateAccountInfo": "Update Account",
@@ -440,7 +440,7 @@
     "add": "Add",
     "properties": "properties",
     "manageAllProperties": "Manage All Properties",
-    "viewAllProperties": "View All Properties",
+    "viewAllProperties": "All Properties",
     "viewAllPropertiesDesc": "View complete list of your properties"
   },
   "about": {
@@ -561,6 +561,8 @@
     "month": "month",
     "months": "months",
     "totalAmount": "Total Amount",
+    "yourEarnings": "Your Earnings",
+    "guestPays": "Guest pays",
     "specialRequests": "Special Requests",
     "approve": "Approve",
     "reject": "Reject",

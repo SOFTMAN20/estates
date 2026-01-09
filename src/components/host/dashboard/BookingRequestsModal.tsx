@@ -188,8 +188,11 @@ const BookingRequestsModal: React.FC<BookingRequestsModalProps> = ({
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs text-gray-500">{t('bookingRequests.totalAmount')}</span>
-                  <p className="font-bold text-primary">{formatCurrency(booking.total_amount)}</p>
+                  <span className="text-xs text-gray-500">{t('bookingRequests.yourEarnings')}</span>
+                  <p className="font-bold text-primary">{formatCurrency(booking.monthly_rent * booking.total_months)}</p>
+                  <span className="text-xs text-gray-400">
+                    {t('bookingRequests.guestPays')}: {formatCurrency(booking.total_amount)}
+                  </span>
                 </div>
               </div>
 

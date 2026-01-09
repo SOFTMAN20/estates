@@ -8,6 +8,7 @@
  * Features:
  * - Price input with currency prefix
  * - Period selector (per day, month, year)
+ * - Minimum rental months input (when per_month is selected)
  * - Validation feedback
  * - Accessible and responsive
  */
@@ -16,7 +17,7 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CheckCircle, Star } from 'lucide-react';
+import { CheckCircle, Star, Calendar } from 'lucide-react';
 import { cn } from '@/utils/utils';
 
 export type PricePeriod = 'per_day' | 'per_month' | 'per_year';
@@ -30,6 +31,10 @@ interface PriceInputProps {
   onPriceChange: (value: string) => void;
   /** Callback when period changes */
   onPeriodChange: (period: PricePeriod) => void;
+  /** Minimum rental months value (only used when period is per_month) */
+  minRentalMonths?: string;
+  /** Callback when minimum rental months changes */
+  onMinRentalMonthsChange?: (value: string) => void;
   /** Label text */
   label?: string;
   /** Placeholder text */
@@ -91,6 +96,8 @@ export const PriceInput: React.FC<PriceInputProps> = ({
   period,
   onPriceChange,
   onPeriodChange,
+  minRentalMonths = '1',
+  onMinRentalMonthsChange,
   label = 'Bei ya Kodi',
   placeholder = '800000',
   currency = 'TZS',
@@ -100,9 +107,10 @@ export const PriceInput: React.FC<PriceInputProps> = ({
   disabled = false,
 }) => {
   const hasValue = value && parseFloat(value) > 0;
+  const showMinRentalMonths = period === 'per_month';
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn('space-y-3', className)}>
       {/* Label */}
       <Label 
         htmlFor="price-input" 
@@ -160,12 +168,51 @@ export const PriceInput: React.FC<PriceInputProps> = ({
         </Select>
       </div>
 
+      {/* Minimum Rental Months Input - Only shown when period is per_month */}
+      {showMinRentalMonths && onMinRentalMonthsChange && (
+        <div className="space-y-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <Label 
+            htmlFor="min-rental-months" 
+            className="flex items-center gap-2 text-sm font-medium text-blue-900"
+          >
+            <Calendar className="h-4 w-4 text-blue-600" />
+            Miezi ya Chini ya Kukodi *
+          </Label>
+          <div className="flex items-center gap-2">
+            <Input
+              id="min-rental-months"
+              type="number"
+              value={minRentalMonths}
+              onChange={(e) => onMinRentalMonthsChange(e.target.value)}
+              placeholder="1"
+              disabled={disabled}
+              className={cn(
+                'w-24 transition-all duration-200',
+                parseInt(minRentalMonths) >= 1 && 'border-green-300 bg-green-50',
+                disabled && 'opacity-50 cursor-not-allowed'
+              )}
+              min="1"
+              max="24"
+            />
+            <span className="text-sm text-blue-800">
+              {parseInt(minRentalMonths) === 1 ? 'mwezi' : 'miezi'}
+            </span>
+          </div>
+          <p className="text-xs text-blue-700">
+            Weka idadi ya chini ya miezi ambayo mpangaji anaweza kukodi nyumba hii
+          </p>
+        </div>
+      )}
+
       {/* Validation Feedback */}
       {showFeedback && hasValue && (
         <div className="flex items-center gap-1 text-green-600 text-xs animate-in fade-in slide-in-from-top-1 duration-200">
           <CheckCircle className="h-3 w-3" />
           <span>
             Bei: {currency} {formatPrice(value)} {getPeriodLabel(period)}
+            {showMinRentalMonths && parseInt(minRentalMonths) > 1 && (
+              <span className="ml-1">(chini ya miezi {minRentalMonths})</span>
+            )}
           </span>
         </div>
       )}

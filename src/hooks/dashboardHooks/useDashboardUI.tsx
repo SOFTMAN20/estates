@@ -12,6 +12,7 @@ export interface UIState {
   showAddForm: boolean;
   showProfileDialog: boolean;
   showHelpDialog: boolean;
+  showBookingRequestsDialog: boolean;
   loading: boolean;
   submitting: boolean;
   profileLoading: boolean;
@@ -34,6 +35,8 @@ interface UseDashboardUIReturn {
   closeProfileDialog: () => void;
   openHelpDialog: () => void;
   closeHelpDialog: () => void;
+  openBookingRequestsDialog: () => void;
+  closeBookingRequestsDialog: () => void;
 }
 
 export const useDashboardUI = (): UseDashboardUIReturn => {
@@ -41,6 +44,7 @@ export const useDashboardUI = (): UseDashboardUIReturn => {
     showAddForm: false,
     showProfileDialog: false,
     showHelpDialog: false,
+    showBookingRequestsDialog: false,
     loading: true,
     submitting: false,
     profileLoading: false,
@@ -94,6 +98,14 @@ export const useDashboardUI = (): UseDashboardUIReturn => {
     updateUIState({ showHelpDialog: false });
   };
 
+  const openBookingRequestsDialog = (): void => {
+    updateUIState({ showBookingRequestsDialog: true });
+  };
+
+  const closeBookingRequestsDialog = (): void => {
+    updateUIState({ showBookingRequestsDialog: false });
+  };
+
   return {
     uiState,
     updateUIState,
@@ -106,6 +118,8 @@ export const useDashboardUI = (): UseDashboardUIReturn => {
     openProfileDialog,
     closeProfileDialog,
     openHelpDialog,
-    closeHelpDialog
+    closeHelpDialog,
+    openBookingRequestsDialog,
+    closeBookingRequestsDialog
   };
 };

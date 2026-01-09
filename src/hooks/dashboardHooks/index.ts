@@ -8,7 +8,9 @@
 export { useDashboardProfile } from './useDashboardProfile';
 export { useDashboardProperties } from './useDashboardProperties';
 export { useDashboardUI } from './useDashboardUI';
+export { useHostBookings } from './useHostBookings';
 
 export type { ProfileFormData } from './useDashboardProfile';
 export type { PropertyFormData } from './useDashboardProperties';
 export type { UIState } from './useDashboardUI';
+export type { HostBooking } from './useHostBookings';

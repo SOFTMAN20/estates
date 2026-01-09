@@ -913,7 +913,8 @@ const PropertyDetail = () => {
                   location: property.location,
                   images: property.images || [],
                   property_type: property.property_type,
-                  price: Number(property.price)
+                  price: Number(property.price),
+                  min_rental_months: (property as typeof property & { min_rental_months?: number }).min_rental_months
                 }}
                 guestInfo={{
                   id: user?.id || '',
@@ -1022,7 +1023,8 @@ const PropertyDetail = () => {
                 location: property.location,
                 images: property.images || [],
                 property_type: property.property_type,
-                price: Number(property.price)
+                price: Number(property.price),
+                min_rental_months: (property as typeof property & { min_rental_months?: number }).min_rental_months
               }}
               guestInfo={{
                 id: user?.id || '',

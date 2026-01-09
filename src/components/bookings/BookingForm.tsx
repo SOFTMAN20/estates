@@ -40,6 +40,7 @@ interface BookingFormProps {
     images: string[];
     property_type: string;
     price: number;
+    min_rental_months?: number;
   };
   guestInfo: {
     id: string;
@@ -82,7 +83,8 @@ export function BookingForm({
   const commissionRate = useCommissionRate();
   const { data: platformSettings } = usePlatformSettings();
   const platformCommission = commissionRate / 100; // Convert percentage to decimal
-  const minBookingMonths = platformSettings?.min_booking_months || 1;
+  // Use property's min_rental_months if set, otherwise fall back to platform settings
+  const minBookingMonths = property.min_rental_months || platformSettings?.min_booking_months || 1;
 
   // Calculate booking details
   const bookingDetails = useMemo(() => {

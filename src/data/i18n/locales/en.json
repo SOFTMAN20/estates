@@ -185,7 +185,8 @@
       "villa": "Villa",
       "bedsitter": "Bedsitter",
       "lodge": "Lodge",
-      "hotel": "Hotel"
+      "hotel": "Hotel",
+      "hostel": "Hostel"
     },
     "amenities": {
       "electricity": "Electricity",
@@ -372,6 +373,10 @@
     "room": "Room",
     "studio": "Studio",
     "office": "Office",
+    "bedsitter": "Bedsitter",
+    "lodge": "Lodge",
+    "hotel": "Hotel",
+    "hostel": "Hostel",
     "bedrooms": "Bedrooms",
     "bathrooms": "Bathrooms",
     "description": "Description",
@@ -486,6 +491,7 @@
   },
   "footer": {
     "description": "A modern platform for finding and renting houses in Tanzania. We connect landlords and tenants easily and securely.",
+    "location": "Mbeya, MUST University",
     "importantPages": "Important Pages",
     "home": "Home",
     "searchHouses": "Search Houses",
@@ -542,5 +548,32 @@
   "property": {
     "edit": "Edit",
     "delete": "Delete"
+  },
+  "bookingRequests": {
+    "title": "Booking Requests",
+    "pendingTab": "Pending Requests",
+    "upcomingTab": "Upcoming Guests",
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "duration": "Duration",
+    "month": "month",
+    "months": "months",
+    "totalAmount": "Total Amount",
+    "specialRequests": "Special Requests",
+    "approve": "Approve",
+    "reject": "Reject",
+    "rejectTitle": "Reject Booking Request",
+    "rejectDescription": "Are you sure you want to reject this booking request? You can optionally provide a reason.",
+    "rejectReasonPlaceholder": "Reason for rejection (optional)",
+    "confirmReject": "Reject Booking",
+    "noPendingRequests": "No Pending Requests",
+    "noPendingDescription": "You don't have any booking requests waiting for approval.",
+    "noUpcomingBookings": "No Upcoming Guests",
+    "noUpcomingDescription": "You don't have any confirmed bookings coming up.",
+    "unknownGuest": "Unknown Guest",
+    "quickActionTitle": "Booking Requests",
+    "quickActionDescription": "Manage incoming booking requests"
   }
 }

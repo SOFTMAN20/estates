@@ -32,6 +32,7 @@ export interface PropertyFormData {
   amenities: string[];
   nearby_services: string[];
   images: string[];
+  min_rental_months: string;
 }
 
 interface UseDashboardPropertiesReturn {
@@ -90,7 +91,8 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     contact_whatsapp_phone: '',
     amenities: [],
     nearby_services: [],
-    images: []
+    images: [],
+    min_rental_months: '1'
   });
 
   /**
@@ -159,7 +161,7 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     }
     
     // Property type validation
-    const allowedTypes = ['Apartment', 'House', 'Studio', 'Shared Room', 'Bedsitter', 'Lodge', 'Hotel', 'Office'];
+    const allowedTypes = ['Apartment', 'House', 'Studio', 'Shared Room', 'Bedsitter', 'Lodge', 'Hotel', 'Hostel', 'Office'];
     if (!formData.property_type?.trim()) {
       errors.push('Chagua aina ya nyumba');
     } else if (!allowedTypes.includes(formData.property_type)) {
@@ -203,7 +205,8 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       contact_whatsapp_phone: formData.contact_whatsapp_phone?.trim() || null,
       amenities: formData.amenities || [],
       nearby_services: formData.nearby_services || [],
-      images: formData.images || []
+      images: formData.images || [],
+      min_rental_months: formData.min_rental_months ? parseInt(formData.min_rental_months) : 1
     };
   };
 
@@ -470,7 +473,8 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       contact_whatsapp_phone: property.contact_whatsapp_phone || profile?.phone || '',
       amenities: property.amenities || [],
       nearby_services: property.nearby_services || [],
-      images: property.images || []
+      images: property.images || [],
+      min_rental_months: (property as Property & { min_rental_months?: number }).min_rental_months?.toString() || '1'
     });
   };
 
@@ -581,7 +585,8 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       contact_whatsapp_phone: profile?.phone || '',
       amenities: [],
       nearby_services: [],
-      images: []
+      images: [],
+      min_rental_months: '1'
     });
   };
 

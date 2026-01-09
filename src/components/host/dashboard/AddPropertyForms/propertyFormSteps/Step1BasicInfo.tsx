@@ -22,6 +22,7 @@ interface Step1BasicInfoProps {
     price_period: string;
     location: string;
     description: string;
+    min_rental_months: string;
   };
   onInputChange: (field: string, value: unknown) => void;
   isValid: boolean;
@@ -73,6 +74,8 @@ export const Step1BasicInfo: React.FC<Step1BasicInfoProps> = ({
         period={(formData.price_period || 'per_month') as PricePeriod}
         onPriceChange={(value) => onInputChange('price', value)}
         onPeriodChange={(period) => onInputChange('price_period', period)}
+        minRentalMonths={formData.min_rental_months || '1'}
+        onMinRentalMonthsChange={(value) => onInputChange('min_rental_months', value)}
         label={t('dashboard.rentPrice')}
         required
         showFeedback

@@ -383,6 +383,7 @@ export type Database = {
           approved_at: string | null
           approved_by: string | null
           available_from: string | null
+          average_rating: number | null
           bathrooms: number
           bedrooms: number
           contact_phone: string | null
@@ -394,6 +395,7 @@ export type Database = {
           images: string[]
           is_available: boolean | null
           location: string
+          min_rental_months: number | null
           nearby_services: string[] | null
           price: number
           price_period: string | null
@@ -403,6 +405,7 @@ export type Database = {
           square_meters: number | null
           status: string | null
           title: string
+          total_reviews: number | null
           updated_at: string | null
         }
         Insert: {
@@ -410,6 +413,7 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           available_from?: string | null
+          average_rating?: number | null
           bathrooms: number
           bedrooms: number
           contact_phone?: string | null
@@ -421,6 +425,7 @@ export type Database = {
           images?: string[]
           is_available?: boolean | null
           location: string
+          min_rental_months?: number | null
           nearby_services?: string[] | null
           price: number
           price_period?: string | null
@@ -430,6 +435,7 @@ export type Database = {
           square_meters?: number | null
           status?: string | null
           title: string
+          total_reviews?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -437,6 +443,7 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           available_from?: string | null
+          average_rating?: number | null
           bathrooms?: number
           bedrooms?: number
           contact_phone?: string | null
@@ -448,6 +455,7 @@ export type Database = {
           images?: string[]
           is_available?: boolean | null
           location?: string
+          min_rental_months?: number | null
           nearby_services?: string[] | null
           price?: number
           price_period?: string | null
@@ -457,6 +465,7 @@ export type Database = {
           square_meters?: number | null
           status?: string | null
           title?: string
+          total_reviews?: number | null
           updated_at?: string | null
         }
         Relationships: [

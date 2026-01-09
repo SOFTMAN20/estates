@@ -35,6 +35,7 @@ type Profile = Tables<'profiles'>;
 interface PropertyFormData extends BasePropertyFormData {
   price_period: string;
   square_meters: string;
+  min_rental_months: string;
 }
 
 interface PropertyFormProps {
@@ -308,7 +309,8 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
               price: formData.price,
               price_period: formData.price_period,
               location: formData.location,
-              description: formData.description
+              description: formData.description,
+              min_rental_months: formData.min_rental_months || '1'
             }}
             onInputChange={onInputChange}
             isValid={isStepValid(1)}

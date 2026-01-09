@@ -1,10 +1,12 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { 
   Plus, 
   BarChart3, 
   Eye,
-  Headphones
+  Headphones,
+  CalendarCheck
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -12,15 +14,19 @@ import { useNavigate } from 'react-router-dom';
 interface QuickActionsProps {
   onAddProperty: () => void;
   onShowHelp: () => void;
+  onShowBookingRequests?: () => void;
   isNewUser: boolean;
   propertiesCount: number;
+  pendingBookingsCount?: number;
 }
 
 const QuickActions: React.FC<QuickActionsProps> = ({
   onAddProperty,
   onShowHelp,
+  onShowBookingRequests,
   isNewUser,
-  propertiesCount
+  propertiesCount,
+  pendingBookingsCount = 0
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -34,7 +40,18 @@ const QuickActions: React.FC<QuickActionsProps> = ({
       onClick: onAddProperty,
       primary: true,
       highlight: isNewUser,
-      color: 'bg-primary hover:bg-primary/90'
+      color: 'bg-primary hover:bg-primary/90',
+      badge: null
+    },
+    {
+      id: 'booking-requests',
+      title: t('bookingRequests.quickActionTitle'),
+      description: t('bookingRequests.quickActionDescription'),
+      icon: CalendarCheck,
+      onClick: onShowBookingRequests,
+      primary: false,
+      color: 'bg-orange-500 hover:bg-orange-600',
+      badge: pendingBookingsCount > 0 ? pendingBookingsCount : null
     },
     {
       id: 'view-properties',
@@ -44,7 +61,8 @@ const QuickActions: React.FC<QuickActionsProps> = ({
       onClick: () => navigate('/host/properties'),
       primary: false,
       disabled: propertiesCount === 0,
-      color: 'bg-blue-500 hover:bg-blue-600'
+      color: 'bg-blue-500 hover:bg-blue-600',
+      badge: null
     },
     {
       id: 'view-analytics',
@@ -54,7 +72,8 @@ const QuickActions: React.FC<QuickActionsProps> = ({
       onClick: () => navigate('/analytics'),
       primary: false,
       disabled: propertiesCount === 0,
-      color: 'bg-green-500 hover:bg-green-600'
+      color: 'bg-green-500 hover:bg-green-600',
+      badge: null
     },
     {
       id: 'help',
@@ -63,12 +82,13 @@ const QuickActions: React.FC<QuickActionsProps> = ({
       icon: Headphones,
       onClick: onShowHelp,
       primary: false,
-      color: 'bg-purple-500 hover:bg-purple-600'
+      color: 'bg-purple-500 hover:bg-purple-600',
+      badge: null
     }
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
       {actions.map((action) => (
         <Card 
           key={action.id}
@@ -77,7 +97,13 @@ const QuickActions: React.FC<QuickActionsProps> = ({
           } ${action.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           onClick={action.disabled ? undefined : action.onClick}
         >
-          <CardContent className="p-6 text-center">
+          <CardContent className="p-6 text-center relative">
+            {/* Badge for pending count */}
+            {action.badge && (
+              <Badge className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 min-w-[24px]">
+                {action.badge}
+              </Badge>
+            )}
             <div className={`w-12 h-12 ${action.color} rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-200`}>
               <action.icon className="h-6 w-6 text-white" />
             </div>

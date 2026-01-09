@@ -37,6 +37,7 @@ import PropertyManagement from '@/components/host/dashboard/dashboardCommon/Prop
 import { PropertyForm } from '@/components/host/dashboard/AddPropertyForms';
 import { ProfileSettings } from '@/components/forms';
 import GetHelpSection from '@/components/host/dashboard/dashboardCommon/GetHelpSection';
+import BookingRequestsModal from '@/components/host/dashboard/BookingRequestsModal';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -50,6 +51,7 @@ import {
   useDashboardProperties
 } from '@/hooks/dashboardHooks';
 import { useBookingsStats } from '@/hooks/dashboardHooks/useBookingsStats';
+import { useHostBookings } from '@/hooks/dashboardHooks/useHostBookings';
 
 /**
  * DASHBOARD COMPONENT - REFACTORED WITH CUSTOM HOOKS
@@ -79,7 +81,9 @@ const Dashboard = () => {
     openProfileDialog,
     closeProfileDialog,
     openHelpDialog,
-    closeHelpDialog
+    closeHelpDialog,
+    openBookingRequestsDialog,
+    closeBookingRequestsDialog
   } = useDashboardUI();
   
   // Profile Management Hook
@@ -113,6 +117,18 @@ const Dashboard = () => {
 
   // Bookings Statistics Hook
   const { totalBookings } = useBookingsStats(user?.id);
+
+  // Host Bookings Hook (for booking requests management)
+  const {
+    pendingBookings,
+    upcomingBookings,
+    pendingCount,
+    isLoading: bookingsLoading,
+    approveBooking,
+    rejectBooking,
+    isApproving,
+    isRejecting
+  } = useHostBookings(user?.id);
 
   /**
    * INITIALIZATION AND LIFECYCLE MANAGEMENT
@@ -302,8 +318,10 @@ const Dashboard = () => {
         <QuickActions
           onAddProperty={openAddForm}
           onShowHelp={openHelpDialog}
+          onShowBookingRequests={openBookingRequestsDialog}
           isNewUser={uiState.isNewUser}
           propertiesCount={properties.length}
+          pendingBookingsCount={pendingCount}
         />
 
         {/* Statistics Section */}
@@ -381,6 +399,19 @@ const Dashboard = () => {
         <GetHelpSection 
           isOpen={uiState.showHelpDialog}
           onClose={closeHelpDialog}
+        />
+
+        {/* Booking Requests Modal */}
+        <BookingRequestsModal
+          isOpen={uiState.showBookingRequestsDialog}
+          onClose={closeBookingRequestsDialog}
+          pendingBookings={pendingBookings}
+          upcomingBookings={upcomingBookings}
+          onApprove={approveBooking}
+          onReject={rejectBooking}
+          isApproving={isApproving}
+          isRejecting={isRejecting}
+          isLoading={bookingsLoading}
         />
       </div>
     </div>

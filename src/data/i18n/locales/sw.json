@@ -185,7 +185,8 @@
       "villa": "Villa",
       "bedsitter": "Bedsitter",
       "lodge": "Lodge",
-      "hotel": "Hoteli"
+      "hotel": "Hoteli",
+      "hostel": "Hosteli"
     },
     "amenities": {
       "electricity": "Umeme",
@@ -372,6 +373,10 @@
     "room": "Chumba",
     "studio": "Studio",
     "office": "Ofisi",
+    "bedsitter": "Bedsitter",
+    "lodge": "Lodge",
+    "hotel": "Hoteli",
+    "hostel": "Hosteli",
     "bedrooms": "Vyumba vya Kulala",
     "bathrooms": "Vyumba vya Kuogea",
     "description": "Maelezo",
@@ -543,5 +548,32 @@
   "property": {
     "edit": "Hariri",
     "delete": "Futa"
+  },
+  "bookingRequests": {
+    "title": "Maombi ya Uhifadhi",
+    "pendingTab": "Maombi Yanayosubiri",
+    "upcomingTab": "Wageni Wanaokuja",
+    "pending": "Inasubiri",
+    "confirmed": "Imethibitishwa",
+    "checkIn": "Kuingia",
+    "checkOut": "Kutoka",
+    "duration": "Muda",
+    "month": "mwezi",
+    "months": "miezi",
+    "totalAmount": "Jumla",
+    "specialRequests": "Maombi Maalum",
+    "approve": "Kubali",
+    "reject": "Kataa",
+    "rejectTitle": "Kataa Ombi la Uhifadhi",
+    "rejectDescription": "Una uhakika unataka kukataa ombi hili la uhifadhi? Unaweza kutoa sababu kama unataka.",
+    "rejectReasonPlaceholder": "Sababu ya kukataa (si lazima)",
+    "confirmReject": "Kataa Uhifadhi",
+    "noPendingRequests": "Hakuna Maombi Yanayosubiri",
+    "noPendingDescription": "Huna maombi ya uhifadhi yanayosubiri idhini yako.",
+    "noUpcomingBookings": "Hakuna Wageni Wanaokuja",
+    "noUpcomingDescription": "Huna uhifadhi uliothibitishwa unaokuja.",
+    "unknownGuest": "Mgeni Asiyejulikana",
+    "quickActionTitle": "Maombi ya Uhifadhi",
+    "quickActionDescription": "Simamia maombi ya uhifadhi yanayoingia"
   }
 }

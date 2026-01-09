@@ -61,72 +61,37 @@ export const Step3PropertyDetails: React.FC<Step2PropertyDetailsProps> = ({
           {t('dashboard.propertyType')} *
         </Label>
 
-        {/* Residential Properties */}
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2">
-            <Home className="h-3.5 w-3.5 text-gray-500" />
-            Makazi (Residential)
-          </h4>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { value: 'Apartment', label: t('dashboard.apartment'), icon: Building },
-              { value: 'House', label: t('dashboard.house'), icon: Home },
-              { value: 'Shared Room', label: t('dashboard.room'), icon: Bed },
-              { value: 'Studio', label: t('dashboard.studio'), icon: Users },
-              { value: 'Bedsitter', label: 'Bedsitter', icon: Briefcase }
-            ].map(({ value, label, icon: Icon }) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => onInputChange('property_type', value)}
-                className={`p-4 border-2 rounded-lg transition-all duration-200 text-left hover:shadow-md ${
-                  formData.property_type === value 
-                    ? 'border-primary bg-primary/5 shadow-md' 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon className={`h-5 w-5 ${formData.property_type === value ? 'text-primary' : 'text-gray-400'}`} />
-                  <span className={`font-medium ${formData.property_type === value ? 'text-primary' : 'text-gray-700'}`}>
-                    {label}
-                  </span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Commercial Properties */}
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2">
-            <Building2 className="h-3.5 w-3.5 text-gray-500" />
-            Biashara (Commercial)
-          </h4>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { value: 'Lodge', label: 'Lodge', icon: Landmark },
-              { value: 'Hotel', label: 'Hotel', icon: Hotel },
-              { value: 'Office', label: 'Ofisi', icon: Building2 }
-            ].map(({ value, label, icon: Icon }) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => onInputChange('property_type', value)}
-                className={`p-4 border-2 rounded-lg transition-all duration-200 text-left hover:shadow-md ${
-                  formData.property_type === value 
-                    ? 'border-primary bg-primary/5 shadow-md' 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon className={`h-5 w-5 ${formData.property_type === value ? 'text-primary' : 'text-gray-400'}`} />
-                  <span className={`font-medium ${formData.property_type === value ? 'text-primary' : 'text-gray-700'}`}>
-                    {label}
-                  </span>
-                </div>
-              </button>
-            ))}
-          </div>
+        {/* All Property Types */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {[
+            { value: 'Apartment', label: t('dashboard.apartment'), icon: Building },
+            { value: 'House', label: t('dashboard.house'), icon: Home },
+            { value: 'Shared Room', label: t('dashboard.room'), icon: Bed },
+            { value: 'Studio', label: t('dashboard.studio'), icon: Users },
+            { value: 'Bedsitter', label: t('dashboard.bedsitter'), icon: Briefcase },
+            { value: 'Lodge', label: t('dashboard.lodge'), icon: Landmark },
+            { value: 'Hotel', label: t('dashboard.hotel'), icon: Hotel },
+            { value: 'Hostel', label: t('dashboard.hostel'), icon: Users },
+            { value: 'Office', label: t('dashboard.office'), icon: Building2 }
+          ].map(({ value, label, icon: Icon }) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => onInputChange('property_type', value)}
+              className={`p-4 border-2 rounded-lg transition-all duration-200 text-left hover:shadow-md ${
+                formData.property_type === value 
+                  ? 'border-primary bg-primary/5 shadow-md' 
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Icon className={`h-5 w-5 ${formData.property_type === value ? 'text-primary' : 'text-gray-400'}`} />
+                <span className={`font-medium ${formData.property_type === value ? 'text-primary' : 'text-gray-700'}`}>
+                  {label}
+                </span>
+              </div>
+            </button>
+          ))}
         </div>
       </div>
 

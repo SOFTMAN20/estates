@@ -58,6 +58,7 @@ export interface PropertyFormData {
   amenities: string[];
   nearby_services: string[];
   images: string[];
+  min_rental_months: string;
 }
 
 /**

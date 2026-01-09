@@ -177,29 +177,26 @@ const Browse = () => {
       )}
 
       {/* Filters Sidebar */}
-      <div className={`fixed top-0 left-0 h-full w-full sm:w-96 md:w-[400px] bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
+      <div className={`fixed top-0 left-0 h-full w-[85%] max-w-[320px] bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
         uiState.showFilters ? 'translate-x-0' : '-translate-x-full'
       }`}>
         {/* Sidebar Header - Sticky */}
-        <div className="sticky top-0 bg-gradient-to-r from-primary/5 to-orange-50 border-b border-gray-200 px-4 sm:px-6 py-4 sm:py-5 z-10">
+        <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-3 z-10">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <svg className="h-5 w-5 sm:h-6 sm:w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-primary/10 rounded-lg">
+                <svg className="h-4 w-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                 </svg>
               </div>
-              <div>
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Filters</h2>
-                <p className="text-xs sm:text-sm text-gray-500">Refine your search</p>
-              </div>
+              <h2 className="text-base font-semibold text-gray-900">Filters</h2>
             </div>
             <button
               onClick={() => updateUIState('showFilters', false)}
-              className="p-2 hover:bg-white/80 rounded-full transition-all duration-200 hover:scale-110"
+              className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
               aria-label="Close filters"
             >
-              <svg className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -207,8 +204,8 @@ const Browse = () => {
         </div>
 
         {/* Filters Content - Scrollable */}
-        <div className="overflow-y-auto h-[calc(100%-80px)] sm:h-[calc(100%-88px)]">
-          <div className="px-4 sm:px-6 py-4 sm:py-6">
+        <div className="overflow-y-auto h-[calc(100%-56px)]">
+          <div className="px-4 py-4">
             <PropertyFiltersPanel
               propertyType={filters.propertyType}
               onPropertyTypeChange={(value) => updateFilter('propertyType', value)}

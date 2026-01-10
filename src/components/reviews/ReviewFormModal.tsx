@@ -64,6 +64,7 @@ export function ReviewFormModal({
       location_rating: 0,
       comment: '',
     },
+    mode: 'onChange', // Validate on change for better UX
   });
 
   const comment = watch('comment');
@@ -100,38 +101,41 @@ export function ReviewFormModal({
       property_id: propertyId,
       booking_id: bookingId,
       rating: data.rating,
-      cleanliness: data.cleanliness,
-      communication: data.communication,
-      value: data.value,
-      location_rating: data.location_rating,
+      cleanliness: data.cleanliness || undefined,
+      communication: data.communication || undefined,
+      value: data.value || undefined,
+      location_rating: data.location_rating || undefined,
       comment: data.comment,
       images: images.length > 0 ? images : undefined,
     };
 
-    createReview(reviewData);
-    onClose();
+    createReview(reviewData, {
+      onSuccess: () => {
+        onClose();
+      },
+    });
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Write a Review</DialogTitle>
+      <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+        <DialogHeader className="pb-2">
+          <DialogTitle className="text-lg sm:text-xl">Write a Review</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
           {/* Property Info */}
-          <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
             {propertyImage && (
               <img
                 src={propertyImage}
                 alt={propertyName}
-                className="w-20 h-20 rounded-lg object-cover"
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover flex-shrink-0"
               />
             )}
-            <div className="flex-1">
-              <h3 className="font-semibold text-gray-900">{propertyName}</h3>
-              <p className="text-sm text-gray-600">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{propertyName}</h3>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
                 {new Date(checkIn).toLocaleDateString()} - {new Date(checkOut).toLocaleDateString()}
               </p>
             </div>
@@ -139,10 +143,10 @@ export function ReviewFormModal({
 
           {/* Overall Rating */}
           <div>
-            <Label className="text-base font-semibold mb-3 block">
+            <Label className="text-sm sm:text-base font-semibold mb-2 sm:mb-3 block">
               Overall Rating <span className="text-red-500">*</span>
             </Label>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
               <RatingStars
                 value={rating}
                 onChange={(value) => setValue('rating', value)}
@@ -165,12 +169,12 @@ export function ReviewFormModal({
           </div>
 
           {/* Category Ratings */}
-          <div className="space-y-4">
-            <Label className="text-base font-semibold">Category Ratings (Optional)</Label>
+          <div className="space-y-3 sm:space-y-4">
+            <Label className="text-sm sm:text-base font-semibold">Category Ratings (Optional)</Label>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm mb-2 block">Cleanliness</Label>
+            <div className="grid grid-cols-1 gap-3 sm:gap-4">
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <Label className="text-sm font-medium">✨ Cleanliness</Label>
                 <RatingStars
                   value={cleanliness || 0}
                   onChange={(value) => setValue('cleanliness', value)}
@@ -179,8 +183,8 @@ export function ReviewFormModal({
                 />
               </div>
 
-              <div>
-                <Label className="text-sm mb-2 block">Communication</Label>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <Label className="text-sm font-medium">💬 Communication</Label>
                 <RatingStars
                   value={communication || 0}
                   onChange={(value) => setValue('communication', value)}
@@ -189,8 +193,8 @@ export function ReviewFormModal({
                 />
               </div>
 
-              <div>
-                <Label className="text-sm mb-2 block">Value for Money</Label>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <Label className="text-sm font-medium">💰 Value for Money</Label>
                 <RatingStars
                   value={value || 0}
                   onChange={(value) => setValue('value', value)}
@@ -199,8 +203,8 @@ export function ReviewFormModal({
                 />
               </div>
 
-              <div>
-                <Label className="text-sm mb-2 block">Location</Label>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <Label className="text-sm font-medium">📍 Location</Label>
                 <RatingStars
                   value={location_rating || 0}
                   onChange={(value) => setValue('location_rating', value)}
@@ -213,44 +217,44 @@ export function ReviewFormModal({
 
           {/* Written Review */}
           <div>
-            <Label htmlFor="comment" className="text-base font-semibold mb-2 block">
+            <Label htmlFor="comment" className="text-sm sm:text-base font-semibold mb-2 block">
               Your Review <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="comment"
               {...register('comment')}
               placeholder="Share your experience with this property. What did you like? What could be improved?"
-              rows={6}
-              className={cn(errors.comment && 'border-red-500')}
+              rows={5}
+              className={cn('text-sm sm:text-base', errors.comment && 'border-red-500')}
             />
             <div className="flex items-center justify-between mt-2">
               <span className={cn(
-                'text-sm',
+                'text-xs sm:text-sm',
                 comment.length < 50 ? 'text-red-500' : 'text-gray-500'
               )}>
-                {comment.length}/1000 characters (minimum 50)
+                {comment.length}/1000 (min 50)
               </span>
             </div>
             {errors.comment && (
-              <p className="text-sm text-red-500 mt-1">{errors.comment.message}</p>
+              <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.comment.message}</p>
             )}
           </div>
 
           {/* Photo Upload */}
           <div>
-            <Label className="text-base font-semibold mb-2 block">
+            <Label className="text-sm sm:text-base font-semibold mb-2 block">
               Add Photos (Optional)
             </Label>
-            <p className="text-sm text-gray-600 mb-3">
+            <p className="text-xs sm:text-sm text-gray-600 mb-3">
               Upload up to 5 photos to help others see what you experienced
             </p>
 
             {images.length < 5 && (
-              <label className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary transition-colors">
+              <label className="flex items-center justify-center w-full h-24 sm:h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary transition-colors active:bg-gray-50">
                 <div className="text-center">
-                  <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                  <span className="text-sm text-gray-600">
-                    Click to upload ({5 - images.length} remaining)
+                  <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 mx-auto mb-1 sm:mb-2" />
+                  <span className="text-xs sm:text-sm text-gray-600">
+                    Tap to upload ({5 - images.length} remaining)
                   </span>
                 </div>
                 <input
@@ -265,18 +269,18 @@ export function ReviewFormModal({
 
             {/* Image Previews */}
             {imagePreviews.length > 0 && (
-              <div className="grid grid-cols-5 gap-2 mt-3">
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-3">
                 {imagePreviews.map((preview, index) => (
-                  <div key={index} className="relative group">
+                  <div key={index} className="relative group aspect-square">
                     <img
                       src={preview}
                       alt={`Preview ${index + 1}`}
-                      className="w-full h-20 object-cover rounded-lg"
+                      className="w-full h-full object-cover rounded-lg"
                     />
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-1 right-1 p-1.5 bg-red-500 text-white rounded-full opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                     >
                       <Trash2 className="w-3 h-3" />
                     </button>
@@ -287,20 +291,22 @@ export function ReviewFormModal({
           </div>
 
           {/* Submit Button */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 pt-4 border-t">
             <Button
               type="button"
               variant="outline"
               onClick={onClose}
               disabled={isCreating}
+              className="w-full sm:w-auto"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={isCreating || rating === 0}
+              disabled={isCreating || rating === 0 || comment.length < 50}
+              className="w-full sm:w-auto"
             >
-              {isCreating ? 'Submitting...' : 'Submit Review'}
+              {isCreating ? 'Submitting...' : rating === 0 ? 'Select a Rating' : comment.length < 50 ? `Need ${50 - comment.length} more chars` : 'Submit Review'}
             </Button>
           </div>
         </form>

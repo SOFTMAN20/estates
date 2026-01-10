@@ -22,9 +22,15 @@ export function RatingStars({
   const [hoverValue, setHoverValue] = useState<number | null>(null);
 
   const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-5 h-5',
-    lg: 'w-6 h-6'
+    sm: 'w-3.5 h-3.5 sm:w-4 sm:h-4',
+    md: 'w-4 h-4 sm:w-5 sm:h-5',
+    lg: 'w-5 h-5 sm:w-6 sm:h-6'
+  };
+
+  const touchTargetClasses = {
+    sm: 'p-0.5',
+    md: 'p-0.5 sm:p-1',
+    lg: 'p-1'
   };
 
   const displayValue = hoverValue !== null ? hoverValue : value;
@@ -60,9 +66,11 @@ export function RatingStars({
         onMouseEnter={() => handleMouseEnter(starValue)}
         onMouseLeave={handleMouseLeave}
         disabled={!interactive}
+        aria-label={`Rate ${starValue} star${starValue !== 1 ? 's' : ''}`}
         className={cn(
-          'relative',
-          interactive && 'cursor-pointer hover:scale-110 transition-transform',
+          'relative touch-manipulation',
+          touchTargetClasses[size],
+          interactive && 'cursor-pointer hover:scale-110 active:scale-95 transition-transform',
           !interactive && 'cursor-default'
         )}
       >
@@ -77,7 +85,8 @@ export function RatingStars({
           <Star
             className={cn(
               sizeClasses[size],
-              filled ? 'fill-yellow-400 text-yellow-400' : 'fill-none text-gray-300'
+              filled ? 'fill-yellow-400 text-yellow-400' : 'fill-none text-gray-300',
+              interactive && !filled && 'hover:text-yellow-300'
             )}
           />
         )}
@@ -86,12 +95,12 @@ export function RatingStars({
   };
 
   return (
-    <div className={cn('flex items-center gap-1', className)}>
-      <div className="flex items-center gap-0.5">
+    <div className={cn('flex items-center gap-0.5', className)}>
+      <div className="flex items-center -mx-0.5">
         {[0, 1, 2, 3, 4].map(renderStar)}
       </div>
       {showValue && (
-        <span className="text-sm font-medium text-gray-700 ml-1">
+        <span className="text-xs sm:text-sm font-semibold text-gray-700 ml-1.5">
           {displayValue.toFixed(1)}
         </span>
       )}

@@ -34,7 +34,6 @@ import {
   Maximize, 
   DollarSign, 
   User, 
-  Mail, 
   Phone, 
   Calendar,
   Home,
@@ -76,7 +75,7 @@ export function PropertyDetailsModal({ propertyId, onClose }: PropertyDetailsMod
         .from('properties')
         .select(`
           *,
-          profiles:user_id (
+          host:profiles!properties_host_id_fkey (
             name,
             phone,
             avatar_url,
@@ -132,7 +131,7 @@ export function PropertyDetailsModal({ propertyId, onClose }: PropertyDetailsMod
 
   if (!property) return null;
 
-  const images = property.image_urls || [];
+  const images = property.images || [];
   const amenities = property.amenities || [];
 
   return (
@@ -211,7 +210,7 @@ export function PropertyDetailsModal({ propertyId, onClose }: PropertyDetailsMod
               <div>
                 <p className="text-sm text-gray-600">Monthly Rent</p>
                 <p className="text-2xl font-bold text-blue-600">
-                  TZS {property.price_per_month?.toLocaleString()}
+                  TZS {property.price?.toLocaleString()}
                 </p>
               </div>
             </div>
@@ -243,18 +242,21 @@ export function PropertyDetailsModal({ propertyId, onClose }: PropertyDetailsMod
                 <div className="flex items-center space-x-2">
                   <User className="h-4 w-4 text-gray-400" />
                   <span className="text-gray-600">Name:</span>
-                  <span className="font-medium">{property.profiles?.name}</span>
+                  <span className="font-medium">{property.host?.name}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Phone className="h-4 w-4 text-gray-400" />
                   <span className="text-gray-600">Phone:</span>
-                  <span className="font-medium">{property.profiles?.phone || 'N/A'}</span>
+                  <span className="font-medium">{property.host?.phone || 'N/A'}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Calendar className="h-4 w-4 text-gray-400" />
                   <span className="text-gray-600">Member since:</span>
                   <span className="font-medium">
-                    {formatDistanceToNow(new Date(property.profiles?.created_at), { addSuffix: true })}
+                    {property.host?.created_at 
+                      ? formatDistanceToNow(new Date(property.host.created_at), { addSuffix: true })
+                      : 'N/A'
+                    }
                   </span>
                 </div>
               </div>

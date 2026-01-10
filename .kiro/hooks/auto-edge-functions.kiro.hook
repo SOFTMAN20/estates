@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Auto Edge Function Creator",
+  "description": "Analyzes prompts for backend requirements and automatically creates Supabase Edge Functions for external API calls, payment processing (M-Pesa, PalmPay), webhooks, and server-side operations",
+  "version": "1",
+  "when": {
+    "type": "promptSubmit"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "echo \"Check if this prompt requires edge functions for: API calls, payments, webhooks, or server-side processing. If so, create the edge function in supabase/functions/\""
+  }
+}

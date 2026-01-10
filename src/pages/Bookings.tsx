@@ -17,8 +17,10 @@ import { useTranslation } from 'react-i18next';
 import Navigation from '@/components/layout/navbarLayout/Navigation';
 import Footer from '@/components/layout/Footer';
 import { BookingCard } from '@/components/bookings/BookingCard';
+import { ReviewFormModal } from '@/components/reviews/ReviewFormModal';
 import { useAuth } from '@/hooks/useAuth';
 import { useBookings, useCancelBooking } from '@/hooks/useBookings';
+import { useReviews } from '@/hooks/useReviews';
 import { useModeToggle } from '@/contexts/ModeContext';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -67,6 +69,7 @@ export default function Bookings() {
   const { user } = useAuth();
   const { currentMode } = useModeToggle();
   const [cancelBookingId, setCancelBookingId] = useState<string | null>(null);
+  const [reviewBooking, setReviewBooking] = useState<BookingWithProperty | null>(null);
 
   // Fetch user's bookings
   const { data: bookings = [], isLoading, error } = useBookings({
@@ -75,6 +78,13 @@ export default function Bookings() {
 
   // Cancel booking mutation
   const { mutate: cancelBooking, isPending: isCancelling } = useCancelBooking();
+
+  // Get user's reviews to check which bookings have been reviewed
+  const { myReviews } = useReviews();
+  const reviewedBookingIds = useMemo(() => 
+    new Set(myReviews.map(r => r.booking_id)), 
+    [myReviews]
+  );
 
   // Filter bookings by status - MUST be before any conditional returns
   const { upcoming, past, cancelled } = useMemo(() => {
@@ -169,8 +179,10 @@ export default function Bookings() {
 
   // Handle leave review
   const handleLeaveReview = (bookingId: string) => {
-    // TODO: Implement review functionality
-    navigate(`/bookings/${bookingId}/review`);
+    const booking = past.find(b => b.id === bookingId);
+    if (booking) {
+      setReviewBooking(booking);
+    }
   };
 
   // Loading state
@@ -318,6 +330,7 @@ export default function Bookings() {
                   key={booking.id}
                   booking={booking}
                   hostName={booking.host_name}
+                  hasReviewed={reviewedBookingIds.has(booking.id)}
                   onContactHost={handleContactHost}
                   onLeaveReview={handleLeaveReview}
                 />
@@ -355,7 +368,7 @@ export default function Bookings() {
 
       {/* Cancel Booking Confirmation Dialog */}
       <AlertDialog open={!!cancelBookingId} onOpenChange={() => setCancelBookingId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[95vw] sm:max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle>
               {i18n.language === 'en' ? 'Cancel Booking?' : 'Ghairi Hifadhi?'}
@@ -367,14 +380,14 @@ export default function Bookings() {
               }
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isCancelling}>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel disabled={isCancelling} className="w-full sm:w-auto">
               {i18n.language === 'en' ? 'Keep Booking' : 'Endelea na Hifadhi'}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmCancelBooking}
               disabled={isCancelling}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
             >
               {isCancelling ? (
                 <>
@@ -388,6 +401,20 @@ export default function Bookings() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Review Modal */}
+      {reviewBooking && (
+        <ReviewFormModal
+          isOpen={true}
+          onClose={() => setReviewBooking(null)}
+          propertyId={reviewBooking.property_id}
+          bookingId={reviewBooking.id}
+          propertyName={reviewBooking.properties?.title || 'Property'}
+          propertyImage={reviewBooking.properties?.images?.[0]}
+          checkIn={reviewBooking.check_in}
+          checkOut={reviewBooking.check_out}
+        />
+      )}
 
       <Footer />
     </div>

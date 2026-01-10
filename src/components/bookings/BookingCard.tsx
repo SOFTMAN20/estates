@@ -56,6 +56,7 @@ interface BookingCardProps {
     };
   };
   hostName?: string;
+  hasReviewed?: boolean;
   onCancel?: (bookingId: string) => void;
   onContactHost?: (bookingId: string) => void;
   onLeaveReview?: (bookingId: string) => void;
@@ -64,6 +65,7 @@ interface BookingCardProps {
 export function BookingCard({
   booking,
   hostName,
+  hasReviewed = false,
   onCancel,
   onContactHost,
   onLeaveReview
@@ -126,8 +128,8 @@ export function BookingCard({
     return daysUntilCheckIn > 7;
   };
 
-  // Check if can leave review (completed bookings)
-  const canReview = booking.status === 'completed';
+  // Check if can leave review (completed bookings that haven't been reviewed)
+  const canReview = booking.status === 'completed' && !hasReviewed;
 
   const statusInfo = getStatusInfo(booking.status);
   const property = booking.properties;
@@ -261,15 +263,15 @@ export function BookingCard({
                   </Button>
                 )}
 
-                {canReview && onLeaveReview && (
+                {booking.status === 'completed' && hasReviewed && (
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => onLeaveReview(booking.id)}
-                    className="flex-1 sm:flex-none"
+                    disabled
+                    className="flex-1 sm:flex-none text-green-600 border-green-200 bg-green-50"
                   >
-                    <Star className="h-4 w-4 mr-2" />
-                    {i18n.language === 'en' ? 'Leave Review' : 'Acha Maoni'}
+                    <Star className="h-4 w-4 mr-2 fill-green-600" />
+                    {i18n.language === 'en' ? 'Reviewed' : 'Imepitiwa'}
                   </Button>
                 )}
               </div>

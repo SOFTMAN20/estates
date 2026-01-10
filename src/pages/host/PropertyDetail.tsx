@@ -929,12 +929,14 @@ const PropertyDetail = () => {
 
             {/* Host Information Card */}
             <HostInformationCard
+              hostId={property.host_id}
               hostName={property.profiles?.name ?? undefined}
               hostAvatar={property.profiles?.avatar_url ?? undefined}
               memberSince={property.profiles?.created_at ?? undefined}
               totalProperties={hostPropertyCount}
               contactPhone={property.contact_phone}
               whatsappPhone={property.contact_whatsapp_phone}
+              propertyId={property.id}
               propertyTitle={property.title}
               isVerified={true}
             />

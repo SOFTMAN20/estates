@@ -95,6 +95,9 @@ const NotificationSettings = lazy(() => import("./pages/NotificationSettings"));
 const MyReviews = lazy(() => import("./pages/MyReviews"));
 const HostReviews = lazy(() => import("./pages/host/Reviews"));
 
+// Messages page
+const Messages = lazy(() => import("./pages/Messages"));
+
 // Admin pages
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminProperties = lazy(() => import("./pages/admin/properties"));
@@ -195,6 +198,7 @@ const App = () => (
                 <Route path="/settings/notifications" element={<NotificationSettings />} />
                 <Route path="/reviews" element={<MyReviews />} />
                 <Route path="/host/reviews" element={<HostReviews />} />
+                <Route path="/messages" element={<Messages />} />
 
                 {/* Authentication routes - Njia za uthibitisho */}
                 <Route path="/signin" element={<SignIn />} />

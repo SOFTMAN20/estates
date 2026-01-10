@@ -38,10 +38,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Menu, User, Building2, LogOut, Heart, Bell, Settings, Calendar, Home as HomeIcon, Shield, Globe } from 'lucide-react';
+import { Menu, User, Building2, LogOut, Heart, Bell, Settings, Calendar, Home as HomeIcon, Shield, Globe, MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useModeToggle } from '@/hooks/useModeToggle';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useMessaging } from '@/hooks/useMessaging';
 import type { Tables } from '@/lib/integrations/supabase/types';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
@@ -80,6 +81,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
   const navigate = useNavigate();
   const { currentMode } = useModeToggle();
   const { unreadCount } = useNotifications();
+  const { unreadCount: unreadMessages } = useMessaging();
 
   /**
    * Toggle language between English and Swahili
@@ -212,6 +214,19 @@ const UserMenu: React.FC<UserMenuProps> = ({
             {unreadCount > 0 && (
               <Badge className="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5">
                 {unreadCount}
+              </Badge>
+            )}
+          </Link>
+        </DropdownMenuItem>
+
+        {/* Messages */}
+        <DropdownMenuItem asChild>
+          <Link to="/messages" className="flex items-center cursor-pointer">
+            <MessageCircle className="mr-2 h-4 w-4" />
+            <span>Messages</span>
+            {unreadMessages > 0 && (
+              <Badge className="ml-auto bg-primary text-white text-xs px-1.5 py-0.5">
+                {unreadMessages}
               </Badge>
             )}
           </Link>

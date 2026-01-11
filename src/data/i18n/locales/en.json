@@ -226,7 +226,10 @@
     "bedroomsPlus": "{{count}}+ Bedrooms",
     "bathroomPlus": "{{count}}+ Bathroom",
     "bathroomsPlus": "{{count}}+ Bathrooms",
-    "amenitiesServices": "Amenities & Services"
+    "amenitiesServices": "Amenities & Services",
+    "loading": "Loading...",
+    "loadMore": "Load More",
+    "endOfResults": "You've seen all properties"
   },
   "propertyCard": {
     "perMonth": "/month",

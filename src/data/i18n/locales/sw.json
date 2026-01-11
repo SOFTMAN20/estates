@@ -226,7 +226,10 @@
     "bedroomsPlus": "Vyumba {{count}}+",
     "bathroomPlus": "Choo {{count}}+",
     "bathroomsPlus": "Vyoo {{count}}+",
-    "amenitiesServices": "Huduma na Vifaa"
+    "amenitiesServices": "Huduma na Vifaa",
+    "loading": "Inapakia...",
+    "loadMore": "Pakia Zaidi",
+    "endOfResults": "Umeona nyumba zote"
   },
   "propertyCard": {
     "perMonth": "/mwezi",

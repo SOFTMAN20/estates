@@ -59,7 +59,7 @@ const HeroSection = () => {
   const [maxPrice, setMaxPrice] = useState('');           // Maximum price filter
 
   return (
-    <div className="relative min-h-[60vh] sm:min-h-[65vh] lg:min-h-[70vh] flex items-center overflow-hidden">
+    <div className="relative min-h-[85vh] sm:min-h-[90vh] lg:min-h-screen flex items-center overflow-hidden">
       {/* Hero Background Image - Picha ya nyuma ya kishujaa */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"

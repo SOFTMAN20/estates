@@ -237,7 +237,7 @@ const PropertyManagement: React.FC<PropertyManagementProps> = ({
             >
               <span>
                 {properties.length > limit! 
-                  ? `${t('dashboard.viewAll')} (${properties.length} ${t('dashboard.properties')})`
+                  ? `${t('dashboard.viewAll')} (${properties.length} ${t('dashboard.propertiesLabel')})`
                   : t('dashboard.manageAllProperties')
                 }
               </span>

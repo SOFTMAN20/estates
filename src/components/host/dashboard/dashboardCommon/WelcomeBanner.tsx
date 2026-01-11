@@ -201,7 +201,7 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
               <div className="flex items-center space-x-3">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-primary">{propertiesCount}</div>
-                  <div className="text-xs text-gray-600">{t('dashboard.properties')}</div>
+                  <div className="text-xs text-gray-600">{t('dashboard.propertiesLabel')}</div>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center space-x-1">

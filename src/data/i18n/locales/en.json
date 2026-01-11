@@ -27,6 +27,8 @@
     "minPrice": "Min price",
     "maxPrice": "Max price",
     "searchButton": "Search Houses",
+    "mobileFilters": "Price Range (TZS)",
+    "clearFilters": "Clear filters",
     "availableProperties": "Available properties",
     "majorCities": "Major cities",
     "happyCustomers": "Happy customers",
@@ -49,6 +51,88 @@
     "subtitle": "Discover the best places to live in Tanzania",
     "properties": "properties",
     "startingFrom": "Starting from"
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "subtitle": "Getting started with NyumbaLink is simple. Follow these easy steps to find your perfect home or start earning from your property.",
+    "tabs": {
+      "renter": "I'm Looking for a Home",
+      "host": "I Want to List Property"
+    },
+    "renter": {
+      "step1": {
+        "title": "Search Properties",
+        "description": "Browse thousands of verified listings. Filter by location, price, and amenities to find your perfect match."
+      },
+      "step2": {
+        "title": "Book a Viewing",
+        "description": "Schedule a visit at your convenience. Connect directly with landlords and ask questions."
+      },
+      "step3": {
+        "title": "Move In",
+        "description": "Complete the booking, sign your agreement, and move into your new home. It's that simple!"
+      }
+    },
+    "host": {
+      "step1": {
+        "title": "List Your Property",
+        "description": "Create a listing in minutes. Add photos, set your price, and describe your property's features."
+      },
+      "step2": {
+        "title": "Get Verified",
+        "description": "Our team reviews your listing to ensure quality. Verified properties get more visibility and trust."
+      },
+      "step3": {
+        "title": "Start Earning",
+        "description": "Receive booking requests, manage tenants, and earn income from your property hassle-free."
+      }
+    }
+  },
+  "testimonials": {
+    "title": "What Our Users Say",
+    "subtitle": "Join thousands of satisfied renters and hosts who found success with NyumbaLink",
+    "renter": "Renter",
+    "host": "Property Owner",
+    "reviews": {
+      "review1": "NyumbaLink made finding my apartment so easy! The search filters helped me find exactly what I needed in Dar es Salaam. Moved in within a week!",
+      "review2": "As a property owner, I've been able to fill my apartments faster than ever. The verification process gives tenants confidence, and I get quality renters.",
+      "review3": "I was skeptical at first, but the platform exceeded my expectations. Found a beautiful 2-bedroom in Mwanza at a great price. Highly recommend!",
+      "review4": "Managing multiple properties used to be a headache. Now I handle everything from one dashboard. My rental income has increased by 30%!",
+      "review5": "The customer support is amazing! They helped me through the entire process. Found my dream beachfront apartment in Zanzibar."
+    }
+  },
+  "newsletter": {
+    "title": "Stay Updated with New Listings",
+    "subtitle": "Subscribe to our newsletter and be the first to know about new properties, exclusive deals, and rental tips in Tanzania.",
+    "placeholder": "Enter your email address",
+    "subscribe": "Subscribe",
+    "privacy": "We respect your privacy. Unsubscribe anytime.",
+    "invalidEmail": "Please enter a valid email address",
+    "successTitle": "Successfully subscribed!",
+    "successMessage": "You'll receive updates about new properties and deals.",
+    "thankYou": "Thank you for subscribing!",
+    "subscribeAnother": "Subscribe another email",
+    "benefit1": "New listings alerts",
+    "benefit2": "Exclusive deals",
+    "benefit3": "Rental tips & guides"
+  },
+  "propertyTypeFilters": {
+    "title": "Browse by Property Type",
+    "subtitle": "Find exactly what you're looking for with our quick filters",
+    "apartment": "Apartments",
+    "house": "Houses",
+    "studio": "Studios",
+    "room": "Rooms",
+    "villa": "Villas",
+    "bedsitter": "Bedsitters",
+    "viewAll": "View all",
+    "browseAll": "Browse All Properties"
+  },
+  "cta": {
+    "title": "Ready to Start? Register Now!",
+    "subtitle": "Join thousands of Tanzanians using Nyumba Link to find their dream homes.",
+    "registerAsLandlord": "Register as Landlord",
+    "searchHouses": "Search Houses"
   },
   "features": {
     "whyChoose": "Why Choose Nyumba Link?",
@@ -446,7 +530,7 @@
     "propertyCount_other": "{{count}} houses",
     "viewAll": "View All",
     "add": "Add",
-    "properties": "properties",
+    "propertiesLabel": "properties",
     "manageAllProperties": "Manage All Properties",
     "viewAllProperties": "All Properties",
     "viewAllPropertiesDesc": "View complete list of your properties"

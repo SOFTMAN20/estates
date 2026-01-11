@@ -150,13 +150,13 @@ const FeaturedProperties = () => {
 
   if (isLoading) {
     return (
-      <section className="pt-0 pb-8 bg-gradient-to-br from-safari-50 via-white to-kilimanjaro-50 relative overflow-hidden -mt-8">
+      <section className="py-16 bg-gradient-to-br from-safari-50 via-white to-kilimanjaro-50 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
               {t('featuredProperties.title')}
             </h2>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-lg text-muted-foreground">
               {t('featuredProperties.subtitle')}
             </p>
           </div>
@@ -189,15 +189,15 @@ const FeaturedProperties = () => {
   }
 
   return (
-    <section className="pt-0 pb-8 bg-gradient-to-br from-safari-50 via-white to-kilimanjaro-50 relative overflow-hidden -mt-8">
+    <section className="py-16 bg-gradient-to-br from-safari-50 via-white to-kilimanjaro-50 relative overflow-hidden">
       {/* Background Pattern for Visual Interest */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-serengeti-100 to-transparent rounded-full blur-3xl opacity-30"></div>
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-primary/10 to-transparent rounded-full blur-3xl opacity-40"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="mb-6 text-left mt-8">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 bg-clip-text text-transparent mb-1">
+        <div className="mb-8 text-left">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 bg-clip-text text-transparent mb-2">
             {t('featuredProperties.title')}
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl leading-relaxed">

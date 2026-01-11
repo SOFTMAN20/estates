@@ -27,6 +27,8 @@
     "minPrice": "Bei ya chini",
     "maxPrice": "Bei ya juu",
     "searchButton": "Tafuta Nyumba",
+    "mobileFilters": "Kiwango cha Bei (TZS)",
+    "clearFilters": "Futa vichujio",
     "availableProperties": "Nyumba zinazopatikana",
     "majorCities": "Miji mikuu",
     "happyCustomers": "Wateja wenye furaha",
@@ -49,6 +51,88 @@
     "subtitle": "Gundua maeneo bora ya kuishi Tanzania",
     "properties": "nyumba",
     "startingFrom": "Kuanzia"
+  },
+  "howItWorks": {
+    "title": "Jinsi Inavyofanya Kazi",
+    "subtitle": "Kuanza na NyumbaLink ni rahisi. Fuata hatua hizi rahisi kupata nyumba yako bora au kuanza kupata mapato kutoka mali yako.",
+    "tabs": {
+      "renter": "Natafuta Nyumba",
+      "host": "Nataka Kutangaza Mali"
+    },
+    "renter": {
+      "step1": {
+        "title": "Tafuta Nyumba",
+        "description": "Vinjari maelfu ya orodha zilizohakikiwa. Chuja kwa mahali, bei, na huduma kupata inayokufaa."
+      },
+      "step2": {
+        "title": "Panga Kutembelea",
+        "description": "Panga ziara kwa wakati unaokufaa. Wasiliana moja kwa moja na wamiliki na uliza maswali."
+      },
+      "step3": {
+        "title": "Hamia",
+        "description": "Kamilisha uhifadhi, saini mkataba wako, na uhamie nyumba yako mpya. Ni rahisi hivyo!"
+      }
+    },
+    "host": {
+      "step1": {
+        "title": "Tangaza Mali Yako",
+        "description": "Unda orodha kwa dakika. Ongeza picha, weka bei yako, na elezea vipengele vya mali yako."
+      },
+      "step2": {
+        "title": "Hakikiwa",
+        "description": "Timu yetu inakagua orodha yako kuhakikisha ubora. Mali zilizohakikiwa hupata mwonekano na uaminifu zaidi."
+      },
+      "step3": {
+        "title": "Anza Kupata Mapato",
+        "description": "Pokea maombi ya uhifadhi, simamia wapangaji, na upate mapato kutoka mali yako bila usumbufu."
+      }
+    }
+  },
+  "testimonials": {
+    "title": "Watumiaji Wetu Wanasema Nini",
+    "subtitle": "Jiunge na maelfu ya wapangaji na wamiliki waliofanikiwa na NyumbaLink",
+    "renter": "Mpangaji",
+    "host": "Mwenye Mali",
+    "reviews": {
+      "review1": "NyumbaLink ilifanya kupata nyumba yangu kuwa rahisi sana! Vichujio vya utafutaji vilinisaidia kupata hasa nilichohitaji Dar es Salaam. Nilihamia ndani ya wiki moja!",
+      "review2": "Kama mwenye mali, nimeweza kujaza nyumba zangu haraka zaidi kuliko hapo awali. Mchakato wa uhakiki unawapa wapangaji ujasiri, na napata wapangaji bora.",
+      "review3": "Nilikuwa na mashaka mwanzoni, lakini jukwaa lilizidi matarajio yangu. Nilipata nyumba nzuri ya vyumba 2 Mwanza kwa bei nzuri. Napendekeza sana!",
+      "review4": "Kusimamia mali nyingi ilikuwa kazi ngumu. Sasa ninashughulikia kila kitu kutoka dashibodi moja. Mapato yangu ya kodi yameongezeka kwa 30%!",
+      "review5": "Msaada wa wateja ni wa ajabu! Walinisaidia katika mchakato wote. Nilipata nyumba yangu ya ndoto karibu na pwani Zanzibar."
+    }
+  },
+  "newsletter": {
+    "title": "Pata Habari za Nyumba Mpya",
+    "subtitle": "Jisajili kwa jarida letu na uwe wa kwanza kujua kuhusu nyumba mpya, ofa maalum, na vidokezo vya kukodi Tanzania.",
+    "placeholder": "Weka barua pepe yako",
+    "subscribe": "Jisajili",
+    "privacy": "Tunaheshimu faragha yako. Jiondoe wakati wowote.",
+    "invalidEmail": "Tafadhali weka barua pepe sahihi",
+    "successTitle": "Umejisajili kwa mafanikio!",
+    "successMessage": "Utapata habari kuhusu nyumba mpya na ofa.",
+    "thankYou": "Asante kwa kujisajili!",
+    "subscribeAnother": "Sajili barua pepe nyingine",
+    "benefit1": "Arifa za nyumba mpya",
+    "benefit2": "Ofa maalum",
+    "benefit3": "Vidokezo vya kukodi"
+  },
+  "propertyTypeFilters": {
+    "title": "Vinjari kwa Aina ya Nyumba",
+    "subtitle": "Pata hasa unachotafuta kwa vichujio vyetu vya haraka",
+    "apartment": "Ghorofa",
+    "house": "Nyumba",
+    "studio": "Studio",
+    "room": "Vyumba",
+    "villa": "Villa",
+    "bedsitter": "Bedsitter",
+    "viewAll": "Tazama zote",
+    "browseAll": "Vinjari Nyumba Zote"
+  },
+  "cta": {
+    "title": "Tayari Kuanza? Jisajili Sasa!",
+    "subtitle": "Jiunge na elfu za Watanzania wanaotumia Nyumba Link kupata nyumba zao za ndoto.",
+    "registerAsLandlord": "Jisajili Kama Mwenye Nyumba",
+    "searchHouses": "Tafuta Nyumba"
   },
   "features": {
     "whyChoose": "Kwa Nini Uchague Nyumba Link?",
@@ -446,7 +530,7 @@
     "propertyCount_other": "Nyumba {{count}}",
     "viewAll": "Tazama Zote",
     "add": "Ongeza",
-    "properties": "nyumba",
+    "propertiesLabel": "nyumba",
     "manageAllProperties": "Simamia Nyumba Zote",
     "viewAllProperties": "Nyumba Zote",
     "viewAllPropertiesDesc": "Angalia orodha kamili ya nyumba zako"

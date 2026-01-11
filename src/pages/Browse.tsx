@@ -47,7 +47,6 @@ import PropertyFiltersPanel from '@/components/search/PropertyFiltersPanel';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import LoadingSpinner from '@/components/ui/loading-spinner';
 import { PropertyGridSkeleton } from '@/components/properties/propertyCommon/PropertyCardSkeleton';
 import { Search } from 'lucide-react';
 import { useProperties } from '@/hooks/useProperties';
@@ -344,16 +343,6 @@ const Browse = () => {
                   </Badge>
                 ))}
               </div>
-            </div>
-          )
-        }
-
-        {/* Loading State */}
-        {
-          isLoading && (
-            <div className="py-16">
-              <LoadingSpinner size="lg" className="mb-4" />
-              <p className="text-center text-gray-600">{t('browse.loadingProperties')}</p>
             </div>
           )
         }

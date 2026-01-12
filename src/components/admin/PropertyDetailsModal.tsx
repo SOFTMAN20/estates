@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Select,
   SelectContent,
@@ -38,9 +39,13 @@ import {
   Calendar,
   Home,
   CheckCircle,
-  XCircle
+  XCircle,
+  ExternalLink,
+  Mail,
+  Building,
+  Star
 } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format } from 'date-fns';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,6 +65,7 @@ interface PropertyDetailsModalProps {
 export function PropertyDetailsModal({ propertyId, onClose }: PropertyDetailsModalProps) {
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [showApproveDialog, setShowApproveDialog] = useState(false);
+  const [showHostProfileDialog, setShowHostProfileDialog] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [rejectionNotes, setRejectionNotes] = useState('');
   const [notifyHost, setNotifyHost] = useState(true);
@@ -76,10 +82,14 @@ export function PropertyDetailsModal({ propertyId, onClose }: PropertyDetailsMod
         .select(`
           *,
           host:profiles!properties_host_id_fkey (
+            id,
             name,
             phone,
             avatar_url,
-            created_at
+            bio,
+            location,
+            created_at,
+            user_id
           )
         `)
         .eq('id', propertyId)
@@ -88,6 +98,40 @@ export function PropertyDetailsModal({ propertyId, onClose }: PropertyDetailsMod
       if (error) throw error;
       return data;
     },
+  });
+
+  // Fetch host's properties count and stats
+  const { data: hostStats } = useQuery({
+    queryKey: ['admin', 'host-stats', property?.host_id],
+    queryFn: async () => {
+      if (!property?.host_id) return null;
+      
+      const { data: properties, error } = await supabase
+        .from('properties')
+        .select('id, status, average_rating, total_reviews')
+        .eq('host_id', property.host_id);
+
+      if (error) throw error;
+      
+      const totalProperties = properties?.length || 0;
+      const approvedProperties = properties?.filter(p => p.status === 'approved').length || 0;
+      const pendingProperties = properties?.filter(p => p.status === 'pending').length || 0;
+      const rejectedProperties = properties?.filter(p => p.status === 'rejected').length || 0;
+      const totalReviews = properties?.reduce((sum, p) => sum + (p.total_reviews || 0), 0) || 0;
+      const avgRating = properties?.filter(p => p.average_rating).length > 0
+        ? properties.reduce((sum, p) => sum + (p.average_rating || 0), 0) / properties.filter(p => p.average_rating).length
+        : 0;
+
+      return {
+        totalProperties,
+        approvedProperties,
+        pendingProperties,
+        rejectedProperties,
+        totalReviews,
+        avgRating: avgRating.toFixed(1)
+      };
+    },
+    enabled: !!property?.host_id,
   });
 
   const handleApprove = () => {
@@ -237,27 +281,46 @@ export function PropertyDetailsModal({ propertyId, onClose }: PropertyDetailsMod
 
             {/* Host Information */}
             <div className="border-t pt-4">
-              <h3 className="font-semibold mb-3">Host Information</h3>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <User className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600">Name:</span>
-                  <span className="font-medium">{property.host?.name}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Phone className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600">Phone:</span>
-                  <span className="font-medium">{property.host?.phone || 'N/A'}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Calendar className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600">Member since:</span>
-                  <span className="font-medium">
-                    {property.host?.created_at 
-                      ? formatDistanceToNow(new Date(property.host.created_at), { addSuffix: true })
-                      : 'N/A'
-                    }
-                  </span>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold">Host Information</h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowHostProfileDialog(true)}
+                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                >
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  View Host Profile
+                </Button>
+              </div>
+              <div className="flex items-start gap-4">
+                <Avatar className="h-12 w-12">
+                  <AvatarImage src={property.host?.avatar_url} alt={property.host?.name} />
+                  <AvatarFallback className="bg-primary/10 text-primary">
+                    {property.host?.name?.charAt(0)?.toUpperCase() || 'H'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="space-y-1.5 flex-1">
+                  <div className="flex items-center space-x-2">
+                    <User className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-600">Name:</span>
+                    <span className="font-medium">{property.host?.name || 'N/A'}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Phone className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-600">Phone:</span>
+                    <span className="font-medium">{property.host?.phone || 'N/A'}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-600">Member since:</span>
+                    <span className="font-medium">
+                      {property.host?.created_at 
+                        ? formatDistanceToNow(new Date(property.host.created_at), { addSuffix: true })
+                        : 'N/A'
+                      }
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -395,6 +458,120 @@ export function PropertyDetailsModal({ propertyId, onClose }: PropertyDetailsMod
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Host Profile Dialog */}
+      <Dialog open={showHostProfileDialog} onOpenChange={setShowHostProfileDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <User className="h-5 w-5 text-primary" />
+              Host Profile
+            </DialogTitle>
+            <DialogDescription>
+              Detailed information about the property host
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            {/* Host Avatar & Basic Info */}
+            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+              <Avatar className="h-20 w-20 border-2 border-white shadow-md">
+                <AvatarImage src={property?.host?.avatar_url} alt={property?.host?.name} />
+                <AvatarFallback className="bg-primary text-white text-2xl">
+                  {property?.host?.name?.charAt(0)?.toUpperCase() || 'H'}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900">
+                  {property?.host?.name || 'Unknown Host'}
+                </h3>
+                <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                  <MapPin className="h-3.5 w-3.5" />
+                  {property?.host?.location || 'Location not set'}
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Member since {property?.host?.created_at 
+                    ? format(new Date(property.host.created_at), 'MMMM yyyy')
+                    : 'N/A'
+                  }
+                </p>
+              </div>
+            </div>
+
+            {/* Contact Information */}
+            <div>
+              <h4 className="text-sm font-semibold text-gray-700 mb-3">Contact Information</h4>
+              <div className="space-y-2">
+                <div className="flex items-center gap-3 p-2.5 bg-white border rounded-lg">
+                  <Phone className="h-4 w-4 text-gray-400" />
+                  <div>
+                    <p className="text-xs text-gray-500">Phone Number</p>
+                    <p className="font-medium text-gray-900">{property?.host?.phone || 'Not provided'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bio */}
+            {property?.host?.bio && (
+              <div>
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">About</h4>
+                <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                  {property.host.bio}
+                </p>
+              </div>
+            )}
+
+            {/* Host Statistics */}
+            {hostStats && (
+              <div>
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">Host Statistics</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 bg-blue-50 rounded-lg text-center">
+                    <Building className="h-5 w-5 text-blue-600 mx-auto mb-1" />
+                    <p className="text-2xl font-bold text-blue-600">{hostStats.totalProperties}</p>
+                    <p className="text-xs text-gray-600">Total Properties</p>
+                  </div>
+                  <div className="p-3 bg-green-50 rounded-lg text-center">
+                    <CheckCircle className="h-5 w-5 text-green-600 mx-auto mb-1" />
+                    <p className="text-2xl font-bold text-green-600">{hostStats.approvedProperties}</p>
+                    <p className="text-xs text-gray-600">Approved</p>
+                  </div>
+                  <div className="p-3 bg-yellow-50 rounded-lg text-center">
+                    <Calendar className="h-5 w-5 text-yellow-600 mx-auto mb-1" />
+                    <p className="text-2xl font-bold text-yellow-600">{hostStats.pendingProperties}</p>
+                    <p className="text-xs text-gray-600">Pending</p>
+                  </div>
+                  <div className="p-3 bg-red-50 rounded-lg text-center">
+                    <XCircle className="h-5 w-5 text-red-600 mx-auto mb-1" />
+                    <p className="text-2xl font-bold text-red-600">{hostStats.rejectedProperties}</p>
+                    <p className="text-xs text-gray-600">Rejected</p>
+                  </div>
+                </div>
+
+                {/* Rating & Reviews */}
+                <div className="mt-3 p-3 bg-amber-50 rounded-lg flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
+                    <span className="font-semibold text-gray-900">{hostStats.avgRating}</span>
+                    <span className="text-sm text-gray-600">Average Rating</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-semibold text-gray-900">{hostStats.totalReviews}</span>
+                    <span className="text-sm text-gray-600 ml-1">Reviews</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end pt-4 border-t">
+            <Button variant="outline" onClick={() => setShowHostProfileDialog(false)}>
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

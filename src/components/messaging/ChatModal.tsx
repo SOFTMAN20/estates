@@ -142,7 +142,7 @@ export function ChatModal({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="w-full max-w-lg h-[80vh] sm:h-[600px] p-0 flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center gap-3 p-4 border-b bg-white">

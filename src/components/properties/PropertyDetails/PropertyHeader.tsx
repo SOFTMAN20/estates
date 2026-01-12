@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Zap, Droplets, Shield, Wifi, Car, Wind, Tv, Sofa, Sparkles } from 'lucide-react';
+import { MapPin, Zap, Droplets, Shield, Wifi, Car, Wind, Tv, Sofa, Sparkles, Navigation } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface PropertyHeaderProps {
@@ -42,6 +42,14 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
     return { Icon: Sparkles, label: amenity, color: 'bg-gray-50 text-gray-700 border-gray-200' };
   };
 
+  // Check if fullAddress is different from location and has content
+  const hasDetailedAddress = fullAddress && fullAddress !== location && fullAddress.trim().length > 0;
+
+  // Format full address - replace newlines with comma and space for single line display
+  const formattedAddress = fullAddress 
+    ? fullAddress.split('\n').filter(line => line.trim()).join(', ')
+    : null;
+
   return (
     <div className="overflow-hidden">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 space-y-2 sm:space-y-0">
@@ -56,12 +64,23 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
         </div>
       </div>
 
-      <div className="flex items-center text-gray-600 mb-4">
+      {/* Location */}
+      <div className="flex items-center text-gray-600 mb-2">
         <MapPin className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
-        <span className="text-sm sm:text-base break-words overflow-hidden">
-          {fullAddress || location}
+        <span className="text-sm sm:text-base break-words overflow-hidden font-medium">
+          {location}
         </span>
       </div>
+
+      {/* Full Address - Show only if different from location */}
+      {hasDetailedAddress && formattedAddress && formattedAddress !== location && (
+        <div className="flex items-start text-gray-500 mb-4 ml-6 sm:ml-7">
+          <Navigation className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0 mt-0.5" />
+          <span className="text-xs sm:text-sm break-words overflow-hidden">
+            {formattedAddress}
+          </span>
+        </div>
+      )}
 
       {/* Amenity Badges */}
       <div className="flex flex-wrap gap-2 mb-4">

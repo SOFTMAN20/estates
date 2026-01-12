@@ -491,7 +491,7 @@ export type Database = {
           country: string | null
           created_at: string | null
           district: string | null
-          full_address: string | null
+          location: string | null
           id: string
           latitude: number | null
           longitude: number | null
@@ -506,7 +506,7 @@ export type Database = {
           country?: string | null
           created_at?: string | null
           district?: string | null
-          full_address?: string | null
+          location?: string | null
           id?: string
           latitude?: number | null
           longitude?: number | null
@@ -521,7 +521,7 @@ export type Database = {
           country?: string | null
           created_at?: string | null
           district?: string | null
-          full_address?: string | null
+          location?: string | null
           id?: string
           latitude?: number | null
           longitude?: number | null

@@ -222,6 +222,54 @@ export const Step3PropertyDetails: React.FC<Step2PropertyDetailsProps> = ({
         </div>
       </div>
 
+      {/* Near University - For Student Housing */}
+      <div className="space-y-3">
+        <Label className="flex items-center gap-2 text-sm font-medium">
+          <Award className="h-4 w-4 text-indigo-600" />
+          🎓 {t('dashboard.nearUniversity')}
+        </Label>
+        <p className="text-xs text-gray-500">{t('dashboard.nearUniversityHint')}</p>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { key: 'udsm', label: 'UDSM' },
+            { key: 'ardhi', label: 'Ardhi' },
+            { key: 'duce', label: 'DUCE' },
+            { key: 'kcmc', label: 'KCMC' },
+            { key: 'sua', label: 'SUA' },
+            { key: 'udom', label: 'UDOM' },
+            { key: 'must', label: 'MUST' },
+            { key: 'cbe', label: 'CBE' },
+            { key: 'ims', label: 'IMS' },
+            { key: 'out', label: 'OUT' },
+            { key: 'ifm', label: 'IFM' },
+            { key: 'cuom', label: 'CUOM' },
+            { key: 'dit', label: 'DIT' },
+            { key: 'atc', label: 'ATC' },
+            { key: 'muce', label: 'MUCE' },
+            { key: 'saut', label: 'SAUT' },
+            { key: 'tudarco', label: 'TUDARCo' },
+            { key: 'sjut', label: 'SJUT' },
+            { key: 'hkmu', label: 'HKMU' },
+            { key: 'irdp', label: 'IRDP' },
+            { key: 'mwecau', label: 'MWECAU' },
+            { key: 'rucu', label: 'RUCU' }
+          ].map(({ key, label }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onServiceToggle(key)}
+              className={`px-4 py-2 rounded-full border transition-all duration-200 ${
+                formData.nearby_services.includes(key)
+                  ? 'border-indigo-600 bg-indigo-600 text-white shadow-md'
+                  : 'border-gray-300 text-gray-600 hover:border-indigo-400 hover:text-indigo-600'
+              }`}
+            >
+              🎓 {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
     </div>
   );
 };

@@ -229,7 +229,17 @@
     "amenitiesServices": "Huduma na Vifaa",
     "loading": "Inapakia...",
     "loadMore": "Pakia Zaidi",
-    "endOfResults": "Umeona nyumba zote"
+    "endOfResults": "Umeona nyumba zote",
+    "nearUniversity": "Karibu na Chuo",
+    "nearUniversityHint": "Tafuta hosteli na vyumba karibu na vyuo vikuu",
+    "popularAreas": "Maeneo Maarufu",
+    "suggestedSearches": "Utafutaji Unaopendekezwa",
+    "budgetFriendly": "Bei Nafuu",
+    "under300k": "Chini ya TZS 300,000/mwezi",
+    "studentHostels": "Hosteli na vyumba vya wanafunzi",
+    "modernLiving": "Maisha ya kisasa mjini",
+    "familyHomes": "Nyumba za Familia",
+    "spaciousHouses": "Nyumba zenye vyumba 3+"
   },
   "propertyCard": {
     "perMonth": "/mwezi",
@@ -488,6 +498,8 @@
     "market": "Soko",
     "bank": "Benki",
     "transport": "Usafiri",
+    "nearUniversity": "Karibu na Chuo Kikuu",
+    "nearUniversityHint": "Chagua kama nyumba yako iko karibu na chuo kikuu (husaidia wanafunzi kupata hosteli)",
     "contactPhone": "Nambari ya Simu ya Mawasiliano",
     "contactPhoneDescription": "Nambari hii itaonekana kwa wapangaji wanaotaka kuwasiliana nawe",
     "whatsappNumber": "Nambari ya WhatsApp",

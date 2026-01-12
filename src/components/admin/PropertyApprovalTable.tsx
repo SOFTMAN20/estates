@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Select,
   SelectContent,
@@ -37,7 +40,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Check, X, Eye, MapPin, Home, Loader2, Bed, Bath, Calendar, User, Mail, Phone, Maximize2, Package } from 'lucide-react';
+import { Check, X, Eye, MapPin, Home, Loader2, Bed, Bath, Calendar, User, Phone, Maximize2, Package, Building, Star, CheckCircle, XCircle } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { useAdminProperties, useApproveProperty, useRejectProperty, type AdminProperty } from '@/hooks/useAdminProperties';
 import type { SortOption } from '@/pages/admin/properties';
@@ -55,6 +58,7 @@ export function PropertyApprovalTable({ statusFilter = 'pending', searchQuery = 
   const [showApproveConfirm, setShowApproveConfirm] = useState(false);
   const [showBulkApproveConfirm, setShowBulkApproveConfirm] = useState(false);
   const [showBulkRejectDialog, setShowBulkRejectDialog] = useState(false);
+  const [showHostProfileDialog, setShowHostProfileDialog] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [rejectionCategory, setRejectionCategory] = useState('');
   const [rejectionNotes, setRejectionNotes] = useState('');
@@ -530,7 +534,12 @@ export function PropertyApprovalTable({ statusFilter = 'pending', searchQuery = 
                           <span>Member since {format(new Date(selectedProperty.profiles.created_at), 'MMM yyyy')}</span>
                         </div>
                       )}
-                      <Button variant="link" className="p-0 h-auto text-blue-600" size="sm">
+                      <Button 
+                        variant="link" 
+                        className="p-0 h-auto text-blue-600" 
+                        size="sm"
+                        onClick={() => setShowHostProfileDialog(true)}
+                      >
                         View Host Profile →
                       </Button>
                     </div>
@@ -784,6 +793,184 @@ export function PropertyApprovalTable({ statusFilter = 'pending', searchQuery = 
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Host Profile Dialog */}
+      <HostProfileDialog 
+        isOpen={showHostProfileDialog}
+        onClose={() => setShowHostProfileDialog(false)}
+        hostId={selectedProperty?.host_id}
+        hostProfile={selectedProperty?.profiles}
+      />
     </div>
+  );
+}
+
+// Host Profile Dialog Component
+interface HostProfileDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  hostId?: string;
+  hostProfile?: {
+    name?: string;
+    phone?: string;
+    avatar_url?: string;
+    bio?: string;
+    location?: string;
+    created_at?: string;
+  };
+}
+
+function HostProfileDialog({ isOpen, onClose, hostId, hostProfile }: HostProfileDialogProps) {
+  // Fetch host's properties count and stats
+  const { data: hostStats, isLoading: statsLoading } = useQuery({
+    queryKey: ['admin', 'host-stats', hostId],
+    queryFn: async () => {
+      if (!hostId) return null;
+      
+      const { data: properties, error } = await supabase
+        .from('properties')
+        .select('id, status, average_rating, total_reviews')
+        .eq('host_id', hostId);
+
+      if (error) throw error;
+      
+      const totalProperties = properties?.length || 0;
+      const approvedProperties = properties?.filter(p => p.status === 'approved').length || 0;
+      const pendingProperties = properties?.filter(p => p.status === 'pending').length || 0;
+      const rejectedProperties = properties?.filter(p => p.status === 'rejected').length || 0;
+      const totalReviews = properties?.reduce((sum, p) => sum + (p.total_reviews || 0), 0) || 0;
+      const avgRating = properties?.filter(p => p.average_rating).length > 0
+        ? properties.reduce((sum, p) => sum + (p.average_rating || 0), 0) / properties.filter(p => p.average_rating).length
+        : 0;
+
+      return {
+        totalProperties,
+        approvedProperties,
+        pendingProperties,
+        rejectedProperties,
+        totalReviews,
+        avgRating: avgRating.toFixed(1)
+      };
+    },
+    enabled: isOpen && !!hostId,
+  });
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <User className="h-5 w-5 text-primary" />
+            Host Profile
+          </DialogTitle>
+          <DialogDescription>
+            Detailed information about the property host
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          {/* Host Avatar & Basic Info */}
+          <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+            <Avatar className="h-20 w-20 border-2 border-white shadow-md">
+              <AvatarImage src={hostProfile?.avatar_url} alt={hostProfile?.name} />
+              <AvatarFallback className="bg-primary text-white text-2xl">
+                {hostProfile?.name?.charAt(0)?.toUpperCase() || 'H'}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900">
+                {hostProfile?.name || 'Unknown Host'}
+              </h3>
+              <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                <MapPin className="h-3.5 w-3.5" />
+                {hostProfile?.location || 'Location not set'}
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                Member since {hostProfile?.created_at 
+                  ? format(new Date(hostProfile.created_at), 'MMMM yyyy')
+                  : 'N/A'
+                }
+              </p>
+            </div>
+          </div>
+
+          {/* Contact Information */}
+          <div>
+            <h4 className="text-sm font-semibold text-gray-700 mb-3">Contact Information</h4>
+            <div className="space-y-2">
+              <div className="flex items-center gap-3 p-2.5 bg-white border rounded-lg">
+                <Phone className="h-4 w-4 text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-500">Phone Number</p>
+                  <p className="font-medium text-gray-900">{hostProfile?.phone || 'Not provided'}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bio */}
+          {hostProfile?.bio && (
+            <div>
+              <h4 className="text-sm font-semibold text-gray-700 mb-2">About</h4>
+              <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                {hostProfile.bio}
+              </p>
+            </div>
+          )}
+
+          {/* Host Statistics */}
+          {statsLoading ? (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : hostStats && (
+            <div>
+              <h4 className="text-sm font-semibold text-gray-700 mb-3">Host Statistics</h4>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 bg-blue-50 rounded-lg text-center">
+                  <Building className="h-5 w-5 text-blue-600 mx-auto mb-1" />
+                  <p className="text-2xl font-bold text-blue-600">{hostStats.totalProperties}</p>
+                  <p className="text-xs text-gray-600">Total Properties</p>
+                </div>
+                <div className="p-3 bg-green-50 rounded-lg text-center">
+                  <CheckCircle className="h-5 w-5 text-green-600 mx-auto mb-1" />
+                  <p className="text-2xl font-bold text-green-600">{hostStats.approvedProperties}</p>
+                  <p className="text-xs text-gray-600">Approved</p>
+                </div>
+                <div className="p-3 bg-yellow-50 rounded-lg text-center">
+                  <Calendar className="h-5 w-5 text-yellow-600 mx-auto mb-1" />
+                  <p className="text-2xl font-bold text-yellow-600">{hostStats.pendingProperties}</p>
+                  <p className="text-xs text-gray-600">Pending</p>
+                </div>
+                <div className="p-3 bg-red-50 rounded-lg text-center">
+                  <XCircle className="h-5 w-5 text-red-600 mx-auto mb-1" />
+                  <p className="text-2xl font-bold text-red-600">{hostStats.rejectedProperties}</p>
+                  <p className="text-xs text-gray-600">Rejected</p>
+                </div>
+              </div>
+
+              {/* Rating & Reviews */}
+              <div className="mt-3 p-3 bg-amber-50 rounded-lg flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
+                  <span className="font-semibold text-gray-900">{hostStats.avgRating}</span>
+                  <span className="text-sm text-gray-600">Average Rating</span>
+                </div>
+                <div className="text-right">
+                  <span className="font-semibold text-gray-900">{hostStats.totalReviews}</span>
+                  <span className="text-sm text-gray-600 ml-1">Reviews</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-end pt-4 border-t">
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

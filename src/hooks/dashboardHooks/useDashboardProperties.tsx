@@ -222,7 +222,7 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     const addressLines = fullAddress.split('\n');
     const addressData = {
       property_id: propertyId,
-      full_address: fullAddress,
+      location: fullAddress,
       street: addressLines[0]?.trim() || null,
       city: addressLines[2]?.trim() || null,
       region: addressLines[3]?.trim() || null,
@@ -446,12 +446,12 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     try {
       const { data: addressData } = await supabase
         .from('property_addresses')
-        .select('full_address')
+        .select('location')
         .eq('property_id', property.id)
         .single();
       
       if (addressData) {
-        fullAddress = addressData.full_address || '';
+        fullAddress = addressData.location || '';
       }
     } catch (error) {
       console.error('Error fetching property address:', error);

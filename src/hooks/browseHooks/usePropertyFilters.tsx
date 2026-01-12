@@ -29,9 +29,16 @@ const getInitialFilterState = (searchParams: URLSearchParams): FilterState => {
   const utilitiesParam = searchParams.get('utilities');
   const utilities = utilitiesParam ? utilitiesParam.split(',') : [];
   
-  // Parse nearby services from URL (comma-separated)
+  // Parse nearby services from URL (comma-separated or single value)
   const servicesParam = searchParams.get('services');
-  const nearbyServices = servicesParam ? servicesParam.split(',') : [];
+  const singleServiceParam = searchParams.get('nearbyService'); // For single university search from navbar
+  let nearbyServices: string[] = [];
+  
+  if (servicesParam) {
+    nearbyServices = servicesParam.split(',');
+  } else if (singleServiceParam) {
+    nearbyServices = [singleServiceParam];
+  }
   
   return {
     searchQuery: searchParams.get('location') || '',

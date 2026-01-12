@@ -16,7 +16,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, MapPin, DollarSign, TrendingUp } from 'lucide-react';
+import { Search, MapPin, DollarSign, TrendingUp, GraduationCap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface NavbarSearchBarProps {
@@ -27,7 +27,7 @@ interface SearchSuggestion {
   icon: React.ReactNode;
   text: string;
   description: string;
-  category: 'location' | 'price' | 'combined';
+  category: 'location' | 'price' | 'combined' | 'university';
 }
 
 /**
@@ -37,9 +37,45 @@ interface SearchSuggestion {
  * - "500000" (price only)
  * - "Kinondoni under 800000" (location + price)
  * - "price 1000000" (price with keyword)
+ * - "UDSM" or "near UDSM" (university search)
  */
-const parseSearchQuery = (query: string): { location?: string; minPrice?: string; maxPrice?: string } => {
-  const trimmedQuery = query.trim();
+const parseSearchQuery = (query: string): { location?: string; minPrice?: string; maxPrice?: string; university?: string } => {
+  const trimmedQuery = query.trim().toLowerCase();
+  
+  // University mapping for search
+  const universityMap: Record<string, string> = {
+    'udsm': 'udsm',
+    'ardhi': 'ardhi',
+    'duce': 'duce',
+    'kcmc': 'kcmc',
+    'sua': 'sua',
+    'udom': 'udom',
+    'must': 'must',
+    'cbe': 'cbe',
+    'ims': 'ims',
+    'out': 'out',
+    'ifm': 'ifm',
+    'cuom': 'cuom',
+    'dit': 'dit',
+    'atc': 'atc',
+    'muce': 'muce',
+    'saut': 'saut',
+    'tudarco': 'tudarco',
+    'sjut': 'sjut',
+    'hkmu': 'hkmu',
+    'irdp': 'irdp',
+    'mwecau': 'mwecau',
+    'rucu': 'rucu'
+  };
+  
+  // Check if query matches a university (with or without "near" prefix)
+  const nearMatch = trimmedQuery.match(/^(?:near\s+)?(\w+)$/i);
+  if (nearMatch) {
+    const possibleUni = nearMatch[1].toLowerCase();
+    if (universityMap[possibleUni]) {
+      return { university: universityMap[possibleUni] };
+    }
+  }
   
   // Check if query contains only numbers (price search)
   if (/^\d+$/.test(trimmedQuery)) {
@@ -50,20 +86,20 @@ const parseSearchQuery = (query: string): { location?: string; minPrice?: string
   const priceMatch = trimmedQuery.match(/(?:price|under|below|max|up to)\s*(\d+)/i);
   const minPriceMatch = trimmedQuery.match(/(?:above|over|min|from)\s*(\d+)/i);
   
-  let location = trimmedQuery;
+  let location = query.trim();
   let maxPrice: string | undefined;
   let minPrice: string | undefined;
   
   if (priceMatch) {
     maxPrice = priceMatch[1];
     // Remove price part from location
-    location = location.replace(priceMatch[0], '').trim();
+    location = location.replace(new RegExp(priceMatch[0], 'i'), '').trim();
   }
   
   if (minPriceMatch) {
     minPrice = minPriceMatch[1];
     // Remove price part from location
-    location = location.replace(minPriceMatch[0], '').trim();
+    location = location.replace(new RegExp(minPriceMatch[0], 'i'), '').trim();
   }
   
   return {
@@ -85,20 +121,38 @@ const NavbarSearchBar: React.FC<NavbarSearchBarProps> = ({ className = '' }) => 
   const suggestions: SearchSuggestion[] = [
     {
       icon: <MapPin className="h-4 w-4 text-orange-500" />,
+      text: 'Dar es Salaam',
+      description: 'Region - Mkoa',
+      category: 'location'
+    },
+    {
+      icon: <MapPin className="h-4 w-4 text-orange-500" />,
       text: 'Kinondoni',
-      description: 'Popular area in Dar es Salaam',
+      description: 'District - Wilaya, Dar es Salaam',
       category: 'location'
     },
     {
       icon: <MapPin className="h-4 w-4 text-orange-500" />,
       text: 'Ilala',
-      description: 'Central district',
+      description: 'Municipal - Manispaa, Dar es Salaam',
       category: 'location'
     },
     {
       icon: <MapPin className="h-4 w-4 text-orange-500" />,
-      text: 'Temeke',
-      description: 'Industrial area',
+      text: 'Mbeya',
+      description: 'Region - Mkoa',
+      category: 'location'
+    },
+    {
+      icon: <MapPin className="h-4 w-4 text-orange-500" />,
+      text: 'Sinza',
+      description: 'Ward/Street - Mtaa, Kinondoni',
+      category: 'location'
+    },
+    {
+      icon: <MapPin className="h-4 w-4 text-orange-500" />,
+      text: 'Mikocheni',
+      description: 'Ward/Street - Mtaa, Kinondoni',
       category: 'location'
     },
     {
@@ -118,6 +172,42 @@ const NavbarSearchBar: React.FC<NavbarSearchBarProps> = ({ className = '' }) => 
       text: 'above 800000',
       description: 'Above TZS 800,000',
       category: 'price'
+    },
+    {
+      icon: <GraduationCap className="h-4 w-4 text-indigo-500" />,
+      text: 'MUST',
+      description: 'Mbeya University of Science and Technology',
+      category: 'university'
+    },
+    {
+      icon: <GraduationCap className="h-4 w-4 text-indigo-500" />,
+      text: 'UDSM',
+      description: 'University of Dar es Salaam',
+      category: 'university'
+    },
+    {
+      icon: <GraduationCap className="h-4 w-4 text-indigo-500" />,
+      text: 'Ardhi',
+      description: 'Ardhi University',
+      category: 'university'
+    },
+    {
+      icon: <GraduationCap className="h-4 w-4 text-indigo-500" />,
+      text: 'IFM',
+      description: 'Institute of Finance Management',
+      category: 'university'
+    },
+    {
+      icon: <GraduationCap className="h-4 w-4 text-indigo-500" />,
+      text: 'DIT',
+      description: 'Dar es Salaam Institute of Technology',
+      category: 'university'
+    },
+    {
+      icon: <GraduationCap className="h-4 w-4 text-indigo-500" />,
+      text: 'CBE',
+      description: 'College of Business Education',
+      category: 'university'
     },
     {
       icon: <TrendingUp className="h-4 w-4 text-blue-500" />,
@@ -149,13 +239,14 @@ const NavbarSearchBar: React.FC<NavbarSearchBarProps> = ({ className = '' }) => 
   const handleSearch = (query?: string) => {
     const searchText = query || searchQuery;
     if (searchText.trim()) {
-      const { location, minPrice, maxPrice } = parseSearchQuery(searchText);
+      const { location, minPrice, maxPrice, university } = parseSearchQuery(searchText);
       
       // Build URL parameters
       const params = new URLSearchParams();
       if (location) params.set('location', location);
       if (minPrice) params.set('minPrice', minPrice);
       if (maxPrice) params.set('maxPrice', maxPrice);
+      if (university) params.set('nearbyService', university);
       
       navigate(`/browse?${params.toString()}`);
       setShowSuggestions(false);
@@ -240,6 +331,26 @@ const NavbarSearchBar: React.FC<NavbarSearchBarProps> = ({ className = '' }) => 
                   <div className="flex-shrink-0">{suggestion.icon}</div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium text-gray-900 group-hover:text-orange-600">
+                      {suggestion.text}
+                    </div>
+                    <div className="text-xs text-gray-500">{suggestion.description}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* University Suggestions - For Students */}
+            <div className="mb-2">
+              <div className="text-xs font-medium text-gray-400 px-3 py-1">🎓 Near University (For Students)</div>
+              {suggestions.filter(s => s.category === 'university').map((suggestion, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleSuggestionClick(suggestion.text)}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-indigo-50 rounded-lg transition-colors text-left group"
+                >
+                  <div className="flex-shrink-0">{suggestion.icon}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-gray-900 group-hover:text-indigo-600">
                       {suggestion.text}
                     </div>
                     <div className="text-xs text-gray-500">{suggestion.description}</div>

@@ -224,6 +224,27 @@ const Properties = () => {
             </p>
           </div>
 
+          {/* Rejection Reason Alert */}
+          {property.status === 'rejected' && property.rejection_reason && (
+            <div className="mb-3 p-2.5 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-start gap-2">
+                <div className="flex-shrink-0 mt-0.5">
+                  <svg className="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-red-700 mb-0.5">
+                    {i18n.language === 'en' ? 'Rejection Reason' : 'Sababu ya Kukataliwa'}
+                  </p>
+                  <p className="text-xs text-red-600 line-clamp-2">
+                    {property.rejection_reason}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 pb-3 border-b">
             <div className="flex items-center">
               <Bed className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />

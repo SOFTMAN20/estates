@@ -60,6 +60,12 @@ interface BookingWithProperty {
     images: string[];
     property_type: string;
   };
+  host_profile?: {
+    id: string;
+    name: string;
+    phone?: string | null;
+    avatar_url?: string | null;
+  };
   host_name?: string;
 }
 
@@ -164,16 +170,6 @@ export default function Bookings() {
           );
         }
       }
-    );
-  };
-
-  // Handle contact host
-  const handleContactHost = () => {
-    // TODO: Implement contact host functionality
-    toast.info(
-      i18n.language === 'en'
-        ? 'Contact host feature coming soon'
-        : 'Kipengele cha kuwasiliana kinakuja hivi karibuni'
     );
   };
 
@@ -301,9 +297,8 @@ export default function Bookings() {
                 <BookingCard
                   key={booking.id}
                   booking={booking}
-                  hostName={booking.host_name}
+                  hostName={booking.host_profile?.name || booking.host_name}
                   onCancel={handleCancelBooking}
-                  onContactHost={handleContactHost}
                 />
               ))
             )}
@@ -329,9 +324,8 @@ export default function Bookings() {
                 <BookingCard
                   key={booking.id}
                   booking={booking}
-                  hostName={booking.host_name}
+                  hostName={booking.host_profile?.name || booking.host_name}
                   hasReviewed={reviewedBookingIds.has(booking.id)}
-                  onContactHost={handleContactHost}
                   onLeaveReview={handleLeaveReview}
                 />
               ))
@@ -358,7 +352,7 @@ export default function Bookings() {
                 <BookingCard
                   key={booking.id}
                   booking={booking}
-                  hostName={booking.host_name}
+                  hostName={booking.host_profile?.name || booking.host_name}
                 />
               ))
             )}

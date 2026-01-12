@@ -229,7 +229,17 @@
     "amenitiesServices": "Amenities & Services",
     "loading": "Loading...",
     "loadMore": "Load More",
-    "endOfResults": "You've seen all properties"
+    "endOfResults": "You've seen all properties",
+    "nearUniversity": "Near University",
+    "nearUniversityHint": "Find hostels & rooms near universities",
+    "popularAreas": "Popular Areas",
+    "suggestedSearches": "Suggested Searches",
+    "budgetFriendly": "Budget Friendly",
+    "under300k": "Under TZS 300,000/month",
+    "studentHostels": "Student hostels & rooms",
+    "modernLiving": "Modern city living",
+    "familyHomes": "Family Homes",
+    "spaciousHouses": "3+ bedroom houses"
   },
   "propertyCard": {
     "perMonth": "/month",
@@ -488,6 +498,8 @@
     "market": "Market",
     "bank": "Bank",
     "transport": "Transport",
+    "nearUniversity": "Near University",
+    "nearUniversityHint": "Select if your property is near a university (helps students find hostels)",
     "contactPhone": "Contact Phone Number",
     "contactPhoneDescription": "This number will be visible to tenants who want to contact you",
     "whatsappNumber": "WhatsApp Number",

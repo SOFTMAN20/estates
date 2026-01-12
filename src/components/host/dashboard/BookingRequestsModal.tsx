@@ -110,11 +110,11 @@ const BookingRequestsModal: React.FC<BookingRequestsModalProps> = ({
     const propertyImage = property?.images?.[0] || '/placeholder-property.jpg';
 
     return (
-      <Card key={booking.id} className="mb-4 overflow-hidden hover:shadow-md transition-shadow">
+      <Card key={booking.id} className="mb-3 sm:mb-4 overflow-hidden hover:shadow-md transition-shadow">
         <CardContent className="p-0">
           <div className="flex flex-col sm:flex-row">
             {/* Property Image */}
-            <div className="w-full sm:w-32 h-32 sm:h-auto flex-shrink-0">
+            <div className="w-full sm:w-28 md:w-32 h-28 sm:h-auto flex-shrink-0">
               <img
                 src={propertyImage}
                 alt={property?.title}
@@ -123,18 +123,18 @@ const BookingRequestsModal: React.FC<BookingRequestsModalProps> = ({
             </div>
 
             {/* Booking Details */}
-            <div className="flex-1 p-4">
+            <div className="flex-1 p-3 sm:p-4">
               {/* Header: Guest Info & Status */}
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
+              <div className="flex items-start justify-between gap-2 mb-2 sm:mb-3">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                  <Avatar className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0">
                     <AvatarImage src={guest?.avatar_url} alt={guest?.name} />
-                    <AvatarFallback className="bg-primary/10 text-primary">
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs sm:text-sm">
                       {getInitials(guest?.name || 'Guest')}
                     </AvatarFallback>
                   </Avatar>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">{guest?.name || t('bookingRequests.unknownGuest')}</h4>
+                  <div className="min-w-0">
+                    <h4 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{guest?.name || t('bookingRequests.unknownGuest')}</h4>
                     <p className="text-xs text-gray-500 flex items-center gap-1">
                       <Clock className="h-3 w-3" />
                       {formatDistanceToNow(new Date(booking.created_at), { addSuffix: true })}
@@ -143,113 +143,110 @@ const BookingRequestsModal: React.FC<BookingRequestsModalProps> = ({
                 </div>
                 <Badge 
                   variant={booking.status === 'pending' ? 'secondary' : 'default'}
-                  className={booking.status === 'confirmed' ? 'bg-green-100 text-green-700' : ''}
+                  className={`text-xs whitespace-nowrap ${booking.status === 'confirmed' ? 'bg-green-100 text-green-700' : ''}`}
                 >
                   {booking.status === 'pending' ? t('bookingRequests.pending') : t('bookingRequests.confirmed')}
                 </Badge>
               </div>
 
               {/* Property Info */}
-              <div className="mb-3">
-                <div className="flex items-center gap-2 text-sm text-gray-700">
-                  <Home className="h-4 w-4 text-primary" />
-                  <span className="font-medium">{property?.title}</span>
+              <div className="mb-2 sm:mb-3">
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-700">
+                  <Home className="h-3 w-3 sm:h-4 sm:w-4 text-primary flex-shrink-0" />
+                  <span className="font-medium truncate">{property?.title}</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
-                  <MapPin className="h-3 w-3" />
-                  <span>{property?.location}</span>
+                  <MapPin className="h-3 w-3 flex-shrink-0" />
+                  <span className="truncate">{property?.location}</span>
                 </div>
               </div>
 
               {/* Dates & Amount */}
-              <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-gray-400" />
-                  <div>
-                    <span className="text-gray-500">{t('bookingRequests.checkIn')}:</span>
-                    <span className="ml-1 font-medium">{format(new Date(booking.check_in), 'MMM d, yyyy')}</span>
+              <div className="grid grid-cols-2 gap-1 sm:gap-2 mb-2 sm:mb-3 text-xs sm:text-sm">
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <span className="text-gray-500 hidden sm:inline">{t('bookingRequests.checkIn')}:</span>
+                    <span className="ml-0 sm:ml-1 font-medium">{format(new Date(booking.check_in), 'MMM d')}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CalendarCheck className="h-4 w-4 text-gray-400" />
-                  <div>
-                    <span className="text-gray-500">{t('bookingRequests.checkOut')}:</span>
-                    <span className="ml-1 font-medium">{format(new Date(booking.check_out), 'MMM d, yyyy')}</span>
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <CalendarCheck className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <span className="text-gray-500 hidden sm:inline">{t('bookingRequests.checkOut')}:</span>
+                    <span className="ml-0 sm:ml-1 font-medium">{format(new Date(booking.check_out), 'MMM d')}</span>
                   </div>
                 </div>
               </div>
 
               {/* Amount & Duration */}
-              <div className="flex items-center justify-between mb-3 p-2 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between mb-2 sm:mb-3 p-2 bg-gray-50 rounded-lg">
                 <div>
                   <span className="text-xs text-gray-500">{t('bookingRequests.duration')}</span>
-                  <p className="font-semibold text-gray-900">
+                  <p className="font-semibold text-gray-900 text-sm">
                     {booking.total_months} {booking.total_months === 1 ? t('bookingRequests.month') : t('bookingRequests.months')}
                   </p>
                 </div>
                 <div className="text-right">
                   <span className="text-xs text-gray-500">{t('bookingRequests.yourEarnings')}</span>
-                  <p className="font-bold text-primary">{formatCurrency(booking.monthly_rent * booking.total_months)}</p>
-                  <span className="text-xs text-gray-400">
-                    {t('bookingRequests.guestPays')}: {formatCurrency(booking.total_amount)}
-                  </span>
+                  <p className="font-bold text-primary text-sm sm:text-base">{formatCurrency(booking.monthly_rent * booking.total_months, { showPerMonth: false })}</p>
                 </div>
               </div>
 
               {/* Special Requests */}
               {booking.special_requests && (
-                <div className="mb-3 p-2 bg-yellow-50 rounded-lg border border-yellow-100">
+                <div className="mb-2 sm:mb-3 p-2 bg-yellow-50 rounded-lg border border-yellow-100">
                   <div className="flex items-start gap-2">
-                    <MessageSquare className="h-4 w-4 text-yellow-600 mt-0.5" />
-                    <div>
+                    <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                    <div className="min-w-0">
                       <span className="text-xs font-medium text-yellow-700">{t('bookingRequests.specialRequests')}:</span>
-                      <p className="text-sm text-yellow-800">{booking.special_requests}</p>
+                      <p className="text-xs sm:text-sm text-yellow-800 line-clamp-2">{booking.special_requests}</p>
                     </div>
                   </div>
                 </div>
               )}
 
               {/* Contact & Actions */}
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                 {guest?.phone && (
                   <a 
                     href={`tel:${guest.phone}`}
-                    className="flex items-center gap-1 text-sm text-primary hover:underline"
+                    className="flex items-center gap-1 text-xs sm:text-sm text-primary hover:underline"
                   >
-                    <Phone className="h-4 w-4" />
+                    <Phone className="h-3 w-3 sm:h-4 sm:w-4" />
                     {guest.phone}
                   </a>
                 )}
 
                 {showActions && (
-                  <div className="flex gap-2 ml-auto">
+                  <div className="flex gap-2 w-full sm:w-auto sm:ml-auto">
                     <Button
                       size="sm"
                       variant="outline"
-                      className="text-red-600 border-red-200 hover:bg-red-50"
+                      className="flex-1 sm:flex-none h-8 text-xs sm:text-sm text-red-600 border-red-200 hover:bg-red-50"
                       onClick={() => handleRejectClick(booking.id)}
                       disabled={isRejecting}
                     >
                       {isRejecting ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                       ) : (
                         <>
-                          <X className="h-4 w-4 mr-1" />
+                          <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                           {t('bookingRequests.reject')}
                         </>
                       )}
                     </Button>
                     <Button
                       size="sm"
-                      className="bg-green-600 hover:bg-green-700"
+                      className="flex-1 sm:flex-none h-8 text-xs sm:text-sm bg-green-600 hover:bg-green-700"
                       onClick={() => handleApprove(booking.id)}
                       disabled={isApproving}
                     >
                       {isApproving ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                       ) : (
                         <>
-                          <Check className="h-4 w-4 mr-1" />
+                          <Check className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                           {t('bookingRequests.approve')}
                         </>
                       )}
@@ -289,35 +286,35 @@ const BookingRequestsModal: React.FC<BookingRequestsModalProps> = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <User className="h-5 w-5 text-primary" />
+        <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] overflow-hidden flex flex-col p-3 sm:p-6">
+          <DialogHeader className="pb-2 sm:pb-4">
+            <DialogTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               {t('bookingRequests.title')}
             </DialogTitle>
           </DialogHeader>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="pending" className="relative">
+            <TabsList className="grid w-full grid-cols-2 h-9 sm:h-10">
+              <TabsTrigger value="pending" className="relative text-xs sm:text-sm">
                 {t('bookingRequests.pendingTab')}
                 {pendingBookings.length > 0 && (
-                  <Badge className="ml-2 bg-red-500 text-white text-xs px-1.5 py-0.5">
+                  <Badge className="ml-1 sm:ml-2 bg-red-500 text-white text-xs px-1 sm:px-1.5 py-0 sm:py-0.5 h-4 sm:h-5 min-w-[16px] sm:min-w-[20px]">
                     {pendingBookings.length}
                   </Badge>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="upcoming">
+              <TabsTrigger value="upcoming" className="text-xs sm:text-sm">
                 {t('bookingRequests.upcomingTab')}
                 {upcomingBookings.length > 0 && (
-                  <Badge className="ml-2 bg-green-500 text-white text-xs px-1.5 py-0.5">
+                  <Badge className="ml-1 sm:ml-2 bg-green-500 text-white text-xs px-1 sm:px-1.5 py-0 sm:py-0.5 h-4 sm:h-5 min-w-[16px] sm:min-w-[20px]">
                     {upcomingBookings.length}
                   </Badge>
                 )}
               </TabsTrigger>
             </TabsList>
 
-            <div className="flex-1 overflow-y-auto mt-4">
+            <div className="flex-1 overflow-y-auto mt-3 sm:mt-4">
               {isLoading ? (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -348,26 +345,27 @@ const BookingRequestsModal: React.FC<BookingRequestsModalProps> = ({
 
       {/* Reject Confirmation Dialog */}
       <AlertDialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="w-[90vw] max-w-md p-4 sm:p-6">
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('bookingRequests.rejectTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-base sm:text-lg">{t('bookingRequests.rejectTitle')}</AlertDialogTitle>
+            <AlertDialogDescription className="text-xs sm:text-sm">
               {t('bookingRequests.rejectDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="my-4">
+          <div className="my-3 sm:my-4">
             <Textarea
               placeholder={t('bookingRequests.rejectReasonPlaceholder')}
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               rows={3}
+              className="text-sm"
             />
           </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+            <AlertDialogCancel className="w-full sm:w-auto">{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleRejectConfirm}
-              className="bg-red-600 hover:bg-red-700"
+              className="w-full sm:w-auto bg-red-600 hover:bg-red-700"
             >
               {t('bookingRequests.confirmReject')}
             </AlertDialogAction>

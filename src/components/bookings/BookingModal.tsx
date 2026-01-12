@@ -104,13 +104,13 @@ export function BookingModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-            <CheckCircle2 className="h-6 w-6 text-primary" />
+      <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+        <DialogHeader className="space-y-1 sm:space-y-2">
+          <DialogTitle className="text-lg sm:text-2xl font-bold flex items-center gap-2">
+            <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             {i18n.language === 'en' ? 'Confirm Your Booking' : 'Thibitisha Hifadhi Yako'}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-xs sm:text-sm">
             {i18n.language === 'en' 
               ? 'Review your booking details before confirming'
               : 'Kagua maelezo ya hifadhi yako kabla ya kuthibitisha'
@@ -118,30 +118,30 @@ export function BookingModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-4 sm:space-y-6 py-2 sm:py-4">
           {/* Property Summary */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-lg flex items-center gap-2">
-              <Home className="h-5 w-5 text-primary" />
+          <div className="space-y-2 sm:space-y-3">
+            <h3 className="font-semibold text-base sm:text-lg flex items-center gap-2">
+              <Home className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               {i18n.language === 'en' ? 'Property Details' : 'Maelezo ya Nyumba'}
             </h3>
             
-            <div className="flex gap-4 p-4 bg-gradient-to-r from-primary/5 to-purple-50/50 rounded-lg border border-primary/20">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-3 sm:p-4 bg-gradient-to-r from-primary/5 to-purple-50/50 rounded-lg border border-primary/20">
               {/* Property Image */}
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 mx-auto sm:mx-0">
                 <img
                   src={property.images[0] || '/placeholder.svg'}
                   alt={property.title}
-                  className="w-24 h-24 object-cover rounded-lg"
+                  className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
                 />
               </div>
 
               {/* Property Info */}
-              <div className="flex-1 space-y-2">
-                <h4 className="font-semibold text-gray-900">{property.title}</h4>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <MapPin className="h-4 w-4" />
-                  <span>{property.location}</span>
+              <div className="flex-1 space-y-1 sm:space-y-2 text-center sm:text-left">
+                <h4 className="font-semibold text-sm sm:text-base text-gray-900 line-clamp-2">{property.title}</h4>
+                <div className="flex items-center justify-center sm:justify-start gap-2 text-xs sm:text-sm text-gray-600">
+                  <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="line-clamp-1">{property.location}</span>
                 </div>
                 <Badge variant="secondary" className="text-xs">
                   {property.property_type}
@@ -149,11 +149,11 @@ export function BookingModal({
               </div>
 
               {/* Price */}
-              <div className="text-right">
-                <div className="text-sm text-gray-600">
+              <div className="text-center sm:text-right mt-2 sm:mt-0">
+                <div className="text-xs sm:text-sm text-gray-600">
                   {i18n.language === 'en' ? 'Monthly Rent' : 'Kodi ya Mwezi'}
                 </div>
-                <div className="text-lg font-bold text-primary">
+                <div className="text-base sm:text-lg font-bold text-primary">
                   {formatCurrency(property.price)}
                 </div>
               </div>
@@ -163,38 +163,38 @@ export function BookingModal({
           <Separator />
 
           {/* Booking Dates */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-lg flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-primary" />
+          <div className="space-y-2 sm:space-y-3">
+            <h3 className="font-semibold text-base sm:text-lg flex items-center gap-2">
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               {i18n.language === 'en' ? 'Booking Period' : 'Muda wa Kukodi'}
             </h3>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-2 sm:gap-4">
               {/* Check-in */}
-              <div className="p-4 bg-white rounded-lg border border-gray-200">
-                <div className="text-sm text-gray-600 mb-1">
-                  {i18n.language === 'en' ? 'Check-in' : 'Tarehe ya Kuingia'}
+              <div className="p-2 sm:p-4 bg-white rounded-lg border border-gray-200">
+                <div className="text-xs text-gray-600 mb-1">
+                  {i18n.language === 'en' ? 'Check-in' : 'Kuingia'}
                 </div>
-                <div className="font-semibold text-gray-900">
-                  {format(bookingData.checkIn, 'PPP')}
+                <div className="font-semibold text-xs sm:text-sm text-gray-900">
+                  {format(bookingData.checkIn, 'PP')}
                 </div>
               </div>
 
               {/* Check-out */}
-              <div className="p-4 bg-white rounded-lg border border-gray-200">
-                <div className="text-sm text-gray-600 mb-1">
-                  {i18n.language === 'en' ? 'Check-out' : 'Tarehe ya Kutoka'}
+              <div className="p-2 sm:p-4 bg-white rounded-lg border border-gray-200">
+                <div className="text-xs text-gray-600 mb-1">
+                  {i18n.language === 'en' ? 'Check-out' : 'Kutoka'}
                 </div>
-                <div className="font-semibold text-gray-900">
-                  {format(bookingData.checkOut, 'PPP')}
+                <div className="font-semibold text-xs sm:text-sm text-gray-900">
+                  {format(bookingData.checkOut, 'PP')}
                 </div>
               </div>
             </div>
 
             {/* Duration */}
-            <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
-              <Clock className="h-5 w-5 text-blue-600" />
-              <span className="text-sm font-medium text-blue-900">
+            <div className="flex items-center gap-2 p-2 sm:p-3 bg-blue-50 rounded-lg">
+              <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+              <span className="text-xs sm:text-sm font-medium text-blue-900">
                 {i18n.language === 'en' ? 'Duration:' : 'Muda:'} {bookingData.months} {
                   bookingData.months === 1 
                     ? (i18n.language === 'en' ? 'month' : 'mwezi')
@@ -207,15 +207,15 @@ export function BookingModal({
           <Separator />
 
           {/* Price Breakdown */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-lg flex items-center gap-2">
-              <Receipt className="h-5 w-5 text-primary" />
+          <div className="space-y-2 sm:space-y-3">
+            <h3 className="font-semibold text-base sm:text-lg flex items-center gap-2">
+              <Receipt className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               {i18n.language === 'en' ? 'Payment Summary' : 'Muhtasari wa Malipo'}
             </h3>
 
-            <div className="space-y-2 p-4 bg-gray-50 rounded-lg">
+            <div className="space-y-2 p-3 sm:p-4 bg-gray-50 rounded-lg">
               {/* Subtotal */}
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-xs sm:text-sm">
                 <span className="text-gray-600">
                   {formatCurrency(property.price)} × {bookingData.months} {
                     bookingData.months === 1 
@@ -227,7 +227,7 @@ export function BookingModal({
               </div>
 
               {/* Service Fee */}
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-xs sm:text-sm">
                 <span className="text-gray-600">
                   {i18n.language === 'en' ? `Service Fee (${commissionRate}%)` : `Ada ya Huduma (${commissionRate}%)`}
                 </span>
@@ -238,10 +238,10 @@ export function BookingModal({
 
               {/* Total */}
               <div className="flex justify-between pt-2">
-                <span className="font-semibold text-lg">
+                <span className="font-semibold text-sm sm:text-lg">
                   {i18n.language === 'en' ? 'Total Amount' : 'Jumla ya Malipo'}
                 </span>
-                <span className="font-bold text-xl text-primary">
+                <span className="font-bold text-lg sm:text-xl text-primary">
                   {formatCurrency(bookingData.totalAmount)}
                 </span>
               </div>
@@ -251,46 +251,46 @@ export function BookingModal({
           <Separator />
 
           {/* Guest Information */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-lg flex items-center gap-2">
-              <User className="h-5 w-5 text-primary" />
+          <div className="space-y-2 sm:space-y-3">
+            <h3 className="font-semibold text-base sm:text-lg flex items-center gap-2">
+              <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               {i18n.language === 'en' ? 'Guest Information' : 'Maelezo ya Mgeni'}
             </h3>
 
-            <div className="space-y-2 p-4 bg-white rounded-lg border border-gray-200">
+            <div className="space-y-2 p-3 sm:p-4 bg-white rounded-lg border border-gray-200">
               {/* Name */}
-              <div className="flex items-center gap-3">
-                <User className="h-4 w-4 text-gray-500" />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <User className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
                 <div>
                   <div className="text-xs text-gray-500">
                     {i18n.language === 'en' ? 'Name' : 'Jina'}
                   </div>
-                  <div className="font-medium">{guestInfo.name || 'N/A'}</div>
+                  <div className="font-medium text-sm">{guestInfo.name || 'N/A'}</div>
                 </div>
               </div>
 
               {/* Email */}
               {guestInfo.email && (
-                <div className="flex items-center gap-3">
-                  <Mail className="h-4 w-4 text-gray-500" />
-                  <div>
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <Mail className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
+                  <div className="min-w-0 flex-1">
                     <div className="text-xs text-gray-500">
                       {i18n.language === 'en' ? 'Email' : 'Barua Pepe'}
                     </div>
-                    <div className="font-medium">{guestInfo.email}</div>
+                    <div className="font-medium text-sm truncate">{guestInfo.email}</div>
                   </div>
                 </div>
               )}
 
               {/* Phone */}
               {guestInfo.phone && (
-                <div className="flex items-center gap-3">
-                  <Phone className="h-4 w-4 text-gray-500" />
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <Phone className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
                   <div>
                     <div className="text-xs text-gray-500">
                       {i18n.language === 'en' ? 'Phone' : 'Simu'}
                     </div>
-                    <div className="font-medium">{guestInfo.phone}</div>
+                    <div className="font-medium text-sm">{guestInfo.phone}</div>
                   </div>
                 </div>
               )}
@@ -300,37 +300,37 @@ export function BookingModal({
           <Separator />
 
           {/* Special Requests */}
-          <div className="space-y-3">
-            <label className="font-semibold text-sm">
+          <div className="space-y-2 sm:space-y-3">
+            <label className="font-semibold text-xs sm:text-sm">
               {i18n.language === 'en' ? 'Special Requests (Optional)' : 'Mahitaji Maalum (Si Lazima)'}
             </label>
             <Textarea
               placeholder={
                 i18n.language === 'en' 
-                  ? 'Any special requests or requirements? (e.g., early check-in, parking space, etc.)'
-                  : 'Una mahitaji maalum? (mfano: kuingia mapema, nafasi ya gari, n.k.)'
+                  ? 'Any special requests or requirements?'
+                  : 'Una mahitaji maalum?'
               }
               value={specialRequests}
               onChange={(e) => setSpecialRequests(e.target.value)}
-              rows={4}
-              className="resize-none"
+              rows={3}
+              className="resize-none text-sm"
             />
           </div>
 
           <Separator />
 
           {/* Terms and Conditions */}
-          <div className="space-y-4">
-            <div className="flex items-start gap-3 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 bg-yellow-50 rounded-lg border border-yellow-200">
               <Checkbox
                 id="terms"
                 checked={agreedToTerms}
                 onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)}
-                className="mt-1"
+                className="mt-0.5"
               />
               <label
                 htmlFor="terms"
-                className="text-sm leading-relaxed cursor-pointer"
+                className="text-xs sm:text-sm leading-relaxed cursor-pointer"
               >
                 {i18n.language === 'en' ? (
                   <>
@@ -338,7 +338,7 @@ export function BookingModal({
                     <a href="/terms" className="text-primary font-medium hover:underline" target="_blank">
                       Terms and Conditions
                     </a>{' '}
-                    and understand that this booking is subject to host approval. Payment will be required after confirmation.
+                    and understand that this booking is subject to host approval.
                   </>
                 ) : (
                   <>
@@ -346,7 +346,7 @@ export function BookingModal({
                     <a href="/terms" className="text-primary font-medium hover:underline" target="_blank">
                       Sheria na Masharti
                     </a>{' '}
-                    na naelewa kwamba hifadhi hii inahitaji idhini ya mwenye nyumba. Malipo yatahitajika baada ya uthibitisho.
+                    na naelewa kwamba hifadhi hii inahitaji idhini ya mwenye nyumba.
                   </>
                 )}
               </label>
@@ -354,12 +354,12 @@ export function BookingModal({
 
             {/* Warning Message */}
             {!agreedToTerms && (
-              <div className="flex items-start gap-2 p-3 bg-red-50 rounded-lg border border-red-200">
-                <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-900">
+              <div className="flex items-start gap-2 p-2 sm:p-3 bg-red-50 rounded-lg border border-red-200">
+                <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <p className="text-xs sm:text-sm text-red-900">
                   {i18n.language === 'en' 
-                    ? 'Please agree to the terms and conditions to continue'
-                    : 'Tafadhali kubali sheria na masharti ili kuendelea'
+                    ? 'Please agree to the terms to continue'
+                    : 'Tafadhali kubali masharti ili kuendelea'
                   }
                 </p>
               </div>
@@ -368,12 +368,12 @@ export function BookingModal({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3 pt-4 border-t">
+        <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4 border-t">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
-            className="flex-1"
+            className="flex-1 h-10 sm:h-11 text-sm"
           >
             {i18n.language === 'en' ? 'Cancel' : 'Ghairi'}
           </Button>
@@ -381,7 +381,7 @@ export function BookingModal({
             onClick={handleConfirm}
             disabled={!agreedToTerms || isLoading}
             className={cn(
-              "flex-1 bg-gradient-to-r from-primary to-primary/90",
+              "flex-1 h-10 sm:h-11 text-sm bg-gradient-to-r from-primary to-primary/90",
               "hover:from-primary/90 hover:to-primary",
               "disabled:opacity-50 disabled:cursor-not-allowed"
             )}

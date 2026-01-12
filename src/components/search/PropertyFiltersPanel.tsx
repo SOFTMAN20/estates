@@ -206,6 +206,53 @@ const PropertyFiltersPanel: React.FC<PropertyFiltersPanelProps> = ({
         </div>
       </div>
 
+      {/* Near University - For Students */}
+      <div className="border-t border-gray-200 pt-3">
+        <label className="text-xs font-medium text-gray-600 mb-2 block">
+          🎓 {t('browse.nearUniversity')}
+        </label>
+        <p className="text-[10px] text-gray-400 mb-2">{t('browse.nearUniversityHint')}</p>
+        <div className="flex flex-wrap gap-1.5">
+          {[
+            { key: 'udsm', label: '🎓 UDSM' },
+            { key: 'ardhi', label: '🎓 Ardhi' },
+            { key: 'duce', label: '🎓 DUCE' },
+            { key: 'kcmc', label: '🎓 KCMC' },
+            { key: 'sua', label: '🎓 SUA' },
+            { key: 'udom', label: '🎓 UDOM' },
+            { key: 'must', label: '🎓 MUST' },
+            { key: 'cbe', label: '🎓 CBE' },
+            { key: 'ims', label: '🎓 IMS' },
+            { key: 'out', label: '🎓 OUT' },
+            { key: 'ifm', label: '🎓 IFM' },
+            { key: 'cuom', label: '🎓 CUOM' },
+            { key: 'dit', label: '🎓 DIT' },
+            { key: 'atc', label: '🎓 ATC' },
+            { key: 'muce', label: '🎓 MUCE' },
+            { key: 'saut', label: '🎓 SAUT' },
+            { key: 'tudarco', label: '🎓 TUDARCo' },
+            { key: 'sjut', label: '🎓 SJUT' },
+            { key: 'hkmu', label: '🎓 HKMU' },
+            { key: 'irdp', label: '🎓 IRDP' },
+            { key: 'mwecau', label: '🎓 MWECAU' },
+            { key: 'rucu', label: '🎓 RUCU' }
+          ].map(({ key, label }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onNearbyServiceToggle(key)}
+              className={`px-2.5 py-1 text-xs rounded-full border transition-all ${
+                nearbyServices.includes(key)
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-400'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Clear Filters Button - Sticky at bottom */}
       <div className="pt-3 border-t border-gray-200">
         <Button 

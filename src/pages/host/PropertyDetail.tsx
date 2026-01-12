@@ -62,6 +62,7 @@ import { format } from 'date-fns';
 import { useReviews } from '@/hooks/useReviews';
 import { RatingSummary } from '@/components/reviews/RatingSummary';
 import { ReviewList } from '@/components/reviews/ReviewList';
+import { supabase } from '@/lib/integrations/supabase/client';
 
 /**
  * PROPERTY DETAIL COMPONENT
@@ -107,10 +108,41 @@ const PropertyDetail = () => {
   // Reviews data
   const { reviews, statistics, isLoading: reviewsLoading } = useReviews(id);
 
+  // Property address state - Anwani kamili ya nyumba
+  const [fullAddress, setFullAddress] = useState<string | null>(null);
+
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Fetch full address from property_addresses table
+  useEffect(() => {
+    const fetchPropertyAddress = async () => {
+      if (!id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('property_addresses')
+          .select('location')
+          .eq('property_id', id)
+          .single();
+        
+        if (error) {
+          console.log('No address found for property:', id);
+          return;
+        }
+        
+        if (data?.location) {
+          setFullAddress(data.location);
+        }
+      } catch (err) {
+        console.error('Error fetching property address:', err);
+      }
+    };
+
+    fetchPropertyAddress();
+  }, [id]);
 
   // Handle sticky button visibility on mobile
   useEffect(() => {
@@ -816,7 +848,7 @@ const PropertyDetail = () => {
                   <PropertyHeader
                     title={property.title}
                     location={property.location}
-                    fullAddress={property.location}
+                    fullAddress={fullAddress || property.location}
                     price={Number(property.price)}
                     amenities={property.amenities}
                     nearbyServices={property.nearby_services}
@@ -944,7 +976,7 @@ const PropertyDetail = () => {
             {/* Location Map */}
             <PropertyLocation
               location={property.location}
-              fullAddress={property.location}
+              fullAddress={fullAddress || property.location}
               title={property.title}
             />
 

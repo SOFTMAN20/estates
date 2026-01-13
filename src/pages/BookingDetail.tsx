@@ -309,7 +309,9 @@ export default function BookingDetail() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-700">{booking.special_requests}</p>
+                  <p className="text-gray-700 whitespace-pre-wrap break-words overflow-hidden">
+                    {booking.special_requests}
+                  </p>
                 </CardContent>
               </Card>
             )}

@@ -30,6 +30,20 @@
   animation: fade-in 0.5s ease-out;
 }
 
+/* Shimmer animation for lazy loading placeholders */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
 /* Definition of the refined design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL for better color manipulation and accessibility.
 */

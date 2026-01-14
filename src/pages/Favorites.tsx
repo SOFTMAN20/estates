@@ -11,7 +11,7 @@
  * - Show empty state when no favorites (Kuonyesha hali tupu wakati hakuna vipendwa)
  */
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import Navigation from '@/components/layout/navbarLayout/Navigation';
 import PropertyCard from '@/components/properties/propertyCommon/PropertyCard';
 import Footer from '@/components/layout/Footer';
@@ -106,10 +106,9 @@ const Favorites = () => {
                 price={Number(property.price)}
                 location={property.location}
                 images={property.images || []}
-                phone={property.profiles?.phone || undefined}
-                contactPhone={property.contact_phone || undefined}
-                contactWhatsappPhone={property.contact_whatsapp_phone || undefined}
                 bedrooms={property.bedrooms || undefined}
+                bathrooms={property.bathrooms || undefined}
+                squareMeters={property.square_meters || undefined}
                 isFavorited={isFavorited(property.id)}
                 onToggleFavorite={toggleFavorite}
                 viewMode="grid"

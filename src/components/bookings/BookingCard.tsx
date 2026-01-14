@@ -213,12 +213,14 @@ export function BookingCard({
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
       <CardContent className="p-0">
         <div className="flex flex-col sm:flex-row">
-          {/* Property Image */}
-          <div className="w-full sm:w-40 md:w-48 h-40 sm:h-auto flex-shrink-0">
+          {/* Property Image with lazy loading */}
+          <div className="w-full sm:w-40 md:w-48 h-40 sm:h-auto flex-shrink-0 relative overflow-hidden bg-gray-100">
             <img
               src={property?.images?.[0] || '/placeholder.svg'}
               alt={property?.title || 'Property'}
               className="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
             />
           </div>
 

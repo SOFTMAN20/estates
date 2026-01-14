@@ -224,6 +224,8 @@ export default function BookingDetail() {
                       src={booking.properties.images[0]}
                       alt={booking.properties.title}
                       className="w-32 h-32 object-cover rounded-lg"
+                      loading="lazy"
+                      decoding="async"
                     />
                   )}
 

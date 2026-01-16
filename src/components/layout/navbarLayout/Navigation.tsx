@@ -225,64 +225,77 @@ const Navigation = () => {
       </div>
 
       {/* SECOND ROW: Navigation Items (YouTube-style category tabs) - Desktop only, scrolls with page */}
-      <div className="hidden md:flex items-center justify-center gap-1 px-4 py-2 overflow-x-auto bg-white border-b border-gray-200">
-        <Link to="/">
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
-              location.pathname === '/'
-                ? 'bg-primary/15 text-primary hover:bg-primary/20 border border-primary/20'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            {t('navigation.home')}
-          </Button>
-        </Link>
-
-        <Link to="/browse">
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
-              location.pathname === '/browse'
-                ? 'bg-primary/15 text-primary hover:bg-primary/20 border border-primary/20'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            {t('navigation.browse')}
-          </Button>
-        </Link>
-
-        <Link to="/about">
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
-              location.pathname === '/about'
-                ? 'bg-primary/15 text-primary hover:bg-primary/20 border border-primary/20'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            {t('navigation.about')}
-          </Button>
-        </Link>
-
-        {user && (
-          <Link to="/dashboard">
+      <div className="hidden md:flex items-center justify-between gap-1 px-4 py-2 overflow-x-auto bg-white border-b border-gray-200">
+        {/* Left side - Navigation links */}
+        <div className="flex items-center gap-1">
+          <Link to="/">
             <Button
               variant="ghost"
               size="sm"
               className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
-                location.pathname === '/dashboard'
+                location.pathname === '/'
                   ? 'bg-primary/15 text-primary hover:bg-primary/20 border border-primary/20'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              {t('navigation.dashboard')}
+              {t('navigation.home')}
             </Button>
           </Link>
-        )}
+
+          <Link to="/browse">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
+                location.pathname === '/browse'
+                  ? 'bg-primary/15 text-primary hover:bg-primary/20 border border-primary/20'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {t('navigation.browse')}
+            </Button>
+          </Link>
+
+          <Link to="/about">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
+                location.pathname === '/about'
+                  ? 'bg-primary/15 text-primary hover:bg-primary/20 border border-primary/20'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {t('navigation.about')}
+            </Button>
+          </Link>
+
+          {user && (
+            <Link to="/dashboard">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
+                  location.pathname === '/dashboard'
+                    ? 'bg-primary/15 text-primary hover:bg-primary/20 border border-primary/20'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {t('navigation.dashboard')}
+              </Button>
+            </Link>
+          )}
+        </div>
+
+        {/* Right side - List Your Property CTA */}
+        <Link to={user ? "/dashboard?action=add-property" : "/signin?redirect=/dashboard?action=add-property"}>
+          <Button
+            size="sm"
+            className="rounded-lg px-4 py-1.5 text-sm font-medium bg-primary hover:bg-primary/90 text-white"
+          >
+            {i18n.language === 'en' ? 'List Your Property' : 'Tangaza Nyumba Yako'}
+          </Button>
+        </Link>
       </div>
 
       {/* MOBILE SEARCH BAR - Sticky on mobile, scrolls away on desktop */}

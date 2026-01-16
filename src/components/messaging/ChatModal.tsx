@@ -228,10 +228,10 @@ export function ChatModal({
                         >
                           <div
                             className={cn(
-                              'max-w-[80%] rounded-2xl px-4 py-2',
+                              'max-w-[80%] rounded-2xl px-4 py-2 shadow-sm',
                               isOwn
-                                ? 'bg-primary text-white rounded-br-md'
-                                : 'bg-white text-gray-900 rounded-bl-md shadow-sm'
+                                ? 'bg-blue-600 text-white rounded-br-md'
+                                : 'bg-white text-gray-900 rounded-bl-md border border-gray-100'
                             )}
                           >
                             {message.message_type === 'image' && message.image_url && (
@@ -241,13 +241,16 @@ export function ChatModal({
                                 className="rounded-lg mb-2 max-w-full"
                               />
                             )}
-                            <p className="text-sm whitespace-pre-wrap break-words">
+                            <p className={cn(
+                              'text-sm whitespace-pre-wrap break-words',
+                              isOwn ? 'text-white' : 'text-gray-800'
+                            )}>
                               {message.content}
                             </p>
                             <p
                               className={cn(
                                 'text-xs mt-1',
-                                isOwn ? 'text-white/70' : 'text-gray-400'
+                                isOwn ? 'text-blue-100' : 'text-gray-400'
                               )}
                             >
                               {formatMessageDate(message.created_at)}

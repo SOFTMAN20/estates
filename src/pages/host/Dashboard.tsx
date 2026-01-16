@@ -182,15 +182,26 @@ const Dashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  // Check if we should open the add property form from navigation state
+  // Check if we should open the add property form from navigation state or URL query parameter
   useEffect(() => {
+    // Check for location.state (from navigate with state)
     if (location.state?.openAddForm && !hasOpenedFormRef.current) {
       hasOpenedFormRef.current = true;
       openAddForm();
       // Clear the state to prevent reopening on refresh
       window.history.replaceState({}, document.title);
+      return;
     }
-  }, [location.state, openAddForm]);
+    
+    // Check for URL query parameter (from "List Your Property" button)
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('action') === 'add-property' && !hasOpenedFormRef.current) {
+      hasOpenedFormRef.current = true;
+      openAddForm();
+      // Clear the query parameter to prevent reopening on refresh
+      navigate('/dashboard', { replace: true });
+    }
+  }, [location.state, location.search, openAddForm, navigate]);
 
   /**
    * HANDLER FUNCTIONS

@@ -30,7 +30,6 @@ import HeroSection from "@/components/layout/HeroSection";
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  PropertyTypeFiltersSkeleton,
   FeaturedPropertiesSkeleton,
   PopularDestinationsSkeleton,
   HowItWorksSkeleton,
@@ -40,7 +39,6 @@ import {
 } from '@/components/common/HomepageSkeletons';
 
 // Lazy load below-the-fold components
-const PropertyTypeFilters = lazy(() => import("@/components/layout/PropertyTypeFilters"));
 const PopularDestinations = lazy(() => import("@/components/properties/propertyCommon/PopularDestinations"));
 const FeaturedProperties = lazy(() => import("@/components/properties/propertyCommon/FeaturedProperties"));
 const HowItWorks = lazy(() => import("@/components/layout/HowItWorks"));
@@ -68,11 +66,6 @@ const Index = () => {
       
       {/* Main hero section with search - Sehemu ya utafutaji mkuu */}
       <HeroSection />
-      
-      {/* Property Type Quick Filters - Vichujio vya haraka vya aina ya nyumba */}
-      <Suspense fallback={<PropertyTypeFiltersSkeleton />}>
-        <PropertyTypeFilters />
-      </Suspense>
       
       {/* Highlighted property listings - Nyumba zilizoangaziwa */}
       <Suspense fallback={<FeaturedPropertiesSkeleton />}>

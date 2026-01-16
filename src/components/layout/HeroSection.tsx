@@ -23,7 +23,14 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Search, MapPin, ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Search, MapPin, ChevronDown, ChevronUp, SlidersHorizontal, Building2, Home, Bed, DoorOpen, Castle, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import heroBackground from '@/assets/hero-background.jpg';
 import { useTranslation } from 'react-i18next';
@@ -31,14 +38,27 @@ import { useTranslation } from 'react-i18next';
 const HeroSection = () => {
   const { t } = useTranslation();
   const [searchLocation, setSearchLocation] = useState('');
+  const [propertyType, setPropertyType] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Property types for dropdown
+  const propertyTypes = [
+    { value: 'apartment', labelKey: 'propertyTypeFilters.apartment', icon: Building2 },
+    { value: 'house', labelKey: 'propertyTypeFilters.house', icon: Home },
+    { value: 'studio', labelKey: 'propertyTypeFilters.studio', icon: DoorOpen },
+    { value: 'room', labelKey: 'propertyTypeFilters.room', icon: Bed },
+    { value: 'villa', labelKey: 'propertyTypeFilters.villa', icon: Castle },
+    { value: 'bedsitter', labelKey: 'propertyTypeFilters.bedsitter', icon: Users },
+  ];
 
   // Build search URL with parameters
   const buildSearchUrl = () => {
     const params = new URLSearchParams();
     if (searchLocation) params.append('location', searchLocation);
+    // Only add propertyType if it's not empty and not "all"
+    if (propertyType && propertyType !== 'all') params.append('propertyType', propertyType);
     if (minPrice) params.append('minPrice', minPrice);
     if (maxPrice) params.append('maxPrice', maxPrice);
     return `/browse${params.toString() ? '?' + params.toString() : ''}`;
@@ -135,7 +155,7 @@ const HeroSection = () => {
                   )}
                 </div>
 
-                {/* Expanded State - Price Filters */}
+                {/* Expanded State - Property Type & Price Filters */}
                 <div className={`overflow-hidden transition-all duration-300 ease-in-out
                                 ${isExpanded ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
                   <div className="space-y-4 pt-2 border-t border-gray-100">
@@ -143,6 +163,33 @@ const HeroSection = () => {
                     <div className="flex items-center gap-2 text-sm font-medium text-gray-600">
                       <SlidersHorizontal className="h-4 w-4" />
                       <span>{t('homepage.mobileFilters')}</span>
+                    </div>
+                    
+                    {/* Property Type Dropdown */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 mb-1.5">
+                        {t('homepage.propertyType')}
+                      </label>
+                      <Select value={propertyType} onValueChange={setPropertyType}>
+                        <SelectTrigger className="h-12 text-sm border-2 border-border focus:border-primary 
+                                                   hover:border-primary/50 transition-all duration-300 rounded-xl">
+                          <SelectValue placeholder={t('homepage.allTypes')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">{t('homepage.allTypes')}</SelectItem>
+                          {propertyTypes.map((type) => {
+                            const Icon = type.icon;
+                            return (
+                              <SelectItem key={type.value} value={type.value}>
+                                <div className="flex items-center gap-2">
+                                  <Icon className="h-4 w-4" />
+                                  <span>{t(type.labelKey)}</span>
+                                </div>
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
                     </div>
                     
                     {/* Price Range Inputs */}
@@ -188,9 +235,9 @@ const HeroSection = () => {
                     </Link>
                     
                     {/* Clear Filters */}
-                    {(minPrice || maxPrice) && (
+                    {(minPrice || maxPrice || propertyType) && (
                       <button
-                        onClick={() => { setMinPrice(''); setMaxPrice(''); }}
+                        onClick={() => { setMinPrice(''); setMaxPrice(''); setPropertyType(''); }}
                         className="w-full text-sm text-gray-500 hover:text-primary transition-colors py-1"
                       >
                         {t('homepage.clearFilters')}
@@ -203,7 +250,7 @@ const HeroSection = () => {
               {/* ========== DESKTOP LAYOUT - Horizontal Row ========== */}
               <div className="hidden lg:grid lg:grid-cols-12 gap-4 items-end">
                 {/* Location Search Input */}
-                <div className="lg:col-span-5 group">
+                <div className="lg:col-span-4 group">
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     {t('homepage.searchLocation')}
                   </label>
@@ -218,6 +265,33 @@ const HeroSection = () => {
                                  focus-visible:ring-offset-0 rounded-2xl"
                     />
                   </div>
+                </div>
+
+                {/* Property Type Dropdown */}
+                <div className="lg:col-span-2 group">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    {t('homepage.propertyType')}
+                  </label>
+                  <Select value={propertyType} onValueChange={setPropertyType}>
+                    <SelectTrigger className="h-14 text-sm border-2 border-border focus:border-primary 
+                                               hover:border-primary/50 transition-all duration-300 rounded-2xl">
+                      <SelectValue placeholder={t('homepage.allTypes')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t('homepage.allTypes')}</SelectItem>
+                      {propertyTypes.map((type) => {
+                        const Icon = type.icon;
+                        return (
+                          <SelectItem key={type.value} value={type.value}>
+                            <div className="flex items-center gap-2">
+                              <Icon className="h-4 w-4" />
+                              <span>{t(type.labelKey)}</span>
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Minimum Price */}
@@ -253,7 +327,7 @@ const HeroSection = () => {
                 </div>
 
                 {/* Search Button */}
-                <div className="lg:col-span-3">
+                <div className="lg:col-span-2">
                   <Link to={buildSearchUrl()} className="w-full block">
                     <Button 
                       className="w-full h-14 text-base font-bold bg-primary hover:bg-primary/90 

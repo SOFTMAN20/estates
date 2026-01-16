@@ -32,6 +32,8 @@ export {
   Step3PropertyDetails,
   Step4PhotoUpload,
   Step5ContactInfo,
+  Step6UnitsRooms,
   StepNavigation,
-  FormNavigationButtons
+  FormNavigationButtons,
+  type PropertyUnit
 } from './propertyFormSteps';

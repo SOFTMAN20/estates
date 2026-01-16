@@ -26,3 +26,6 @@ export * from './search';
 
 // Payment types
 export * from './payment';
+
+// Tenant types
+export * from './tenant';

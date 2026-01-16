@@ -23,8 +23,10 @@ import {
   Step3PropertyDetails, // Exported from Step2PropertyDetails.tsx
   Step4PhotoUpload,
   Step5ContactInfo,
+  Step6UnitsRooms,
   StepNavigation,
-  FormNavigationButtons
+  FormNavigationButtons,
+  type PropertyUnit
 } from '@/components/host/dashboard/AddPropertyForms/propertyFormSteps';
 
 type Property = Tables<'properties'>;
@@ -36,7 +38,11 @@ interface PropertyFormData extends BasePropertyFormData {
   price_period: string;
   square_meters: string;
   min_rental_months: string;
+  units?: PropertyUnit[];
 }
+
+// Multi-unit property types that should show the units step
+const MULTI_UNIT_TYPES = ['Hostel', 'Hotel', 'Lodge', 'Guest House', 'Apartment'];
 
 interface PropertyFormProps {
   isOpen: boolean;
@@ -178,7 +184,8 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
     }
   }, [currentStep, isOpen, editingProperty]);
 
-  const totalSteps = 5;
+  const totalSteps = MULTI_UNIT_TYPES.includes(formData.property_type) ? 6 : 5;
+  const isMultiUnit = MULTI_UNIT_TYPES.includes(formData.property_type);
 
   if (!isOpen) return null;
 
@@ -211,6 +218,9 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
         return formData.images && formData.images.length >= 3;
       case 5:
         return !!formData.contact_phone?.trim();
+      case 6:
+        // Units step is optional but valid if at least one unit is added for multi-unit properties
+        return isMultiUnit ? (formData.units?.length || 0) >= 1 : true;
       default:
         return false;
     }
@@ -296,7 +306,8 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
     { id: 2, title: t('dashboard.details'), icon: Building, description: 'Maelezo na aina ya nyumba' },
     { id: 3, title: 'Anwani', icon: MapPin, description: 'Anwani kamili ya nyumba' },
     { id: 4, title: t('dashboard.photos'), icon: Camera, description: 'Picha za nyumba (za lazima)' },
-    { id: 5, title: t('dashboard.contact'), icon: Phone, description: 'Maelezo ya mawasiliano' }
+    { id: 5, title: t('dashboard.contact'), icon: Phone, description: 'Maelezo ya mawasiliano' },
+    ...(isMultiUnit ? [{ id: 6, title: 'Vyumba', icon: Building, description: 'Ongeza vyumba/units' }] : [])
   ];
 
   const renderCurrentStep = () => {
@@ -363,6 +374,15 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
             isValid={isStepValid(5)}
           />
         );
+      case 6:
+        return isMultiUnit ? (
+          <Step6UnitsRooms
+            units={formData.units || []}
+            propertyType={formData.property_type}
+            onUnitsChange={(units) => onInputChange('units', units)}
+            isValid={isStepValid(6)}
+          />
+        ) : null;
       default:
         return null;
     }

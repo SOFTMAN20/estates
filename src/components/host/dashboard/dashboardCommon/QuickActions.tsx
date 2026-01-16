@@ -3,10 +3,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   Plus, 
-  BarChart3, 
   Eye,
   Headphones,
-  CalendarCheck
+  CalendarCheck,
+  Users
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -65,11 +65,11 @@ const QuickActions: React.FC<QuickActionsProps> = ({
       badge: null
     },
     {
-      id: 'view-analytics',
-      title: t('dashboard.viewAnalytics'),
-      description: t('dashboard.viewPerformance'),
-      icon: BarChart3,
-      onClick: () => navigate('/analytics'),
+      id: 'manage-rentals',
+      title: t('dashboard.manageRentals'),
+      description: t('dashboard.manageTenantsDesc'),
+      icon: Users,
+      onClick: () => navigate('/host/rental-management'),
       primary: false,
       disabled: propertiesCount === 0,
       color: 'bg-green-500 hover:bg-green-600',

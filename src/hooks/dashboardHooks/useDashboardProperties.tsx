@@ -33,7 +33,27 @@ export interface PropertyFormData {
   nearby_services: string[];
   images: string[];
   min_rental_months: string;
+  units?: PropertyUnit[];
 }
+
+// Property unit type for multi-unit properties
+export interface PropertyUnit {
+  id: string;
+  unit_name: string;
+  unit_number: string;
+  unit_type: string;
+  floor_number: number | null;
+  bedrooms: number;
+  bathrooms: number;
+  square_meters: number | null;
+  price: number;
+  price_period: string;
+  description: string;
+  amenities: string[];
+}
+
+// Multi-unit property types
+const MULTI_UNIT_TYPES = ['Hostel', 'Hotel', 'Lodge', 'Guest House', 'Apartment'];
 
 interface UseDashboardPropertiesReturn {
   properties: Property[];
@@ -92,7 +112,8 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     amenities: [],
     nearby_services: [],
     images: [],
-    min_rental_months: '1'
+    min_rental_months: '1',
+    units: []
   });
 
   /**
@@ -190,6 +211,7 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
   };
 
   const buildPropertyData = (user: User) => {
+    const isMultiUnit = MULTI_UNIT_TYPES.includes(formData.property_type);
     return {
       host_id: user.id,
       title: formData.title?.trim() || '',
@@ -206,7 +228,9 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       amenities: formData.amenities || [],
       nearby_services: formData.nearby_services || [],
       images: formData.images || [],
-      min_rental_months: formData.min_rental_months ? parseInt(formData.min_rental_months) : 1
+      min_rental_months: formData.min_rental_months ? parseInt(formData.min_rental_months) : 1,
+      is_multi_unit: isMultiUnit,
+      total_units: isMultiUnit ? (formData.units?.length || 0) : 0
     };
   };
 
@@ -256,6 +280,48 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       if (addressError) {
         console.error('Error inserting property address:', addressError);
       }
+    }
+  };
+
+  /**
+   * SAVE PROPERTY UNITS
+   * ===================
+   * Helper function to save units for multi-unit properties
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const savePropertyUnits = async (client: any, propertyId: string, units: PropertyUnit[]) => {
+    if (!units || units.length === 0) return;
+
+    // Delete existing units first (for updates)
+    await client
+      .from('property_units')
+      .delete()
+      .eq('property_id', propertyId);
+
+    // Insert new units
+    const unitsData = units.map(unit => ({
+      property_id: propertyId,
+      unit_name: unit.unit_name,
+      unit_number: unit.unit_number || null,
+      unit_type: unit.unit_type,
+      floor_number: unit.floor_number,
+      bedrooms: unit.bedrooms,
+      bathrooms: unit.bathrooms,
+      square_meters: unit.square_meters,
+      price: unit.price,
+      price_period: unit.price_period,
+      description: unit.description || null,
+      amenities: unit.amenities || [],
+      is_available: true,
+      status: 'active'
+    }));
+
+    const { error: unitsError } = await client
+      .from('property_units')
+      .insert(unitsData);
+
+    if (unitsError) {
+      console.error('Error saving property units:', unitsError);
     }
   };
 
@@ -332,6 +398,11 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       
       // Save address details
       await savePropertyAddress(authenticatedClient, propertyId, formData.full_address);
+      
+      // Save units for multi-unit properties
+      if (MULTI_UNIT_TYPES.includes(formData.property_type) && formData.units && formData.units.length > 0) {
+        await savePropertyUnits(authenticatedClient, propertyId, formData.units);
+      }
       
       // Clear saved form data
       localStorage.removeItem('nyumba_link_property_form_data');
@@ -419,6 +490,11 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       // Save address details
       await savePropertyAddress(authenticatedClient, propertyId, formData.full_address);
       
+      // Save units for multi-unit properties
+      if (MULTI_UNIT_TYPES.includes(formData.property_type) && formData.units) {
+        await savePropertyUnits(authenticatedClient, propertyId, formData.units);
+      }
+      
       // Clear saved form data
       localStorage.removeItem('nyumba_link_property_form_data');
       localStorage.removeItem('nyumba_link_property_form_step');
@@ -443,6 +519,7 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
     
     // Fetch address from property_addresses table
     let fullAddress = '';
+    let existingUnits: PropertyUnit[] = [];
     try {
       const { data: addressData } = await supabase
         .from('property_addresses')
@@ -452,6 +529,32 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       
       if (addressData) {
         fullAddress = addressData.location || '';
+      }
+      
+      // Fetch existing units for multi-unit properties
+      if (MULTI_UNIT_TYPES.includes(property.property_type || '')) {
+        const { data: unitsData } = await supabase
+          .from('property_units')
+          .select('*')
+          .eq('property_id', property.id)
+          .order('unit_name', { ascending: true });
+        
+        if (unitsData) {
+          existingUnits = unitsData.map(u => ({
+            id: u.id,
+            unit_name: u.unit_name,
+            unit_number: u.unit_number || '',
+            unit_type: u.unit_type || 'room',
+            floor_number: u.floor_number,
+            bedrooms: u.bedrooms || 1,
+            bathrooms: u.bathrooms || 1,
+            square_meters: u.square_meters,
+            price: Number(u.price) || 0,
+            price_period: u.price_period || 'per_month',
+            description: u.description || '',
+            amenities: u.amenities || []
+          }));
+        }
       }
     } catch (error) {
       console.error('Error fetching property address:', error);
@@ -474,7 +577,8 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       amenities: property.amenities || [],
       nearby_services: property.nearby_services || [],
       images: property.images || [],
-      min_rental_months: (property as Property & { min_rental_months?: number }).min_rental_months?.toString() || '1'
+      min_rental_months: (property as Property & { min_rental_months?: number }).min_rental_months?.toString() || '1',
+      units: existingUnits
     });
   };
 
@@ -586,7 +690,8 @@ export const useDashboardProperties = (): UseDashboardPropertiesReturn => {
       amenities: [],
       nearby_services: [],
       images: [],
-      min_rental_months: '1'
+      min_rental_months: '1',
+      units: []
     });
   };
 

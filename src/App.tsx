@@ -71,6 +71,18 @@ const Browse = lazy(() => import("./pages/Browse"));
 const PropertyDetail = lazy(() => import("./pages/host/PropertyDetail"));
 const Dashboard = lazy(() => import("./pages/host/Dashboard"));
 const Properties = lazy(() => import("./pages/host/Properties"));
+const RentalManagement = lazy(() => import("./pages/host/RentalManagement"));
+
+// Rental Manager Sub-pages
+const RentalTenants = lazy(() => import("./pages/host/rental/Tenants"));
+const RentalPayments = lazy(() => import("./pages/host/rental/Payments"));
+const RentalMessages = lazy(() => import("./pages/host/rental/RentalMessages"));
+const RentalMaintenance = lazy(() => import("./pages/host/rental/Maintenance"));
+const RentalApplications = lazy(() => import("./pages/host/rental/Applications"));
+const RentalUnits = lazy(() => import("./pages/host/rental/Units"));
+const RentalAlerts = lazy(() => import("./pages/host/rental/Alerts"));
+const RentalLeases = lazy(() => import("./pages/host/rental/Leases"));
+const RentalScreening = lazy(() => import("./pages/host/rental/Screening"));
 const Profile = lazy(() => import("./pages/Profile"));
 const ProfileHub = lazy(() => import("./pages/ProfileHub"));
 const Favorites = lazy(() => import("./pages/Favorites"));
@@ -187,6 +199,16 @@ const App = () => (
                 {/* User-specific routes - Njia za mtumiaji */}
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/host/properties" element={<Properties />} />
+                <Route path="/host/rental-management" element={<RentalManagement />} />
+                <Route path="/host/rental-management/tenants" element={<RentalTenants />} />
+                <Route path="/host/rental-management/payments" element={<RentalPayments />} />
+                <Route path="/host/rental-management/messages" element={<RentalMessages />} />
+                <Route path="/host/rental-management/maintenance" element={<RentalMaintenance />} />
+                <Route path="/host/rental-management/applications" element={<RentalApplications />} />
+                <Route path="/host/rental-management/units" element={<RentalUnits />} />
+                <Route path="/host/rental-management/alerts" element={<RentalAlerts />} />
+                <Route path="/host/rental-management/leases" element={<RentalLeases />} />
+                <Route path="/host/rental-management/screening" element={<RentalScreening />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/account" element={<ProfileHub />} />
                 <Route path="/favorites" element={<Favorites />} />

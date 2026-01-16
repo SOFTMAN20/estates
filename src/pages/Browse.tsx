@@ -40,16 +40,17 @@
  * - All filters work together (AND logic)
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Navigation from '@/components/layout/navbarLayout/Navigation';
 import PropertyCard from '@/components/properties/propertyCommon/PropertyCard';
+import MobilePropertySection from '@/components/properties/propertyCommon/MobilePropertySection';
 import PropertyFiltersPanel from '@/components/search/PropertyFiltersPanel';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PropertyGridSkeleton } from '@/components/properties/propertyCommon/PropertyCardSkeleton';
-import { Search, Loader2, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
+import { Search, Loader2, SlidersHorizontal, ArrowUpDown, LayoutGrid, Layers } from 'lucide-react';
 import { useProperties } from '@/hooks/useProperties';
 import { useFavorites } from '@/hooks/useFavorites';
 import { usePropertyFilters } from '@/hooks/browseHooks/usePropertyFilters';
@@ -111,6 +112,9 @@ const Browse = () => {
     viewMode: 'grid'
   });
 
+  // Mobile view mode: 'grid' for normal grid, 'grouped' for grouped by type
+  const [mobileViewMode, setMobileViewMode] = useState<'grid' | 'grouped'>('grouped');
+
   // Data fetching from Supabase
   const { data: properties = [], isLoading, error } = useProperties();
 
@@ -129,6 +133,37 @@ const Browse = () => {
 
   // Favorites functionality
   const { isFavorited, toggleFavorite } = useFavorites();
+
+  // Group properties by type for mobile view
+  const groupedProperties = useMemo(() => {
+    const groups: Record<string, typeof sortedProperties> = {};
+    
+    sortedProperties.forEach((property) => {
+      const type = property.property_type || 'Other';
+      if (!groups[type]) {
+        groups[type] = [];
+      }
+      groups[type].push(property);
+    });
+    
+    return groups;
+  }, [sortedProperties]);
+
+  // Property type icons and labels
+  const propertyTypeConfig: Record<string, { icon: string; label: string }> = {
+    'Apartment': { icon: '🏢', label: t('browse.apartment') },
+    'House': { icon: '🏡', label: t('browse.house') },
+    'Studio': { icon: '🛋️', label: t('browse.studio') },
+    'Shared Room': { icon: '🚪', label: t('browse.room') },
+    'Room': { icon: '🚪', label: t('browse.room') },
+    'Bedsitter': { icon: '🛏️', label: t('browse.bedsitter') },
+    'Villa': { icon: '🏰', label: 'Villa' },
+    'Lodge': { icon: '🏨', label: t('browse.lodge') },
+    'Hotel': { icon: '🏩', label: t('browse.hotel') },
+    'Hostel': { icon: '🏠', label: t('browse.hostel') },
+    'Office': { icon: '🏢', label: t('browse.office') },
+    'Other': { icon: '🏘️', label: 'Other' },
+  };
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -396,6 +431,34 @@ const Browse = () => {
           
           {/* Controls: Sort + Filter */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Mobile View Mode Toggle - Only on mobile */}
+            <div className="flex items-center bg-gray-100 rounded-lg p-0.5 md:hidden">
+              <button
+                onClick={() => setMobileViewMode('grouped')}
+                className={`p-1.5 rounded-md transition-colors ${
+                  mobileViewMode === 'grouped' 
+                    ? 'bg-white shadow-sm text-primary' 
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+                aria-label="Grouped view"
+                title="View by category"
+              >
+                <Layers className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setMobileViewMode('grid')}
+                className={`p-1.5 rounded-md transition-colors ${
+                  mobileViewMode === 'grid' 
+                    ? 'bg-white shadow-sm text-primary' 
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+                aria-label="Grid view"
+                title="Grid view"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </button>
+            </div>
+
             {/* Sort Dropdown */}
             <div className="flex items-center gap-2">
               <ArrowUpDown className="h-4 w-4 text-gray-500 hidden sm:block" />
@@ -583,8 +646,47 @@ const Browse = () => {
             />
           ) : displayedProperties.length > 0 ? (
             <>
-              <div className={`grid gap-3 sm:gap-4 lg:gap-5 ${uiState.viewMode === 'grid'
-                ? 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3'
+              {/* Mobile Grouped View - Horizontal Scroll by Property Type */}
+              <div className="md:hidden">
+                {mobileViewMode === 'grouped' ? (
+                  <div className="space-y-2">
+                    {Object.entries(groupedProperties).map(([type, props]) => (
+                      <MobilePropertySection
+                        key={type}
+                        title={propertyTypeConfig[type]?.label || type}
+                        icon={propertyTypeConfig[type]?.icon || '🏘️'}
+                        properties={props}
+                        isFavorited={isFavorited}
+                        onToggleFavorite={toggleFavorite}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  /* Mobile Grid View */
+                  <div className="grid grid-cols-2 gap-3">
+                    {displayedProperties.map((property) => (
+                      <PropertyCard
+                        key={property.id}
+                        id={property.id}
+                        title={property.title}
+                        price={Number(property.price)}
+                        location={property.location}
+                        images={property.images || []}
+                        bedrooms={property.bedrooms || undefined}
+                        bathrooms={property.bathrooms || undefined}
+                        squareMeters={property.square_meters || undefined}
+                        isFavorited={isFavorited(property.id)}
+                        onToggleFavorite={toggleFavorite}
+                        viewMode="grid"
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Desktop/Tablet Grid View */}
+              <div className={`hidden md:grid gap-3 sm:gap-4 lg:gap-5 ${uiState.viewMode === 'grid'
+                ? 'grid-cols-2 lg:grid-cols-3'
                 : 'grid-cols-1'
                 }`}>
                 {displayedProperties.map((property) => (
@@ -595,16 +697,9 @@ const Browse = () => {
                     price={Number(property.price)}
                     location={property.location}
                     images={property.images || []}
-                    phone={property.profiles?.phone || undefined}
-                    contactPhone={property.contact_phone || undefined}
-                    contactWhatsappPhone={property.contact_whatsapp_phone || undefined}
-                    electricity={property.amenities?.includes('electricity') || false}
-                    water={property.amenities?.includes('water') || false}
                     bedrooms={property.bedrooms || undefined}
                     bathrooms={property.bathrooms || undefined}
                     squareMeters={property.square_meters || undefined}
-                    averageRating={property.average_rating || 0}
-                    totalReviews={property.total_reviews || 0}
                     isFavorited={isFavorited(property.id)}
                     onToggleFavorite={toggleFavorite}
                     viewMode={uiState.viewMode}

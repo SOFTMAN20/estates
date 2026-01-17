@@ -189,7 +189,7 @@ export function MaintenanceDetailsModal({ open, onOpenChange, request }: Mainten
                     <span className="text-xs font-medium">Property</span>
                   </div>
                   <p className="font-medium">{request.property?.title}</p>
-                  <p className="text-sm text-gray-500">{request.property?.address}</p>
+                  <p className="text-sm text-gray-500">{request.property?.location}</p>
                 </CardContent>
               </Card>
               <Card>

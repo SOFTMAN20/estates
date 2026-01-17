@@ -144,7 +144,7 @@ export const useProfileForm = (): UseProfileFormReturn => {
       const { error } = await supabase
         .from('profiles')
         .update(updateData as never)
-        .eq('user_id', user.id);
+        .eq('id', user.id);
 
       if (error) throw error;
 

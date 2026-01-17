@@ -31,6 +31,10 @@ export function PaymentDetailsModal({ open, onOpenChange, payment }: PaymentDeta
   const daysOverdue = differenceInDays(new Date(), new Date(payment.due_date));
   const remaining = payment.amount_due - (payment.amount_paid || 0);
 
+  // Support both linked and independent tenants
+  const tenantName = payment.tenant?.user?.full_name || payment.tenant?.tenant_name || 'Unknown Tenant';
+  const tenantAvatar = payment.tenant?.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(tenantName)}&background=3b82f6&color=fff`;
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'paid':
@@ -77,12 +81,12 @@ export function PaymentDetailsModal({ open, onOpenChange, payment }: PaymentDeta
         <div className="flex items-center justify-between pb-4 border-b">
           <div className="flex items-center gap-3">
             <img
-              src={payment.tenant?.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(payment.tenant?.user?.full_name || 'T')}&background=3b82f6&color=fff`}
+              src={tenantAvatar}
               alt=""
               className="w-12 h-12 rounded-full"
             />
             <div>
-              <p className="font-semibold">{payment.tenant?.user?.full_name}</p>
+              <p className="font-semibold">{tenantName}</p>
               <div className="flex items-center gap-1 text-sm text-gray-500">
                 <Home className="h-3.5 w-3.5" />
                 {payment.tenant?.property?.title}

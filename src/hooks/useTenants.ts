@@ -35,12 +35,12 @@ export function useTenants(filters?: TenantFilters) {
     queryFn: async () => {
       if (!user?.id) return [];
 
+      // Query without the user join to avoid issues with null user_id
       let query = supabase
         .from('tenants')
         .select(`
           *,
-          user:profiles!tenants_user_id_fkey(id, full_name, email, phone, avatar_url),
-          property:properties!tenants_property_id_fkey(id, title, address, city, image_urls)
+          property:properties(id, title, location, images)
         `)
         .eq('landlord_id', user.id)
         .order('created_at', { ascending: false });
@@ -58,8 +58,21 @@ export function useTenants(filters?: TenantFilters) {
 
       const { data, error } = await query;
 
-      if (error) throw error;
-      return data as Tenant[];
+      if (error) {
+        throw error;
+      }
+      
+      // Map tenant data - create user object from tenant fields if no user_id
+      return (data || []).map(tenant => ({
+        ...tenant,
+        user: {
+          id: tenant.user_id,
+          full_name: tenant.tenant_name || null,
+          email: tenant.tenant_email || null,
+          phone: tenant.tenant_phone || null,
+          avatar_url: null,
+        }
+      })) as Tenant[];
     },
     enabled: !!user?.id,
   });
@@ -75,14 +88,24 @@ export function useTenant(tenantId: string | undefined) {
         .from('tenants')
         .select(`
           *,
-          user:profiles!tenants_user_id_fkey(id, full_name, email, phone, avatar_url),
-          property:properties!tenants_property_id_fkey(id, title, address, city, image_urls)
+          property:properties!tenants_property_id_fkey(id, title, location, images)
         `)
         .eq('id', tenantId)
         .single();
 
       if (error) throw error;
-      return data as Tenant;
+      
+      // Map tenant data - create user object from tenant fields if no user_id
+      return {
+        ...data,
+        user: {
+          id: data.user_id,
+          full_name: data.tenant_name || null,
+          email: data.tenant_email || null,
+          phone: data.tenant_phone || null,
+          avatar_url: null,
+        }
+      } as Tenant;
     },
     enabled: !!tenantId,
   });
@@ -179,13 +202,17 @@ export function useCreateTenant() {
     mutationFn: async (data: CreateTenantData) => {
       if (!user?.id) throw new Error('Not authenticated');
 
-      // Create tenant record
+      // Create tenant record - user_id is optional for independent tenants
+      // Tenants can be created without linking to profiles (using tenant_name, tenant_phone, tenant_email)
       const { data: tenant, error: tenantError } = await supabase
         .from('tenants')
         .insert({
           property_id: data.property_id,
-          user_id: data.user_id || user.id, // Use provided user_id or current user
+          user_id: data.user_id || null, // NULL for independent tenants (not linked to profiles)
           landlord_id: user.id,
+          tenant_name: data.tenant_name || null, // For independent tenants
+          tenant_phone: data.tenant_phone || null, // For independent tenants
+          tenant_email: data.tenant_email || null, // For independent tenants
           emergency_contact_name: data.emergency_contact_name,
           emergency_contact_phone: data.emergency_contact_phone,
           emergency_contact_relationship: data.emergency_contact_relationship,
@@ -379,17 +406,26 @@ export function useLandlordProperties() {
   return useQuery({
     queryKey: ['landlord-properties', user?.id],
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!user?.id) {
+        return [];
+      }
 
       const { data, error } = await supabase
         .from('properties')
-        .select('id, title, address, city, image_urls')
+        .select('id, title, location, images, price')
         .eq('host_id', user.id)
         .eq('status', 'approved')
         .order('title');
 
-      if (error) throw error;
-      return data;
+      if (error) {
+        throw error;
+      }
+      
+      // Map price to price_per_month for compatibility
+      return (data || []).map(p => ({
+        ...p,
+        price_per_month: p.price
+      }));
     },
     enabled: !!user?.id,
   });
@@ -416,8 +452,11 @@ export function useLeases(filters?: { status?: string; property_id?: string }) {
           *,
           tenant:tenants!lease_agreements_tenant_id_fkey(
             id,
-            user:profiles!tenants_user_id_fkey(id, full_name, email, phone, avatar_url),
-            property:properties!tenants_property_id_fkey(id, title, address, city, image_urls)
+            tenant_name,
+            tenant_email,
+            tenant_phone,
+            user_id,
+            property:properties!tenants_property_id_fkey(id, title, location, images)
           )
         `)
         .eq('landlord_id', user.id)
@@ -567,8 +606,11 @@ export function useLeaseAgreements(filters?: { status?: string; property_id?: st
           *,
           tenant:tenants!lease_agreements_tenant_id_fkey(
             id,
-            user:profiles!tenants_user_id_fkey(id, full_name, email, phone, avatar_url),
-            property:properties!tenants_property_id_fkey(id, title, address, city, image_urls)
+            tenant_name,
+            tenant_email,
+            tenant_phone,
+            user_id,
+            property:properties!tenants_property_id_fkey(id, title, location, images)
           )
         `)
         .eq('landlord_id', user.id)
@@ -601,8 +643,11 @@ export function useLeaseAgreement(leaseId: string | undefined) {
           *,
           tenant:tenants!lease_agreements_tenant_id_fkey(
             id,
-            user:profiles!tenants_user_id_fkey(id, full_name, email, phone, avatar_url),
-            property:properties!tenants_property_id_fkey(id, title, address, city, image_urls)
+            tenant_name,
+            tenant_email,
+            tenant_phone,
+            user_id,
+            property:properties!tenants_property_id_fkey(id, title, location, images)
           )
         `)
         .eq('id', leaseId)
@@ -786,8 +831,12 @@ export function useRentPayments(filters?: {
           *,
           tenant:tenants!rent_payments_tenant_id_fkey(
             id,
-            user:profiles!tenants_user_id_fkey(id, full_name, email, phone, avatar_url),
-            property:properties!tenants_property_id_fkey(id, title, address, city, image_urls)
+            tenant_name,
+            tenant_email,
+            tenant_phone,
+            user_id,
+            user:profiles!tenants_user_id_fkey(id, name, phone, avatar_url),
+            property:properties!tenants_property_id_fkey(id, title, location, images)
           )
         `)
         .eq('landlord_id', user.id)

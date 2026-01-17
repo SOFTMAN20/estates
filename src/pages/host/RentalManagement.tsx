@@ -195,7 +195,7 @@ const RentalManagement = () => {
     <Card className="overflow-hidden border-gray-200">
       <CardContent className="p-0">
         <div className="flex flex-col sm:flex-row">
-          <Skeleton className="sm:w-48 lg:w-56 h-40" />
+          <Skeleton className="sm:w-48 lg:w-56 h-40 sm:h-36" />
           <div className="flex-1 p-4 space-y-3">
             <Skeleton className="h-5 w-3/4" />
             <Skeleton className="h-4 w-1/2" />
@@ -281,7 +281,7 @@ const RentalManagement = () => {
                   <Card key={property.id} className="overflow-hidden border-gray-200 hover:shadow-md transition-shadow">
                     <CardContent className="p-0">
                       <div className="flex flex-col sm:flex-row">
-                        <div className="sm:w-48 lg:w-56 h-40 sm:h-auto relative flex-shrink-0">
+                        <div className="sm:w-48 lg:w-56 h-40 sm:h-36 relative flex-shrink-0">
                           <img src={property.images?.[0] || 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400'} alt={property.title} className="w-full h-full object-cover" />
                           <div className="absolute top-2 left-2">{getStatusBadge(property)}</div>
                         </div>
@@ -298,17 +298,22 @@ const RentalManagement = () => {
                                 <span className="font-medium text-gray-900">{formatCurrency(Number(property.price), { language: i18n.language })}/mo</span>
                               </div>
 
-                              {property.tenants.length > 0 ? (
-                                <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-                                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                                    <Users className="h-4 w-4 text-blue-600" />
+                              {property.tenants.length > 0 ? (() => {
+                                const firstTenant = property.tenants[0];
+                                const tenantName = firstTenant?.user?.name || 
+                                  (firstTenant as { tenant_name?: string })?.tenant_name || 'Tenant';
+                                return (
+                                  <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                      <Users className="h-4 w-4 text-blue-600" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-medium text-gray-900 truncate">{tenantName}</p>
+                                    </div>
+                                    {getPaymentStatus(property)}
                                   </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-gray-900 truncate">{property.tenants[0].user?.name || 'Tenant'}</p>
-                                  </div>
-                                  {getPaymentStatus(property)}
-                                </div>
-                              ) : (
+                                );
+                              })() : (
                                 <div className="flex items-center gap-4 text-sm text-gray-500">
                                   <span className="flex items-center gap-1"><Eye className="h-4 w-4" />No tenants</span>
                                 </div>

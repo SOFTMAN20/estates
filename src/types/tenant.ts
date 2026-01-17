@@ -13,8 +13,13 @@ export type PaymentMethod = 'mpesa' | 'bank_transfer' | 'cash' | 'card';
 export interface Tenant {
   id: string;
   property_id: string;
-  user_id: string;
+  user_id: string | null;
   landlord_id: string;
+  
+  // Tenant info (for tenants without user accounts)
+  tenant_name?: string | null;
+  tenant_phone?: string | null;
+  tenant_email?: string | null;
   
   // Emergency Contact
   emergency_contact_name: string | null;
@@ -54,9 +59,8 @@ export interface Tenant {
   property?: {
     id: string;
     title: string;
-    address: string;
-    city: string;
-    image_urls: string[];
+    location: string;
+    images: string[];
   };
 }
 
@@ -287,9 +291,8 @@ export interface MaintenanceRequest {
   property?: {
     id: string;
     title: string;
-    address: string;
-    city: string;
-    image_urls: string[];
+    location: string;
+    images: string[];
   };
 }
 

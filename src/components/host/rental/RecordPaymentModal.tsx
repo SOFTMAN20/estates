@@ -39,6 +39,9 @@ export function RecordPaymentModal({ open, onOpenChange, tenant }: RecordPayment
   const { data: payments = [] } = useTenantPayments(tenant.id);
   const recordPayment = useRecordPayment();
   
+  // Get tenant display info (supports both linked and independent tenants)
+  const tenantName = tenant.user?.full_name || tenant.tenant_name || 'Unknown Tenant';
+  
   // Get pending payments
   const pendingPayments = payments.filter(p => p.status === 'pending' || p.status === 'late' || p.status === 'partial');
   
@@ -97,7 +100,7 @@ export function RecordPaymentModal({ open, onOpenChange, tenant }: RecordPayment
         <div className="space-y-4">
           {/* Tenant Info */}
           <div className="bg-gray-50 rounded-lg p-3">
-            <p className="font-medium">{tenant.user?.full_name}</p>
+            <p className="font-medium">{tenantName}</p>
             <p className="text-sm text-gray-500">{tenant.property?.title}</p>
             <p className="text-sm text-gray-500">Monthly Rent: TZS {tenant.monthly_rent.toLocaleString()}</p>
           </div>

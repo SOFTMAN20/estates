@@ -39,6 +39,10 @@ export function LeaseDetailsModal({ open, onOpenChange, lease }: LeaseDetailsMod
   const signLease = useSignLease();
   const daysRemaining = differenceInDays(new Date(lease.end_date), new Date());
 
+  // Support both linked and independent tenants
+  const tenantName = lease.tenant?.user?.full_name || lease.tenant?.tenant_name || 'Unknown Tenant';
+  const tenantAvatar = lease.tenant?.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(tenantName)}&background=3b82f6&color=fff`;
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'draft':
@@ -74,17 +78,17 @@ export function LeaseDetailsModal({ open, onOpenChange, lease }: LeaseDetailsMod
         <div className="flex items-start justify-between pb-4 border-b">
           <div className="flex items-center gap-4">
             <img
-              src={lease.tenant?.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(lease.tenant?.user?.full_name || 'T')}&background=3b82f6&color=fff`}
-              alt={lease.tenant?.user?.full_name || 'Tenant'}
+              src={tenantAvatar}
+              alt={tenantName}
               className="w-14 h-14 rounded-full object-cover border-2 border-gray-100"
             />
             <div>
-              <h2 className="text-lg font-semibold">{lease.tenant?.user?.full_name || 'Unknown'}</h2>
+              <h2 className="text-lg font-semibold">{tenantName}</h2>
               <div className="flex items-center gap-1 text-sm text-gray-500">
                 <Home className="h-4 w-4" />
                 {lease.tenant?.property?.title}
               </div>
-              <p className="text-sm text-gray-400">{lease.tenant?.property?.address}</p>
+              <p className="text-sm text-gray-400">{lease.tenant?.property?.location}</p>
             </div>
           </div>
           <div className="text-right">
@@ -307,7 +311,7 @@ export function LeaseDetailsModal({ open, onOpenChange, lease }: LeaseDetailsMod
                     <div>
                       <p className="text-sm text-yellow-700">Pending signature</p>
                       <p className="text-xs text-gray-500 mt-1">
-                        Waiting for {lease.tenant?.user?.full_name || 'tenant'} to sign
+                        Waiting for {tenantName} to sign
                       </p>
                     </div>
                   )}

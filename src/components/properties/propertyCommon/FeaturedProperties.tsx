@@ -44,24 +44,23 @@ const FeaturedPropertyCard = ({ property, index, t }: FeaturedPropertyCardProps)
   };
 
   return (
-    <Card key={property.id} className="group overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 
-                       bg-white hover:border-primary/30 relative before:absolute before:inset-0 before:bg-gradient-to-r before:from-primary/5 before:to-serengeti-500/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 rounded-xl">
+    <Card className="group">
       <Link to={`/property/${property.id}`} className="block">
-        <div className="relative">
-          <div
-            className="relative overflow-hidden rounded-t-xl"
+        {/* Image Container */}
+        <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-100">
+          <img
+            src={property.images && property.images.length > 0
+              ? property.images[0]
+              : 'https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=500&h=400&fit=crop'
+            }
+            alt={property.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             onTouchStart={handleMobileTouch}
             onClick={handleMobileTouch}
-          >
-            <img
-              src={property.images && property.images.length > 0
-                ? property.images[0]
-                : 'https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=500&h=400&fit=crop'
-              }
-              alt={property.title}
-              className="w-full h-32 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-700"
-            />
-          </div>
+          />
+          
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
           {/* Enhanced Featured Badge */}
           <Badge className="absolute top-3 left-3 bg-gradient-to-r from-primary via-serengeti-500 to-kilimanjaro-600 text-white z-20 shadow-lg border border-white/20 backdrop-blur-sm font-bold text-xs px-3 py-1 transform group-hover:scale-105 transition-transform duration-300">

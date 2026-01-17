@@ -44,6 +44,10 @@ const WAIVE_REASONS = [
 export function WaivePaymentModal({ open, onOpenChange, payment }: WaivePaymentModalProps) {
   const waivePayment = useWaivePayment();
   
+  // Support both linked and independent tenants
+  const tenantName = payment.tenant?.user?.full_name || payment.tenant?.tenant_name || 'Unknown Tenant';
+  const tenantAvatar = payment.tenant?.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(tenantName)}&background=3b82f6&color=fff`;
+  
   const [reason, setReason] = useState<string>('');
   const [notes, setNotes] = useState('');
 
@@ -95,12 +99,12 @@ export function WaivePaymentModal({ open, onOpenChange, payment }: WaivePaymentM
         <div className="bg-gray-50 rounded-lg p-4 space-y-3">
           <div className="flex items-center gap-3">
             <img
-              src={payment.tenant?.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(payment.tenant?.user?.full_name || 'T')}&background=3b82f6&color=fff`}
+              src={tenantAvatar}
               alt=""
               className="w-10 h-10 rounded-full"
             />
             <div>
-              <p className="font-medium">{payment.tenant?.user?.full_name}</p>
+              <p className="font-medium">{tenantName}</p>
               <div className="flex items-center gap-1 text-sm text-gray-500">
                 <Home className="h-3.5 w-3.5" />
                 {payment.tenant?.property?.title}

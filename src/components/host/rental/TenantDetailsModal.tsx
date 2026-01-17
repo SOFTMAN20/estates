@@ -33,6 +33,13 @@ export function TenantDetailsModal({ open, onOpenChange, tenant }: TenantDetails
   const { data: payments = [] } = useTenantPayments(tenant.id);
   const { data: lease } = useTenantLease(tenant.id);
 
+  // Get tenant info - support both linked users and independent tenants
+  const tenantName = tenant.user?.full_name || tenant.tenant_name || 'Unknown Tenant';
+  const tenantEmail = tenant.user?.email || tenant.tenant_email;
+  const tenantPhone = tenant.user?.phone || tenant.tenant_phone;
+  const tenantAvatar = tenant.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(tenantName)}&background=3b82f6&color=fff`;
+  const isIndependent = !tenant.user_id;
+
   const getDaysRemaining = () => {
     const end = new Date(tenant.lease_end_date);
     const today = new Date();
@@ -70,47 +77,56 @@ export function TenantDetailsModal({ open, onOpenChange, tenant }: TenantDetails
         {/* Tenant Header */}
         <div className="flex items-start gap-4 pb-4 border-b">
           <img
-            src={tenant.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(tenant.user?.full_name || 'T')}&background=3b82f6&color=fff`}
-            alt={tenant.user?.full_name || 'Tenant'}
+            src={tenantAvatar}
+            alt={tenantName}
             className="w-16 h-16 rounded-full object-cover border-2 border-gray-100"
           />
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-semibold">{tenant.user?.full_name || 'Unknown'}</h2>
+              <h2 className="text-xl font-semibold">{tenantName}</h2>
               <Badge className={tenant.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}>
                 {tenant.status}
               </Badge>
+              {isIndependent && (
+                <Badge variant="outline" className="text-xs">Independent</Badge>
+              )}
             </div>
             <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
-              {tenant.user?.email && (
+              {tenantEmail && (
                 <span className="flex items-center gap-1">
                   <Mail className="h-4 w-4" />
-                  {tenant.user.email}
+                  {tenantEmail}
                 </span>
               )}
-              {tenant.user?.phone && (
+              {tenantPhone && (
                 <span className="flex items-center gap-1">
                   <Phone className="h-4 w-4" />
-                  {tenant.user.phone}
+                  {tenantPhone}
                 </span>
               )}
             </div>
             <div className="flex items-center gap-1 mt-1 text-sm text-gray-500">
               <Home className="h-4 w-4" />
-              {tenant.property?.title} - {tenant.property?.address}
+              {tenant.property?.title} - {tenant.property?.location}
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" asChild>
-              <a href={`mailto:${tenant.user?.email}`}>
-                <Mail className="h-4 w-4 mr-1" />
-                Email
-              </a>
-            </Button>
-            <Button variant="outline" size="sm">
-              <MessageSquare className="h-4 w-4 mr-1" />
-              Message
-            </Button>
+            {tenantEmail && (
+              <Button variant="outline" size="sm" asChild>
+                <a href={`mailto:${tenantEmail}`}>
+                  <Mail className="h-4 w-4 mr-1" />
+                  Email
+                </a>
+              </Button>
+            )}
+            {tenantPhone && (
+              <Button variant="outline" size="sm" asChild>
+                <a href={`tel:${tenantPhone}`}>
+                  <Phone className="h-4 w-4 mr-1" />
+                  Call
+                </a>
+              </Button>
+            )}
           </div>
         </div>
 

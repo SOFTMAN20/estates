@@ -58,7 +58,7 @@ export const useDashboardProfile = (): UseDashboardProfileReturn => {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('id', user.id)
         .single();
 
       console.log('Profile fetch result:', { data, error });
@@ -165,7 +165,7 @@ export const useDashboardProfile = (): UseDashboardProfileReturn => {
       const { error } = await supabase
         .from('profiles')
         .update(updateData)
-        .eq('user_id', user.id);
+        .eq('id', user.id);
 
       if (error) throw error;
 

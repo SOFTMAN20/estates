@@ -61,8 +61,9 @@ const Payments = () => {
   // Filter payments by search
   const filteredPayments = payments.filter(payment => {
     const searchLower = searchQuery.toLowerCase();
+    const tenantName = payment.tenant?.user?.full_name || payment.tenant?.tenant_name || '';
     return (
-      payment.tenant?.user?.full_name?.toLowerCase().includes(searchLower) ||
+      tenantName.toLowerCase().includes(searchLower) ||
       payment.tenant?.property?.title?.toLowerCase().includes(searchLower) ||
       payment.transaction_id?.toLowerCase().includes(searchLower)
     );
@@ -257,7 +258,9 @@ const Payments = () => {
               <SelectContent>
                 <SelectItem value="all">All Tenants</SelectItem>
                 {tenants.map(t => (
-                  <SelectItem key={t.id} value={t.id}>{t.user?.full_name}</SelectItem>
+                  <SelectItem key={t.id} value={t.id}>
+                    {t.user?.full_name || t.tenant_name || 'Unknown Tenant'}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -313,18 +316,21 @@ const Payments = () => {
                   {filteredPayments.map((payment) => {
                     const daysOverdue = getDaysOverdue(payment.due_date);
                     const remaining = payment.amount_due - (payment.amount_paid || 0);
+                    // Support both linked and independent tenants
+                    const tenantName = payment.tenant?.user?.full_name || payment.tenant?.tenant_name || 'Unknown Tenant';
+                    const tenantAvatar = payment.tenant?.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(tenantName)}&background=3b82f6&color=fff&size=32`;
                     
                     return (
                       <tr key={payment.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             <img
-                              src={payment.tenant?.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(payment.tenant?.user?.full_name || 'T')}&background=3b82f6&color=fff&size=32`}
+                              src={tenantAvatar}
                               alt=""
                               className="w-8 h-8 rounded-full"
                             />
                             <div>
-                              <p className="font-medium text-gray-900 text-sm">{payment.tenant?.user?.full_name}</p>
+                              <p className="font-medium text-gray-900 text-sm">{tenantName}</p>
                               <p className="text-xs text-gray-500">{payment.tenant?.property?.title}</p>
                             </div>
                           </div>

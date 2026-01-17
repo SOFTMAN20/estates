@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import RentalManagerLayout from '@/components/host/rental/RentalManagerLayout';
+import { AddTenantModal } from '@/components/host/rental/AddTenantModal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -66,10 +67,48 @@ const Units = () => {
   const [selectedProperty, setSelectedProperty] = useState('all');
   const [filter, setFilter] = useState<'all' | 'rented' | 'vacant'>('all');
   const [expandedProperties, setExpandedProperties] = useState<Set<string>>(new Set());
+  
+  // Add Tenant Modal state
+  const [addTenantModalOpen, setAddTenantModalOpen] = useState(false);
+  const [selectedUnitForTenant, setSelectedUnitForTenant] = useState<{
+    id: string;
+    name: string;
+    unitNumber?: string;
+    propertyId: string;
+    propertyTitle: string;
+    rent: number;
+    isMultiUnit: boolean;
+  } | null>(null);
 
   useEffect(() => {
     if (user) fetchUnits(user);
   }, [user, fetchUnits]);
+
+  // Auto-expand all properties when data loads
+  useEffect(() => {
+    if (units.length > 0) {
+      const propertyIds = new Set(units.map(u => u.propertyId));
+      setExpandedProperties(propertyIds);
+    }
+  }, [units]);
+
+  // Handle Add Tenant click
+  const handleAddTenant = (unit: RentalUnit) => {
+    setSelectedUnitForTenant({
+      id: unit.id,
+      name: unit.name,
+      unitNumber: unit.unitNumber,
+      propertyId: unit.propertyId,
+      propertyTitle: unit.propertyTitle,
+      rent: unit.rent,
+      isMultiUnit: unit.isMultiUnit,
+    });
+    setAddTenantModalOpen(true);
+  };
+
+  const handleTenantAdded = () => {
+    refreshUnits();
+  };
 
   // Group units by property
   const groupedProperties: PropertyGroup[] = React.useMemo(() => {
@@ -365,7 +404,14 @@ const Units = () => {
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem>View Details</DropdownMenuItem>
                                 <DropdownMenuItem>Edit Unit</DropdownMenuItem>
-                                {unit.status === 'vacant' && <DropdownMenuItem>Add Tenant</DropdownMenuItem>}
+                                {unit.status === 'vacant' && (
+                                  <DropdownMenuItem onSelect={(e) => {
+                                    e.preventDefault();
+                                    handleAddTenant(unit);
+                                  }}>
+                                    Add Tenant
+                                  </DropdownMenuItem>
+                                )}
                                 {unit.status === 'rented' && <DropdownMenuItem>Record Payment</DropdownMenuItem>}
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem className="text-red-600">Remove</DropdownMenuItem>
@@ -399,7 +445,15 @@ const Units = () => {
                           
                           {/* Add Tenant Button for Vacant */}
                           {unit.status === 'vacant' && (
-                            <Button size="sm" className="w-full mt-2 h-7 text-xs bg-blue-600 hover:bg-blue-700">
+                            <Button 
+                              size="sm" 
+                              className="w-full mt-2 h-7 text-xs bg-blue-600 hover:bg-blue-700"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                handleAddTenant(unit);
+                              }}
+                            >
                               Add Tenant
                             </Button>
                           )}
@@ -422,6 +476,14 @@ const Units = () => {
           ))}
         </div>
       )}
+
+      {/* Add Tenant Modal */}
+      <AddTenantModal
+        open={addTenantModalOpen}
+        onOpenChange={setAddTenantModalOpen}
+        unit={selectedUnitForTenant}
+        onSuccess={handleTenantAdded}
+      />
     </RentalManagerLayout>
   );
 };

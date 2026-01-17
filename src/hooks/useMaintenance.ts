@@ -36,10 +36,13 @@ export function useMaintenanceRequests(filters?: MaintenanceFilters) {
           *,
           tenant:tenants!maintenance_requests_tenant_id_fkey(
             id,
-            user:profiles!tenants_user_id_fkey(id, full_name, email, phone, avatar_url),
-            property:properties!tenants_property_id_fkey(id, title, address, city, image_urls)
+            tenant_name,
+            tenant_email,
+            tenant_phone,
+            user_id,
+            property:properties!tenants_property_id_fkey(id, title, location, images)
           ),
-          property:properties!maintenance_requests_property_id_fkey(id, title, address, city, image_urls)
+          property:properties!maintenance_requests_property_id_fkey(id, title, location, images)
         `)
         .eq('landlord_id', user.id)
         .order('created_at', { ascending: false });
@@ -81,10 +84,13 @@ export function useMaintenanceRequest(requestId: string | undefined) {
           *,
           tenant:tenants!maintenance_requests_tenant_id_fkey(
             id,
-            user:profiles!tenants_user_id_fkey(id, full_name, email, phone, avatar_url),
-            property:properties!tenants_property_id_fkey(id, title, address, city, image_urls)
+            tenant_name,
+            tenant_email,
+            tenant_phone,
+            user_id,
+            property:properties!tenants_property_id_fkey(id, title, location, images)
           ),
-          property:properties!maintenance_requests_property_id_fkey(id, title, address, city, image_urls)
+          property:properties!maintenance_requests_property_id_fkey(id, title, location, images)
         `)
         .eq('id', requestId)
         .single();

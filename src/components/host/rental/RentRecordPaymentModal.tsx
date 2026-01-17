@@ -144,40 +144,50 @@ export function RentRecordPaymentModal({ open, onOpenChange, payment, tenants }:
                   <SelectValue placeholder="Choose a tenant" />
                 </SelectTrigger>
                 <SelectContent>
-                  {tenants.map(tenant => (
-                    <SelectItem key={tenant.id} value={tenant.id}>
-                      <div className="flex items-center gap-2">
-                        <img
-                          src={tenant.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(tenant.user?.full_name || 'T')}&background=3b82f6&color=fff&size=24`}
-                          alt=""
-                          className="w-6 h-6 rounded-full"
-                        />
-                        <span>{tenant.user?.full_name}</span>
-                        <span className="text-xs text-gray-500">- {tenant.property?.title}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
+                  {tenants.map(tenant => {
+                    const tName = tenant.user?.name || tenant.tenant_name || 'Unknown Tenant';
+                    const tAvatar = tenant.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(tName)}&background=3b82f6&color=fff&size=24`;
+                    return (
+                      <SelectItem key={tenant.id} value={tenant.id}>
+                        <div className="flex items-center gap-2">
+                          <img
+                            src={tAvatar}
+                            alt=""
+                            className="w-6 h-6 rounded-full"
+                          />
+                          <span>{tName}</span>
+                          <span className="text-xs text-gray-500">- {tenant.property?.title}</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
           )}
 
           {/* Tenant Info (if pre-selected) */}
-          {(payment || selectedTenant) && (
-            <div className="bg-gray-50 rounded-lg p-3">
-              <div className="flex items-center gap-3">
-                <img
-                  src={(payment?.tenant?.user || selectedTenant?.user)?.avatar_url || `https://ui-avatars.com/api/?name=T&background=3b82f6&color=fff`}
-                  alt=""
-                  className="w-10 h-10 rounded-full"
-                />
-                <div>
-                  <p className="font-medium">{(payment?.tenant?.user || selectedTenant?.user)?.full_name}</p>
-                  <p className="text-sm text-gray-500">{(payment?.tenant?.property || selectedTenant?.property)?.title}</p>
+          {(payment || selectedTenant) && (() => {
+            const tName = (payment?.tenant?.user || selectedTenant?.user)?.name || 
+                          payment?.tenant?.tenant_name || selectedTenant?.tenant_name || 'Unknown Tenant';
+            const tAvatar = (payment?.tenant?.user || selectedTenant?.user)?.avatar_url || 
+                           `https://ui-avatars.com/api/?name=${encodeURIComponent(tName)}&background=3b82f6&color=fff`;
+            return (
+              <div className="bg-gray-50 rounded-lg p-3">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={tAvatar}
+                    alt=""
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <div>
+                    <p className="font-medium">{tName}</p>
+                    <p className="text-sm text-gray-500">{(payment?.tenant?.property || selectedTenant?.property)?.title}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Payment Month Selection */}
           {!payment && selectedTenantId && (
@@ -204,7 +214,7 @@ export function RentRecordPaymentModal({ open, onOpenChange, payment, tenants }:
                       </SelectItem>
                     ))
                   ) : (
-                    <SelectItem value="" disabled>No pending payments</SelectItem>
+                    <SelectItem value="no-payments" disabled>No pending payments</SelectItem>
                   )}
                 </SelectContent>
               </Select>

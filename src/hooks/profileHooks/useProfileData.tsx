@@ -70,10 +70,12 @@ export const useProfileData = (): UseProfileDataReturn => {
       setLoading(true);
       
       // Query profile from database
+      // Note: profiles.id = auth.users.id (same UUID)
+      // We use 'id' instead of 'user_id' for consistency with RLS policies
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('id', user.id)
         .single();
 
       console.log('Profile fetch result:', { data, error });

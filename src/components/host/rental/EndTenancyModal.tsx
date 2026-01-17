@@ -32,6 +32,9 @@ interface EndTenancyModalProps {
 export function EndTenancyModal({ open, onOpenChange, tenant }: EndTenancyModalProps) {
   const endTenancy = useEndTenancy();
   
+  // Get tenant display info (supports both linked and independent tenants)
+  const tenantName = tenant.user?.full_name || tenant.tenant_name || 'Unknown Tenant';
+  
   const [moveOutDate, setMoveOutDate] = useState<Date>(new Date());
   const [conditionNotes, setConditionNotes] = useState('');
   const [depositReturn, setDepositReturn] = useState<number>(tenant.security_deposit);
@@ -62,7 +65,7 @@ export function EndTenancyModal({ open, onOpenChange, tenant }: EndTenancyModalP
             End Tenancy
           </DialogTitle>
           <DialogDescription>
-            This will end the tenancy for {tenant.user?.full_name} at {tenant.property?.title}.
+            This will end the tenancy for {tenantName} at {tenant.property?.title}.
             This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
@@ -70,7 +73,7 @@ export function EndTenancyModal({ open, onOpenChange, tenant }: EndTenancyModalP
         <div className="space-y-4">
           {/* Tenant Info */}
           <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-            <p className="font-medium text-red-900">{tenant.user?.full_name}</p>
+            <p className="font-medium text-red-900">{tenantName}</p>
             <p className="text-sm text-red-700">{tenant.property?.title}</p>
             <p className="text-sm text-red-700">
               Lease: {format(new Date(tenant.lease_start_date), 'MMM d, yyyy')} - {format(new Date(tenant.lease_end_date), 'MMM d, yyyy')}

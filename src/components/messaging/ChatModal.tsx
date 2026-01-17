@@ -250,7 +250,7 @@ export function ChatModal({
                             <p
                               className={cn(
                                 'text-xs mt-1',
-                                isOwn ? 'text-blue-100' : 'text-gray-400'
+                                isOwn ? 'text-white opacity-80' : 'text-gray-400'
                               )}
                             >
                               {formatMessageDate(message.created_at)}

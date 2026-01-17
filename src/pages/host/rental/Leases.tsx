@@ -57,8 +57,9 @@ const Leases = () => {
   // Filter leases by search
   const filteredLeases = leases.filter(lease => {
     const searchLower = searchQuery.toLowerCase();
+    const tenantName = lease.tenant?.user?.full_name || lease.tenant?.tenant_name || '';
     return (
-      lease.tenant?.user?.full_name?.toLowerCase().includes(searchLower) ||
+      tenantName.toLowerCase().includes(searchLower) ||
       lease.tenant?.property?.title?.toLowerCase().includes(searchLower)
     );
   });
@@ -237,6 +238,9 @@ const Leases = () => {
         <div className="space-y-3">
           {filteredLeases.map((lease) => {
             const daysRemaining = differenceInDays(new Date(lease.end_date), new Date());
+            // Support both linked and independent tenants
+            const tenantName = lease.tenant?.user?.full_name || lease.tenant?.tenant_name || 'Unknown Tenant';
+            const tenantAvatar = lease.tenant?.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(tenantName)}&background=3b82f6&color=fff`;
             
             return (
               <Card key={lease.id} className="border-gray-200 hover:shadow-md transition-shadow">
@@ -246,8 +250,8 @@ const Leases = () => {
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className="relative">
                         <img
-                          src={lease.tenant?.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(lease.tenant?.user?.full_name || 'T')}&background=3b82f6&color=fff`}
-                          alt={lease.tenant?.user?.full_name || 'Tenant'}
+                          src={tenantAvatar}
+                          alt={tenantName}
                           className="w-12 h-12 rounded-full object-cover border-2 border-gray-100"
                         />
                         <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
@@ -257,9 +261,12 @@ const Leases = () => {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="font-semibold text-gray-900 truncate">
-                            {lease.tenant?.user?.full_name || 'Unknown Tenant'}
+                            {tenantName}
                           </h3>
                           {getAgreementTypeBadge(lease.agreement_type)}
+                          {!lease.tenant?.user_id && (
+                            <Badge variant="outline" className="text-xs">Independent</Badge>
+                          )}
                         </div>
                         <div className="flex items-center gap-1 text-sm text-gray-500">
                           <Home className="h-3.5 w-3.5" />
@@ -378,7 +385,6 @@ const Leases = () => {
       <CreateLeaseModal 
         open={showCreateModal} 
         onOpenChange={setShowCreateModal}
-        properties={properties}
       />
       
       {selectedLease && (

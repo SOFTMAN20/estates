@@ -337,7 +337,7 @@ export function useMessaging(conversationId?: string) {
     conversationsLoading,
     messagesLoading,
     getOrCreateConversation,
-    sendMessage: sendMessageMutation.mutate,
+    sendMessage: sendMessageMutation.mutateAsync,
     markAsRead: markAsReadMutation.mutate,
     archiveConversation: archiveConversationMutation.mutate,
     isSending: sendMessageMutation.isPending,

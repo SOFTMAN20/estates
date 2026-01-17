@@ -31,7 +31,6 @@ import { useCreateLeaseAgreement, useTenants } from '@/hooks/useTenants';
 interface CreateLeaseModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  properties: Array<{ id: string; title: string; address: string; city: string }>;
 }
 
 const steps = [
@@ -50,7 +49,21 @@ const UTILITIES = [
   { id: 'security', label: 'Security' },
 ];
 
-export function CreateLeaseModal({ open, onOpenChange, properties }: CreateLeaseModalProps) {
+// Helper to get tenant display info (supports both linked and independent tenants)
+function getTenantDisplayInfo(tenant: { 
+  user_id?: string | null;
+  user?: { full_name?: string | null; email?: string | null; avatar_url?: string | null } | null;
+  tenant_name?: string | null;
+  tenant_email?: string | null;
+}) {
+  const name = tenant.user?.full_name || tenant.tenant_name || 'Unknown Tenant';
+  const email = tenant.user?.email || tenant.tenant_email;
+  const avatar = tenant.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=3b82f6&color=fff`;
+  const isIndependent = !tenant.user_id;
+  return { name, email, avatar, isIndependent };
+}
+
+export function CreateLeaseModal({ open, onOpenChange }: CreateLeaseModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const createLease = useCreateLeaseAgreement();
   const { data: tenants = [] } = useTenants({ status: 'active' });
@@ -204,21 +217,27 @@ export function CreateLeaseModal({ open, onOpenChange, properties }: CreateLease
                     <SelectValue placeholder="Choose a tenant" />
                   </SelectTrigger>
                   <SelectContent>
-                    {tenants.map(tenant => (
-                      <SelectItem key={tenant.id} value={tenant.id}>
-                        <div className="flex items-center gap-2">
-                          <img
-                            src={tenant.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(tenant.user?.full_name || 'T')}&background=3b82f6&color=fff&size=24`}
-                            alt=""
-                            className="w-6 h-6 rounded-full"
-                          />
-                          <div>
-                            <p className="font-medium">{tenant.user?.full_name}</p>
-                            <p className="text-xs text-gray-500">{tenant.property?.title}</p>
+                    {tenants.map(tenant => {
+                      const { name, avatar, isIndependent } = getTenantDisplayInfo(tenant);
+                      return (
+                        <SelectItem key={tenant.id} value={tenant.id}>
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={avatar}
+                              alt=""
+                              className="w-6 h-6 rounded-full"
+                            />
+                            <div>
+                              <p className="font-medium">
+                                {name}
+                                {isIndependent && <span className="text-xs text-gray-400 ml-1">(Independent)</span>}
+                              </p>
+                              <p className="text-xs text-gray-500">{tenant.property?.title}</p>
+                            </div>
                           </div>
-                        </div>
-                      </SelectItem>
-                    ))}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
                 {tenants.length === 0 && (
@@ -242,23 +261,29 @@ export function CreateLeaseModal({ open, onOpenChange, properties }: CreateLease
                 </Select>
               </div>
 
-              {selectedTenant && (
-                <div className="bg-blue-50 rounded-lg p-4 mt-4">
-                  <h4 className="font-medium text-blue-900 mb-2">Selected Tenant</h4>
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={selectedTenant.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedTenant.user?.full_name || 'T')}&background=3b82f6&color=fff`}
-                      alt=""
-                      className="w-12 h-12 rounded-full"
-                    />
-                    <div>
-                      <p className="font-medium">{selectedTenant.user?.full_name}</p>
-                      <p className="text-sm text-gray-600">{selectedTenant.property?.title}</p>
-                      <p className="text-sm text-gray-500">{selectedTenant.user?.email}</p>
+              {selectedTenant && (() => {
+                const { name, email, avatar, isIndependent } = getTenantDisplayInfo(selectedTenant);
+                return (
+                  <div className="bg-blue-50 rounded-lg p-4 mt-4">
+                    <h4 className="font-medium text-blue-900 mb-2">Selected Tenant</h4>
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={avatar}
+                        alt=""
+                        className="w-12 h-12 rounded-full"
+                      />
+                      <div>
+                        <p className="font-medium">
+                          {name}
+                          {isIndependent && <span className="text-xs text-gray-400 ml-1">(Independent)</span>}
+                        </p>
+                        <p className="text-sm text-gray-600">{selectedTenant.property?.title}</p>
+                        {email && <p className="text-sm text-gray-500">{email}</p>}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
           )}
 
@@ -439,19 +464,25 @@ export function CreateLeaseModal({ open, onOpenChange, properties }: CreateLease
                 <h4 className="font-medium text-gray-900 mb-3">Lease Summary</h4>
                 
                 {/* Tenant Info */}
-                {selectedTenant && (
-                  <div className="flex items-center gap-3 pb-3 border-b mb-3">
-                    <img
-                      src={selectedTenant.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedTenant.user?.full_name || 'T')}&background=3b82f6&color=fff`}
-                      alt=""
-                      className="w-10 h-10 rounded-full"
-                    />
-                    <div>
-                      <p className="font-medium">{selectedTenant.user?.full_name}</p>
-                      <p className="text-sm text-gray-500">{selectedTenant.property?.title}</p>
+                {selectedTenant && (() => {
+                  const { name, avatar, isIndependent } = getTenantDisplayInfo(selectedTenant);
+                  return (
+                    <div className="flex items-center gap-3 pb-3 border-b mb-3">
+                      <img
+                        src={avatar}
+                        alt=""
+                        className="w-10 h-10 rounded-full"
+                      />
+                      <div>
+                        <p className="font-medium">
+                          {name}
+                          {isIndependent && <span className="text-xs text-gray-400 ml-1">(Independent)</span>}
+                        </p>
+                        <p className="text-sm text-gray-500">{selectedTenant.property?.title}</p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>

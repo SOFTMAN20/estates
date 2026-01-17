@@ -12,13 +12,40 @@ import type { Tables } from '@/lib/integrations/supabase/types';
 import type { User } from '@supabase/supabase-js';
 
 type Property = Tables<'properties'>;
-type Tenant = Tables<'tenants'>;
 type RentPayment = Tables<'rent_payments'>;
 type Profile = Tables<'profiles'>;
 
+// Local tenant type since it may not be in generated types
+interface TenantRow {
+  id: string;
+  property_id: string;
+  user_id: string | null;
+  landlord_id: string;
+  tenant_name: string | null;
+  tenant_phone: string | null;
+  tenant_email: string | null;
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
+  emergency_contact_relationship: string | null;
+  lease_start_date: string;
+  lease_end_date: string;
+  monthly_rent: number;
+  security_deposit: number;
+  status: string;
+  is_late_on_rent: boolean;
+  move_in_date: string | null;
+  move_out_date: string | null;
+  move_in_condition_notes: string | null;
+  move_out_condition_notes: string | null;
+  move_in_photos: string[];
+  move_out_photos: string[];
+  created_at: string;
+  updated_at: string;
+}
+
 // Extended property type with tenant and payment info
 export interface RentalProperty extends Property {
-  tenants: (Tenant & {
+  tenants: (TenantRow & {
     user: Profile | null;
     latestPayment: RentPayment | null;
   })[];

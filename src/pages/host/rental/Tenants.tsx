@@ -60,7 +60,7 @@ const Tenants = () => {
   
   const { data: tenants = [], isLoading } = useTenants(filters);
   const { data: stats } = useTenantStats();
-  const { data: properties = [] } = useLandlordProperties();
+  const { data: properties = [], isLoading: propertiesLoading } = useLandlordProperties();
 
   // Filter tenants by search
   const filteredTenants = tenants.filter(tenant => {
@@ -280,6 +280,11 @@ const Tenants = () => {
         <div className="space-y-3">
           {filteredTenants.map((tenant) => {
             const daysRemaining = getDaysRemaining(tenant.lease_end_date);
+            // Get tenant display name - use tenant_name for independent tenants
+            const tenantName = tenant.user?.full_name || tenant.tenant_name || 'Unknown Tenant';
+            const tenantEmail = tenant.user?.email || tenant.tenant_email;
+            const tenantPhone = tenant.user?.phone || tenant.tenant_phone;
+            const tenantAvatar = tenant.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(tenantName)}&background=3b82f6&color=fff`;
             
             return (
               <Card key={tenant.id} className="border-gray-200 hover:shadow-md transition-shadow">
@@ -288,23 +293,26 @@ const Tenants = () => {
                     {/* Avatar & Info */}
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <img
-                        src={tenant.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(tenant.user?.full_name || 'T')}&background=3b82f6&color=fff`}
-                        alt={tenant.user?.full_name || 'Tenant'}
+                        src={tenantAvatar}
+                        alt={tenantName}
                         className="w-12 h-12 rounded-full object-cover border-2 border-gray-100"
                       />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-gray-900 truncate">
-                            {tenant.user?.full_name || 'Unknown Tenant'}
+                            {tenantName}
                           </h3>
                           {getStatusBadge(tenant.status)}
+                          {!tenant.user_id && (
+                            <Badge variant="outline" className="text-xs">Independent</Badge>
+                          )}
                         </div>
                         <div className="flex items-center gap-1 text-sm text-gray-500">
                           <Home className="h-3.5 w-3.5" />
                           <span className="truncate">{tenant.property?.title || 'Unknown Property'}</span>
                         </div>
-                        {tenant.user?.email && (
-                          <p className="text-xs text-gray-400 truncate">{tenant.user.email}</p>
+                        {tenantEmail && (
+                          <p className="text-xs text-gray-400 truncate">{tenantEmail}</p>
                         )}
                       </div>
                     </div>
@@ -329,16 +337,16 @@ const Tenants = () => {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2">
-                      {tenant.user?.phone && (
+                      {tenantPhone && (
                         <Button variant="outline" size="sm" asChild>
-                          <a href={`tel:${tenant.user.phone}`}>
+                          <a href={`tel:${tenantPhone}`}>
                             <Phone className="h-3.5 w-3.5" />
                           </a>
                         </Button>
                       )}
-                      {tenant.user?.email && (
+                      {tenantEmail && (
                         <Button variant="outline" size="sm" asChild>
-                          <a href={`mailto:${tenant.user.email}`}>
+                          <a href={`mailto:${tenantEmail}`}>
                             <Mail className="h-3.5 w-3.5" />
                           </a>
                         </Button>
